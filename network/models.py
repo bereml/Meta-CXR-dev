@@ -72,6 +72,15 @@ def convnext_tiny(weights, features_only):
     return model
 
 
+@BACKBONES.register('eva02-tiny')
+def eva02_tiny(weights, features_only):
+    model = _create('eva02-tiny',
+                    'eva02_tiny_patch14_336.mim_in22k_ft_in1k',
+                    weights, features_only)
+    model.out_features = 192
+    return model
+
+
 @BACKBONES.register('mobilenetv3-small-075')
 def mobilenetv3_small_075(weights, features_only):
     model = _create('mobilenetv3-small-075', 'mobilenetv3_small_075',
@@ -118,6 +127,7 @@ def mobilevitv2_200(weights, features_only):
 __all__ = [
     'densenet121', 'densenet161',
     'convnext_tiny', 'convnext_atto',
+    'eva02_tiny',
     'mobilenetv3_small_075', 'mobilenetv3_large_100',
     'mobilevitv2_050', 'mobilevitv2_100', 'mobilevitv2_200',
 ]
