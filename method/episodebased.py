@@ -22,14 +22,11 @@ class EpisodeBased(FewShotMethod):
         )
         self.save_hparams(hparams, self.net)
         self.automatic_optimization = False
-        # self.adapt_episode_inner = {
-        #     16: self.adapt_episode_inner16,
-        #     32: self.adapt_episode_inner32,
-        # }[self.hparams.precision]
         self.float_type = {
             16: torch.bfloat16,
             32: torch.float32,
         }[self.hparams.precision]
+
 
     def _mset_hparams(self, mset):
         return SimpleNamespace(**{
@@ -53,30 +50,8 @@ class EpisodeBased(FewShotMethod):
         super().on_train_start()
         self.mtst_hparams = self._mset_hparams('mtst')
 
-    # def adapt_episode_inner16(self, x, y_true, net, opt, steps, batch_size):
-    #     scaler = torch.cuda.amp.GradScaler()
-    #     for _ in range(steps):
-    #         idx = torch.randperm(len(y_true))[:batch_size]
-    #         x_batch, y_true_batch = x[idx], y_true[idx]
-    #         with torch.autocast(self.device.type, torch.bfloat16):
-    #             y_lgts_batch = net(x_batch)
-    #             loss = self.loss_fn(y_lgts_batch, y_true_batch)
-    #         opt.zero_grad()
-    #         scaler.scale(loss).backward()
-    #         scaler.step(opt)
-    #         scaler.update()
 
-    # def adapt_episode_inner32(self, x, y_true, net, opt, steps, batch_size):
-    #     for _ in range(steps):
-    #         idx = torch.randperm(len(y_true))[:batch_size]
-    #         x_batch, y_true_batch = x[idx], y_true[idx]
-    #         y_lgts_batch = net(x_batch)
-    #         loss = self.loss_fn(y_lgts_batch, y_true_batch)
-    #         opt.zero_grad()
-    #         loss.backward()
-    #         opt.step()
-
-    def adapt_episode_inner(self, x, y_true, net, opt, steps, batch_size):
+    def adapt_inner(self, x, y_true, net, opt, steps, batch_size):
         scaler = torch.cuda.amp.GradScaler()
         for _ in range(steps):
             idx = torch.randperm(len(y_true))[:batch_size]
@@ -85,9 +60,8 @@ class EpisodeBased(FewShotMethod):
                 y_lgts_batch = net(x_batch)
                 loss = self.loss_fn(y_lgts_batch, y_true_batch)
             opt.zero_grad()
-            # TODO: check which one is better
             loss = scaler.scale(loss)
-            # self.manual_backward(loss)
+            # same results loss.backward() or self.manual_backward(loss)
             loss.backward()
             scaler.step(opt)
             scaler.update()
@@ -96,7 +70,7 @@ class EpisodeBased(FewShotMethod):
         # prepare data & model
         x_trn, y_true_trn, x_tst, y_true_tst = self.split(episode)
         n_examples, n_classes = y_true_trn.shape
-        # new backbone for mval/mtst
+        # HORROR
         net = self.net if mtrn else deepcopy(self.net)
         net.new_head('fc', n_classes)
         # adapt full net
@@ -104,16 +78,18 @@ class EpisodeBased(FewShotMethod):
         net.unfreeze_and_train_backbone()
         net.unfreeze_and_train_head()
         opt = optim.AdamW(net.parameters(), lr=hparams.net_lr)
-        self.adapt_episode_inner(
+        self.adapt_inner(
             x_trn, y_true_trn, net, opt,
-            hparams.net_steps, batch_size)
+            hparams.net_steps, batch_size
+        )
         # adapt head only
         batch_size = int(n_examples * hparams.head_batch_pct)
         net.freeze_and_eval_backbone()
         opt = optim.AdamW(net.head.parameters(), lr=hparams.head_lr)
-        self.adapt_episode_inner(
+        self.adapt_inner(
             x_trn, y_true_trn, net, opt,
-            hparams.head_steps, batch_size)
+            hparams.head_steps, batch_size
+        )
         # evaluation
         net.eval()
         with torch.no_grad():
