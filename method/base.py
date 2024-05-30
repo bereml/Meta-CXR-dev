@@ -70,7 +70,6 @@ class FewShotMethod(pl.LightningModule):
         self.loss_fn = self.build_loss()
         self.episodes_metrics = []
 
-
     def convert_hparams(self, hparams):
         if isinstance(hparams, dict):
             return Namespace(**hparams)

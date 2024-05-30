@@ -22,9 +22,13 @@ class EpisodeBased(FewShotMethod):
         )
         self.save_hparams(hparams, self.net)
         self.automatic_optimization = False
-        self.adapt_episode_inner = {
-            16: self.adapt_episode_inner16,
-            32: self.adapt_episode_inner32,
+        # self.adapt_episode_inner = {
+        #     16: self.adapt_episode_inner16,
+        #     32: self.adapt_episode_inner32,
+        # }[self.hparams.precision]
+        self.float_type = {
+            16: torch.bfloat16,
+            32: torch.float32,
         }[self.hparams.precision]
 
     def _mset_hparams(self, mset):
@@ -49,34 +53,50 @@ class EpisodeBased(FewShotMethod):
         super().on_train_start()
         self.mtst_hparams = self._mset_hparams('mtst')
 
-    def adapt_episode_inner16(self, x, y_true, net, opt, steps, batch_size):
+    # def adapt_episode_inner16(self, x, y_true, net, opt, steps, batch_size):
+    #     scaler = torch.cuda.amp.GradScaler()
+    #     for _ in range(steps):
+    #         idx = torch.randperm(len(y_true))[:batch_size]
+    #         x_batch, y_true_batch = x[idx], y_true[idx]
+    #         with torch.autocast(self.device.type, torch.bfloat16):
+    #             y_lgts_batch = net(x_batch)
+    #             loss = self.loss_fn(y_lgts_batch, y_true_batch)
+    #         opt.zero_grad()
+    #         scaler.scale(loss).backward()
+    #         scaler.step(opt)
+    #         scaler.update()
+
+    # def adapt_episode_inner32(self, x, y_true, net, opt, steps, batch_size):
+    #     for _ in range(steps):
+    #         idx = torch.randperm(len(y_true))[:batch_size]
+    #         x_batch, y_true_batch = x[idx], y_true[idx]
+    #         y_lgts_batch = net(x_batch)
+    #         loss = self.loss_fn(y_lgts_batch, y_true_batch)
+    #         opt.zero_grad()
+    #         loss.backward()
+    #         opt.step()
+
+    def adapt_episode_inner(self, x, y_true, net, opt, steps, batch_size):
         scaler = torch.cuda.amp.GradScaler()
         for _ in range(steps):
             idx = torch.randperm(len(y_true))[:batch_size]
             x_batch, y_true_batch = x[idx], y_true[idx]
-            with torch.autocast(self.device.type, torch.bfloat16):
+            with torch.autocast(self.device.type, self.float_type):
                 y_lgts_batch = net(x_batch)
                 loss = self.loss_fn(y_lgts_batch, y_true_batch)
             opt.zero_grad()
-            scaler.scale(loss).backward()
+            # TODO: check which one is better
+            loss = scaler.scale(loss)
+            # self.manual_backward(loss)
+            loss.backward()
             scaler.step(opt)
             scaler.update()
-
-    def adapt_episode_inner32(self, x, y_true, net, opt, steps, batch_size):
-        for _ in range(steps):
-            idx = torch.randperm(len(y_true))[:batch_size]
-            x_batch, y_true_batch = x[idx], y_true[idx]
-            y_lgts_batch = net(x_batch)
-            loss = self.loss_fn(y_lgts_batch, y_true_batch)
-            opt.zero_grad()
-            loss.backward()
-            opt.step()
 
     def adapt_episode(self, episode, hparams, mtrn):
         # prepare data & model
         x_trn, y_true_trn, x_tst, y_true_tst = self.split(episode)
         n_examples, n_classes = y_true_trn.shape
-        # HORROR
+        # new backbone for mval/mtst
         net = self.net if mtrn else deepcopy(self.net)
         net.new_head('fc', n_classes)
         # adapt full net

@@ -1,33 +1,21 @@
 # Paper 🩻 🐺 🤟🏽 😿
 
-## Today
-* Setup repo
-* Replicate repo on baymax
-* Finish results document
-* Run Subpopulation Shift exp
-
-
-## TODO
-* Run experiments
-* Check another arch
-* Verify reproducibility
-* Develop nb for plot results
-* Explore another method
-* Develop Foundation exp
-* Implement snakemake pipeline
-* Write README
-
 
 --------------------------------------------------
 ## Method
 
-| Backbone     | Unseen     | Seen       | Combined   | Unseen     | Seen       | Combined   |
+* MetaChest pretraining is a batch-based pretraning (BatchBased have it by design)
+
+| Pretraining  |            |            |            |  MetaChest |  MetaChest | MetaChest  |
 | ------------ | ---------: | ---------: | ---------: | ---------: | ---------: | ---------: |
-|              |       None |       None |       None |  MetaChest |  MetaChest | MetaChest  |
-| BatchBased   | 89.52±0.21 | 93.40±0.13 | 92.00±0.14 | 89.52±0.21 | 93.40±0.13 | 92.00±0.14 |
-| ProtoNet     | 74.35±0.33 | 86.30±0.24 | 82.69±0.24 | 78.11±0.33 | 90.67±0.20 | 87.13±0.22 |
-| FEAT         | 72.19±0.36 | 79.73±0.24 | 77.45±0.23 | 72.34±0.40 | 82.45±0.25 | 79.46±0.25 |
-| EpisodeBased | 60.65±0.28 | 62.96±0.20 | 62.44±0.18 | 74.21±0.29 | 81.22±0.19 | 78.96±0.18 |
+|              | Unseen     | Seen       | Combined   | Unseen     | Seen       | Combined   |
+| *STL*        |            |            |            |            |            |            |
+| BatchBased   |  |  |  |  |  |  |
+| EpisodeBased |  |  |  |  |  |  |
+| *MTL*        |            |            |            |            |            |            |
+| ProtoNet     |  |  |  |  |  |  |
+| FEAT         |  |  |  |  |  |  |
+
 
 
 Observations
@@ -156,3 +144,34 @@ Observations
 
 Observations
 * La Beye es un 🐶
+
+
+
+
+--------------------------------------------------
+--------------------------------------------------
+--------------------------------------------------
+
+## TODO
+* Run experiments
+* Check another arch
+* Verify reproducibility
+* Develop nb for plot results
+* Explore another method
+* Develop Foundation exp
+* Implement snakemake pipeline
+* Write README
+
+### Today
+* Read EpisodeBased
+* Check manual_backward on EpisodeBased
+* Setup EpisodeBased exp
+* Run EpisodeBased to check reproducibility
+* Read ProtoNet
+* Check another arch
+
+### 29/05
+* Setup repo 🤟🏽
+* Replicate repo on baymax 🤟🏽
+* Run Subpopulation Shift exp 🤟🏽
+* Finish results document 🤟🏽
