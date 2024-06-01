@@ -69,7 +69,55 @@ def paper_subpop(
         aggregate_exp_df(join(results_dir, exp))
 
 
-
+def paper_subds(
+        mval_episodes=100,
+        mtst_episodes=10000,
+        backbone='mobilenetv3-large-100',
+        weights='i1k',
+        max_epochs=150,
+        stop_patience=10,
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    batchbased_train_batches = 0
+    if debug:
+        batchbased_train_batches = 2
+        mval_episodes = 2
+        mtst_episodes = 2
+        max_epochs = 2
+        results_dir = 'rdev'
+    exp = 'subds'
+    cfgs = list(product(
+        # data_distro
+        [
+            'ds_chestxray14',
+            'ds_chexpert',
+            'ds_mimic',
+            'ds_padchest',
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (data_distro, seed) = cfg
+        run = '_'.join([
+            data_distro,
+        ])
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            data_distro=data_distro,
+            net_backbone=backbone,
+            net_weights=weights,
+            method='batchbased',
+            batchbased_train_batches=batchbased_train_batches,
+            mval_episodes=mval_episodes,
+            mtst_episodes=mtst_episodes,
+            max_epochs=max_epochs,
+            stop_patience=stop_patience,
+            seed=seed,
+        )
+        aggregate_exp_df(join(results_dir, exp))
 
 
 
