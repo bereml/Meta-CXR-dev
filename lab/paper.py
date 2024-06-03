@@ -43,6 +43,7 @@ def paper_subpop(
             'sex_male',
             'view_ap',
             'view_pa',
+            'complete',
         ],
         seeds,
     ))
@@ -94,6 +95,7 @@ def paper_subds(
             'ds_chexpert',
             'ds_mimic',
             'ds_padchest',
+            'complete',
         ],
         seeds,
     ))
