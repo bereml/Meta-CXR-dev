@@ -22,7 +22,6 @@ def paper_subpop(
         backbone='mobilenetv3-large-100',
         weights='i1k',
         max_epochs=150,
-        stop_patience=10,
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         debug=False):
@@ -76,7 +75,6 @@ def paper_subds(
         backbone='mobilenetv3-large-100',
         weights='i1k',
         max_epochs=150,
-        stop_patience=10,
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         debug=False):
