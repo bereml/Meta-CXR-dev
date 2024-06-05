@@ -23,11 +23,11 @@ class BatchBased(FewShotMethod):
         )
         self.save_hparams(hparams, self.net)
         self.automatic_optimization = False
-        self.precision16 = self.hparams.precision == 16
-        self.train_batch, self.adapt_episode_inner = {
-            16: (self.train_batch16, self.adapt_episode_inner16),
-            32: (self.train_batch32, self.adapt_episode_inner32),
+        self.float_type = {
+            16: torch.bfloat16,
+            32: torch.float32,
         }[self.hparams.precision]
+
 
     def configure_optimizers(self):
         opt = optim.AdamW(
@@ -38,12 +38,11 @@ class BatchBased(FewShotMethod):
 
     def on_train_start(self):
         super().on_train_start()
-        if self.precision16:
-            self.scaler = torch.cuda.amp.GradScaler()
+        self.scaler = torch.cuda.amp.GradScaler()
 
-    def train_batch16(self, batch):
+    def train_batch(self, batch):
         x, y_true = batch['x'], batch['y']
-        with torch.autocast(self.device.type, torch.bfloat16):
+        with torch.autocast(self.device.type, self.float_type):
             y_lgts = self.net(x)
             loss = self.loss_fn(y_lgts, y_true)
         opt = self.optimizers()
@@ -56,17 +55,6 @@ class BatchBased(FewShotMethod):
             y_prob = torch.sigmoid(y_lgts)
         return y_true, y_prob, loss
 
-    def train_batch32(self, batch):
-        x, y_true = batch['x'], batch['y']
-        y_lgts = self.net(x)
-        loss = self.loss_fn(y_lgts, y_true)
-        opt = self.optimizers()
-        opt.zero_grad()
-        self.manual_backward(loss)
-        opt.step()
-        with torch.no_grad():
-            y_prob = torch.sigmoid(y_lgts)
-        return y_true, y_prob, loss
 
     def training_step(self, batch, _):
         if self.net.head_classes == 0:
@@ -78,12 +66,13 @@ class BatchBased(FewShotMethod):
         self.compute_metrics_and_log('mtrn', y_true, y_prob,
                                      batch['unseen'], batch['seen'], loss)
 
-    def adapt_episode_inner16(self, x, y_true, net, opt, steps, batch_size):
+
+    def adapt_episode_inner(self, x, y_true, net, opt, steps, batch_size):
         scaler = torch.cuda.amp.GradScaler()
         for _ in range(steps):
             idx = torch.randperm(len(y_true))[:batch_size]
             x_batch, y_true_batch = x[idx], y_true[idx]
-            with torch.autocast(self.device.type, torch.bfloat16):
+            with torch.autocast(self.device.type, self.float_type):
                 y_lgts_batch = net(x_batch)
                 loss = self.loss_fn(y_lgts_batch, y_true_batch)
             opt.zero_grad()
@@ -91,15 +80,6 @@ class BatchBased(FewShotMethod):
             scaler.step(opt)
             scaler.update()
 
-    def adapt_episode_inner32(self, x, y_true, net, opt, steps, batch_size):
-        for _ in range(steps):
-            idx = torch.randperm(len(y_true))[:batch_size]
-            x_batch, y_true_batch = x[idx], y_true[idx]
-            y_lgts_batch = net(x_batch)
-            loss = self.loss_fn(y_lgts_batch, y_true_batch)
-            opt.zero_grad()
-            loss.backward()
-            opt.step()
 
     def adapt_episode(self, episode):
         # prepare data & net
