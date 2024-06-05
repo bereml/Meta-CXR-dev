@@ -70,7 +70,7 @@ def compute_similarity(p, z):
     # compute distance
     # [b, n] <- [b, n, d], [b, n, d]
     dist = torch.sqrt(torch.pow(p - z, 2).sum(dim=2))
-    # comvert to similarity
+    # convert to similarity
     # [b, n]
     sim = -(dist - dist.mean())
 
@@ -110,17 +110,17 @@ class ProtoNet(FewShotMethod):
         z = self.net(x)
 
         # split episode in trn/tst
-        # [btrt, d], [btrt, n]
+        # [b_trn, d], [b_trn, n]
         z_trn, y_true_trn = z[:n_trn], y_true[:n_trn]
-        # [btst, d], [btst, n]
+        # [b_tst, d], [b_tst, n]
         z_tst, y_true_tst = z[n_trn:], y_true[n_trn:]
 
         # compute prototypes
-        # [n, d] <- [btrt, d], [btrt, n]
+        # [n, d] <- [b_trn, d], [b_trn, n]
         p = compute_protos(z_trn, y_true_trn)
 
         # compute logits
-        # [btst, n] <- [n, d], [btst, d]
+        # [b_tst, n] <- [n, d], [b_tst, d]
         y_lgts_tst = compute_similarity(p, z_tst)
 
         # compute probs
@@ -146,7 +146,8 @@ class ProtoNet(FewShotMethod):
     def test_step(self, episode, episode_idx):
         y_true_tst, y_prob_tst, _ = self.adapt_episode(episode)
         metrics = self.compute_full_metrics(
-            y_true_tst, y_prob_tst, episode['unseen'], episode['seen'])
+            y_true_tst, y_prob_tst,
+            episode['unseen'], episode['seen'])
         self.add_episode_metrics(metrics)
 
     @staticmethod

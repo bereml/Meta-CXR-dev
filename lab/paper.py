@@ -114,7 +114,6 @@ def paper_subds(
             mval_episodes=mval_episodes,
             mtst_episodes=mtst_episodes,
             max_epochs=max_epochs,
-            stop_patience=stop_patience,
             seed=seed,
         )
         aggregate_exp_df(join(results_dir, exp))
