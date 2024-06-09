@@ -74,6 +74,66 @@ def paper_arch(
         aggregate_exp_df(join(results_dir, exp))
 
 
+def paper_nway_unseen(
+        mval_episodes=100,
+        mtst_episodes=10000,
+        net_backbone='mobilenetv3-large-100',
+        net_weights='i1k',
+        max_epochs=150,
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    batchbased_train_batches = 0
+    if debug:
+        batchbased_train_batches = 2
+        mval_episodes = 2
+        mtst_episodes = 2
+        max_epochs = 2
+        results_dir = 'rdev'
+    exp = 'nway-unseen'
+    cfgs = list(product(
+        # n_way, n_unseen
+        [
+            [3, 1],
+            [3, 2],
+            [3, 3],
+            [4, 1],
+            [4, 2],
+            [4, 3],
+            [4, 4],
+            [5, 2],
+            [5, 3],
+            [5, 4],
+            [5, 5],
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (n_way, n_unseen), seed = cfg
+        run = '_'.join([
+            f'nway-{n_way}',
+            f'unseen-{n_unseen}',
+        ])
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            net_backbone=net_backbone,
+            net_weights=net_weights,
+            method='batchbased',
+            batchbased_train_batches=batchbased_train_batches,
+            mval_episodes=mval_episodes,
+            mtst_episodes=mtst_episodes,
+            mval_n_way=n_way,
+            mval_n_unseen=n_unseen,
+            mtst_n_way=n_way,
+            mtst_n_unseen=n_unseen,
+            max_epochs=max_epochs,
+            seed=seed,
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
 def paper_resolution(
         mval_episodes=100,
         mtst_episodes=1000,
