@@ -42,8 +42,8 @@ def method_protonet(
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
         protonet_encoder_type, protonet_encoder_size, seed = cfg
         run = '_'.join([
-            protonet_encoder_type,
-            protonet_encoder_size
+            f'{protonet_encoder_type}',
+            f'{protonet_encoder_size}',
         ])
         train_model(
             results_dir=results_dir,
