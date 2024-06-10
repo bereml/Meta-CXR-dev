@@ -109,7 +109,7 @@ def paper_nway_unseen(
         seeds,
     ))
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        (n_way, n_unseen), seed = cfg
+        n_way, n_unseen, seed = cfg
         run = '_'.join([
             f'nway-{n_way}',
             f'unseen-{n_unseen}',
@@ -221,7 +221,7 @@ def paper_subds(
         seeds,
     ))
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        (data_distro, seed) = cfg
+        data_distro, seed = cfg
         run = '_'.join([
             data_distro,
         ])
