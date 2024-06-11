@@ -29,7 +29,7 @@ def train():
     torch.set_float32_matmul_precision('medium')
 
     hparams = parse_args()
-    seed_everything(hparams.seed)
+    seed_everything(hparams.seed, workers=True)
 
     run_dir = get_run_dir(hparams)
     if isdir(run_dir):
