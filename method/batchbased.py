@@ -134,9 +134,6 @@ class BatchBased(FewShotMethod):
 
     @staticmethod
     def add_args(parser):
-        parser.add_argument('--batchbased_batch_size',
-                            type=int, default=64,
-                            help='meta-trn batch size')
         parser.add_argument('--batchbased_trn_lr',
                             type=float, default=0.0001,
                             help='meta-trn lr')

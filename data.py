@@ -487,7 +487,7 @@ def test_build_dl(
         mset='mtrn',
         image_size=384, data_aug=False,
         norm={'mean': [0.0, 0.0, 0.0], 'std': [1.0, 1.0, 1.0]},
-        batch_size=32,
+        batch_size=64,
         num_workers=0,
         batches=1,
         data_distro='complete',
@@ -503,6 +503,13 @@ def test_build_dl(
     hparams = SimpleNamespace(**hparams)
 
     dl = build_dl(mset, batch_size, hparams)
+
+    print(
+        'Dataloader:\n'
+        f'  number of examples: {len(dl.dataset)}\n'
+        f'          batch size: {batch_size}\n'
+        f'   number of batches: {len(dl)}\n'
+    )
 
     for batch in take(dl, batches):
         unseen = batch['unseen']
@@ -586,6 +593,50 @@ def test_build_mdl(
         episode_size.append(n_trn + n_tst)
 
     print(f'Mean episode size: {np.mean(episode_size)}')
+
+
+def compute_mean_mdl(
+        mset='mtrn',
+        image_size=384, data_aug=False,
+        n_episodes=1000, n_way=3, n_unseen=1,
+        trn_k_shot=5, tst_k_shot=15,
+        norm={'mean': [0.0, 0.0, 0.0], 'std': [1.0, 1.0, 1.0]},
+        num_workers=0,
+        data_distro='complete',
+        seed=0,
+        debug=True):
+
+    hparams = locals()
+
+    from types import SimpleNamespace
+
+    from tqdm import tqdm
+
+
+    hparams = SimpleNamespace(**hparams)
+
+    mdl = build_mdl(
+        mset, n_episodes, n_way, n_unseen, trn_k_shot, tst_k_shot, hparams)
+
+    episode_sizes = []
+    for episode in tqdm(mdl):
+        episode_sizes.append(episode['n_trn'] + episode['n_tst'])
+
+    total = len(mdl.dataset)
+    episode_size = np.mean(episode_sizes)
+    examples_used = np.sum(episode_sizes)
+
+
+    print(
+        'Dataloader:\n'
+        f'      total examples: {total}\n'
+        f'        episode size: {episode_size}\n'
+        f'   number of batches: {len(mdl)}\n'
+        f'       examples used: {examples_used}\n'
+        f'     proportion used: {examples_used / total}\n'
+        f'           eval freq: {total / examples_used}\n'
+    )
+
 
 
 if __name__ == '__main__':

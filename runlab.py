@@ -6,8 +6,9 @@ Run lab experiments.
 
 # from lab.sem8 import *
 from lab.paper import *
-from lab.dev import *
-from lab.method import *
+# from lab.dev import *
+# from lab.method import *
+from lab.study import *
 
 
 if __name__ == '__main__':

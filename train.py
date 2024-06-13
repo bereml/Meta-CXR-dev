@@ -7,7 +7,6 @@ from os.path import isdir, join
 import pytorch_lightning as pl
 import torch
 from pytorch_lightning.callbacks import ModelCheckpoint
-# from model_checkpoint import ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning import seed_everything
@@ -45,7 +44,7 @@ def train():
     if hparams.method in {'batchbased'}:
         mtrn_dl = build_dl(
             'mtrn',
-            hparams.batchbased_batch_size,
+            hparams.mtrn_batch_size,
             hparams
         )
         if hparams.batchbased_train_batches:
@@ -110,10 +109,10 @@ def train():
         **trainer_args,
     )
 
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        trainer.fit(method, mtrn_dl, mval_dl)
-    # trainer.fit(method, mtrn_dl, mval_dl)
+    # with warnings.catch_warnings():
+    #     warnings.simplefilter("ignore")
+    #     trainer.fit(method, mtrn_dl, mval_dl)
+    trainer.fit(method, mtrn_dl, mval_dl)
 
     print(f"Best: {checkpoint_cb.best_model_path}")
 
