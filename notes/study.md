@@ -1,7 +1,13 @@
-# Methods Analysis 🩻 🐺 🤟🏽 😿
+# General Study 🩻 🐺 🤟🏽 😿
+
+
+
+
 
 --------------------------------------------------
-## ProtoNet
+## Methods
+
+### Protonet
 
 * Cfg: i1k
 
@@ -16,3 +22,11 @@
 
 Observations
 * La Beye es un 🐶
+
+
+--------------------------------------------------
+## Reproducibility
+
+*
+
+

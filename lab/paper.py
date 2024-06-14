@@ -12,26 +12,23 @@ from utils import aggregate_exp_df, train_model
 
 SEEDS = [0]
 RESULTS_DIR = 'rpaper'
-
+DEBUG_PARAMS = {
+    'batchbased_train_batches': 1,
+    'mtrn_episodes': 1,
+    'mval_episodes': 1,
+    'mtst_episodes': 1,
+    'max_epochs': 1,
+}
 
 
 def paper_arch(
-        mval_episodes=100,
-        mtst_episodes=10000,
-        weights='i1k',
-        method='batchbased',
-        # batchbased_mval_lr=0.005,
-        # batchbased_inner_steps=100,
-        max_epochs=150,
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
+        mtrn_batch_size=32,
         debug=False):
-    batchbased_train_batches = 0
+    hparams = {}
     if debug:
-        batchbased_train_batches = 2
-        mval_episodes = 2
-        mtst_episodes = 2
-        max_epochs = 2
+        hparams.update(DEBUG_PARAMS)
         results_dir = 'rdev'
     exp = f'arch'
     cfgs = list(product(
@@ -52,7 +49,6 @@ def paper_arch(
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
         backbone, seed = cfg
         run = '_'.join([
-            method,
             backbone,
         ])
         train_model(
@@ -60,35 +56,20 @@ def paper_arch(
             exp=exp,
             run=run,
             net_backbone=backbone,
-            net_weights=weights,
-            method=method,
-            batchbased_batch_size=48,
-            # batchbased_mval_lr=batchbased_mval_lr,
-            # batchbased_inner_steps=batchbased_inner_steps,
-            batchbased_train_batches=batchbased_train_batches,
-            mval_episodes=mval_episodes,
-            mtst_episodes=mtst_episodes,
-            max_epochs=max_epochs,
+            mtrn_batch_size=mtrn_batch_size,
             seed=seed,
+            **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
 
 
 def paper_nway_unseen(
-        mval_episodes=100,
-        mtst_episodes=10000,
-        net_backbone='mobilenetv3-large-100',
-        net_weights='i1k',
-        max_epochs=150,
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         debug=False):
-    batchbased_train_batches = 0
+    hparams = {}
     if debug:
-        batchbased_train_batches = 2
-        mval_episodes = 2
-        mtst_episodes = 2
-        max_epochs = 2
+        hparams.update(DEBUG_PARAMS)
         results_dir = 'rdev'
     exp = 'nway-unseen'
     cfgs = list(product(
@@ -109,7 +90,7 @@ def paper_nway_unseen(
         seeds,
     ))
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        n_way, n_unseen, seed = cfg
+        (n_way, n_unseen), seed = cfg
         run = '_'.join([
             f'nway-{n_way}',
             f'unseen-{n_unseen}',
@@ -118,37 +99,24 @@ def paper_nway_unseen(
             results_dir=results_dir,
             exp=exp,
             run=run,
-            net_backbone=net_backbone,
-            net_weights=net_weights,
-            method='batchbased',
-            batchbased_train_batches=batchbased_train_batches,
-            mval_episodes=mval_episodes,
-            mtst_episodes=mtst_episodes,
             mval_n_way=n_way,
             mval_n_unseen=n_unseen,
             mtst_n_way=n_way,
             mtst_n_unseen=n_unseen,
-            max_epochs=max_epochs,
             seed=seed,
+            **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
 
 
 def paper_resolution(
-        mval_episodes=100,
-        mtst_episodes=1000,
-        net_weights='random',
-        method='batchbased',
-        max_epochs=50,
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
+        mtrn_batch_size=32,
         debug=False):
-    batchbased_train_batches = 0
+    hparams = {}
     if debug:
-        batchbased_train_batches = 2
-        mval_episodes = 2
-        mtst_episodes = 2
-        max_epochs = 2
+        hparams.update(DEBUG_PARAMS)
         results_dir = 'rdev'
     exp = f'resolution'
     cfgs = list(product(
@@ -162,9 +130,9 @@ def paper_resolution(
             [ 224, 'convnext-tiny'],
             [ 384, 'convnext-tiny'],
             [ 512, 'convnext-tiny'],
-            # [ 224, 'densenet121'],
-            # [ 384, 'densenet121'],
-            # [ 512, 'densenet121'],
+            [ 224, 'densenet121'],
+            [ 384, 'densenet121'],
+            [ 512, 'densenet121'],
         ],
         seeds,
     ))
@@ -180,35 +148,22 @@ def paper_resolution(
             run=run,
             image_size=image_size,
             net_backbone=net_backbone,
-            net_weights=net_weights,
-            method=method,
-            batchbased_batch_size=48,
-            batchbased_train_batches=batchbased_train_batches,
-            mval_episodes=mval_episodes,
-            mtst_episodes=mtst_episodes,
-            max_epochs=max_epochs,
+            mtrn_batch_size=mtrn_batch_size,
             seed=seed,
+            **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
 
 
-def paper_subds(
-        mval_episodes=100,
-        mtst_episodes=10000,
-        max_epochs=150,
-        backbone='mobilenetv3-large-100',
-        weights='i1k',
+def paper_shift_ds(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         debug=False):
-    batchbased_train_batches = 0
+    hparams = {}
     if debug:
-        batchbased_train_batches = 2
-        mval_episodes = 2
-        mtst_episodes = 2
-        max_epochs = 2
+        hparams.update(DEBUG_PARAMS)
         results_dir = 'rdev'
-    exp = 'subds'
+    exp = 'shift_ds'
     cfgs = list(product(
         # data_distro
         [
@@ -230,35 +185,21 @@ def paper_subds(
             exp=exp,
             run=run,
             data_distro=data_distro,
-            net_backbone=backbone,
-            net_weights=weights,
-            method='batchbased',
-            batchbased_train_batches=batchbased_train_batches,
-            mval_episodes=mval_episodes,
-            mtst_episodes=mtst_episodes,
-            max_epochs=max_epochs,
             seed=seed,
+            **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
 
 
-def paper_subpop(
-        mval_episodes=100,
-        mtst_episodes=10000,
-        max_epochs=150,
-        backbone='mobilenetv3-large-100',
-        weights='i1k',
+def paper_shift_pop(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         debug=False):
-    batchbased_train_batches = 0
+    hparams = {}
     if debug:
-        batchbased_train_batches = 2
-        mval_episodes = 2
-        mtst_episodes = 2
-        max_epochs = 2
+        hparams.update(DEBUG_PARAMS)
         results_dir = 'rdev'
-    exp = 'subpop'
+    exp = 'shift_pop'
     cfgs = list(product(
         # data_distro
         [
@@ -282,13 +223,7 @@ def paper_subpop(
             exp=exp,
             run=run,
             data_distro=data_distro,
-            net_backbone=backbone,
-            net_weights=weights,
-            method='batchbased',
-            batchbased_train_batches=batchbased_train_batches,
-            mval_episodes=mval_episodes,
-            mtst_episodes=mtst_episodes,
-            max_epochs=max_epochs,
             seed=seed,
+            **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
