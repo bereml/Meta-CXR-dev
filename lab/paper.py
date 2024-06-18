@@ -63,6 +63,31 @@ def paper_arch(
         aggregate_exp_df(join(results_dir, exp))
 
 
+def paper_base(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        checkpoint_name='base',
+        debug=False):
+    hparams = {}
+    if debug:
+        hparams.update(DEBUG_PARAMS)
+        results_dir = 'rdev'
+    exp = 'base'
+    run = 'base'
+    cfgs = seeds
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        seed = cfg
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
 def paper_nway_unseen(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
