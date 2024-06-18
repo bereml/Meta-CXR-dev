@@ -88,6 +88,43 @@ def paper_base(
         aggregate_exp_df(join(results_dir, exp))
 
 
+def paper_foundation(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        mtrn_batch_size=32,
+        debug=False):
+    hparams = {}
+    if debug:
+        hparams.update(DEBUG_PARAMS)
+        results_dir = 'rdev'
+    exp = f'foundation'
+    cfgs = list(product(
+        # image_size, net_backbone
+        [
+            [ 336, 'eva02-tiny'],
+            [ 336, 'eva02-small'],
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (image_size, net_backbone), seed = cfg
+        run = '_'.join([
+            f'{image_size:04d}',
+            net_backbone,
+        ])
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            image_size=image_size,
+            net_backbone=net_backbone,
+            mtrn_batch_size=mtrn_batch_size,
+            seed=seed,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
 def paper_nway_unseen(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
