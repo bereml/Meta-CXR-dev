@@ -7,7 +7,7 @@ from os.path import join, isfile
 
 from tqdm import tqdm
 
-from utils import aggregate_exp_df, train_model
+from utils import aggregate_exp_df, eval_model, train_model
 
 
 SEEDS = [0]
@@ -91,6 +91,7 @@ def paper_base(
 def paper_nway_unseen(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
+        checkpoint_name='base',
         debug=False):
     hparams = {}
     if debug:
@@ -120,7 +121,7 @@ def paper_nway_unseen(
             f'nway-{n_way}',
             f'unseen-{n_unseen}',
         ])
-        train_model(
+        eval_model(
             results_dir=results_dir,
             exp=exp,
             run=run,
@@ -129,6 +130,7 @@ def paper_nway_unseen(
             mtst_n_way=n_way,
             mtst_n_unseen=n_unseen,
             seed=seed,
+            checkpoint_name=checkpoint_name,
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
@@ -183,6 +185,7 @@ def paper_resolution(
 def paper_shift_ds(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
+        checkpoint_name='base',
         debug=False):
     hparams = {}
     if debug:
@@ -205,12 +208,13 @@ def paper_shift_ds(
         run = '_'.join([
             data_distro,
         ])
-        train_model(
+        eval_model(
             results_dir=results_dir,
             exp=exp,
             run=run,
             data_distro=data_distro,
             seed=seed,
+            checkpoint_name=checkpoint_name,
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
@@ -219,6 +223,7 @@ def paper_shift_ds(
 def paper_shift_pop(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
+        checkpoint_name='base',
         debug=False):
     hparams = {}
     if debug:
@@ -243,12 +248,13 @@ def paper_shift_pop(
         run = '_'.join([
             data_distro,
         ])
-        train_model(
+        eval_model(
             results_dir=results_dir,
             exp=exp,
             run=run,
             data_distro=data_distro,
             seed=seed,
+            checkpoint_name=checkpoint_name,
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))

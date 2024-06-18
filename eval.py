@@ -2,10 +2,12 @@
 
 import warnings
 import glob
+from os import makedirs
 from os.path import isfile, join
 
 import pandas as pd
 import pytorch_lightning as pl
+import torch
 from pytorch_lightning import seed_everything
 
 from args import parse_args
@@ -45,12 +47,27 @@ def eval(run=None):
 
     seed_everything(hparams.seed, workers=True)
 
-    ckpt_pattern = join(get_run_dir(hparams), 'checkpoints', '*.ckpt')
-    best_model_path = glob.glob(ckpt_pattern)[0]
+    if not hparams.checkpoint_name:
+        ckpt_pattern = join(get_run_dir(hparams), 'checkpoints', '*.ckpt')
+        best_model_path = glob.glob(ckpt_pattern)[0]
 
-    Method = METHODS[hparams.method]
-    method = Method.load_from_checkpoint(best_model_path, strict=False)
-    method.hparams.episodes_mtst_csv = hparams.episodes_mtst_csv
+        Method = METHODS[hparams.method]
+        method = Method.load_from_checkpoint(best_model_path, strict=False)
+        method.hparams.episodes_mtst_csv = hparams.episodes_mtst_csv
+    else:
+        checkpoints_dir = 'checkpoints'
+        checkpoint_path = join(checkpoints_dir, f'{hparams.checkpoint_name}.pth')
+        if not isfile(checkpoint_path):
+            raise FileNotFoundError(f"Checkpoint not found {checkpoint_path}")
+        Method = METHODS.get(hparams.method, None)
+        if Method is None:
+            raise ValueError(f"unknown method {hparams.method}")
+
+        makedirs(join(hparams.results_dir, hparams.exp, hparams.run))
+
+        method = Method(hparams)
+        method.net.backbone.load_state_dict(torch.load(checkpoint_path))
+
     hparams.norm = method.hparams.norm
 
     mtst_dl = build_mdl(

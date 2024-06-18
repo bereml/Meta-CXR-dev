@@ -165,6 +165,12 @@ def train_model(**kwargs):
     run_cmd(cmd)
 
 
+def eval_model(**kwargs):
+    elems = ['python eval.py'] + [f'--{k} {v}' for k, v in kwargs.items()]
+    cmd = ' '.join(elems)
+    run_cmd(cmd)
+
+
 class RunTimer:
 
     def __enter__(self):
