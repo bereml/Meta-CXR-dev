@@ -91,7 +91,6 @@ def paper_arch(
 def paper_foundation(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
-        mtrn_batch_size=32,
         debug=False):
     hparams = {}
     if debug:
@@ -120,7 +119,6 @@ def paper_foundation(
             image_size=image_size,
             net_backbone=net_backbone,
             net_weights=net_weights,
-            mtrn_batch_size=mtrn_batch_size,
             seed=seed,
             **hparams
         )
