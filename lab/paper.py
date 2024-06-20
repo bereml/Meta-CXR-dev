@@ -21,6 +21,31 @@ DEBUG_PARAMS = {
 }
 
 
+def paper_base(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        checkpoint_name='base',
+        debug=False):
+    hparams = {}
+    if debug:
+        hparams.update(DEBUG_PARAMS)
+        results_dir = 'rdev'
+    exp = 'base'
+    run = 'base'
+    cfgs = seeds
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        seed = cfg
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
 def paper_arch(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
@@ -58,31 +83,6 @@ def paper_arch(
             net_backbone=backbone,
             mtrn_batch_size=mtrn_batch_size,
             seed=seed,
-            **hparams
-        )
-        aggregate_exp_df(join(results_dir, exp))
-
-
-def paper_base(
-        seeds=SEEDS,
-        results_dir=RESULTS_DIR,
-        checkpoint_name='base',
-        debug=False):
-    hparams = {}
-    if debug:
-        hparams.update(DEBUG_PARAMS)
-        results_dir = 'rdev'
-    exp = 'base'
-    run = 'base'
-    cfgs = seeds
-    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        seed = cfg
-        train_model(
-            results_dir=results_dir,
-            exp=exp,
-            run=run,
-            seed=seed,
-            checkpoint_name=checkpoint_name,
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
@@ -145,6 +145,7 @@ def paper_nway_unseen(
             [4, 2],
             [4, 3],
             [4, 4],
+            [5, 1],
             [5, 2],
             [5, 3],
             [5, 4],
@@ -274,6 +275,40 @@ def paper_shift_pop(
             'age_tails',
             'sex_female',
             'sex_male',
+            'complete',
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (data_distro, seed) = cfg
+        run = '_'.join([
+            data_distro,
+        ])
+        eval_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            data_distro=data_distro,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
+def paper_shift_view(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        checkpoint_name='base',
+        debug=False):
+    hparams = {}
+    if debug:
+        hparams.update(DEBUG_PARAMS)
+        results_dir = 'rdev'
+    exp = 'shift_view'
+    cfgs = list(product(
+        # data_distro
+        [
             'view_ap',
             'view_pa',
             'complete',
