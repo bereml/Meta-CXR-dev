@@ -3,7 +3,7 @@
 import warnings
 import glob
 from os import makedirs
-from os.path import isfile, join
+from os.path import isdir, isfile, join
 
 import pandas as pd
 import pytorch_lightning as pl
@@ -59,11 +59,15 @@ def eval(run=None):
         checkpoint_path = join(checkpoints_dir, f'{hparams.checkpoint_name}.pth')
         if not isfile(checkpoint_path):
             raise FileNotFoundError(f"Checkpoint not found {checkpoint_path}")
+        run_dir = join(hparams.results_dir, hparams.exp, hparams.run)
+        if isdir(run_dir):
+            print(f'Evaluation dir already exists: {run_dir}')
+            return
+
+        makedirs(run_dir)
         Method = METHODS.get(hparams.method, None)
         if Method is None:
             raise ValueError(f"unknown method {hparams.method}")
-
-        makedirs(join(hparams.results_dir, hparams.exp, hparams.run))
 
         method = Method(hparams)
         method.net.backbone.load_state_dict(torch.load(checkpoint_path))
