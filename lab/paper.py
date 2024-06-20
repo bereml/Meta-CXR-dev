@@ -55,7 +55,7 @@ def paper_arch(
     if debug:
         hparams.update(DEBUG_PARAMS)
         results_dir = 'rdev'
-    exp = f'arch'
+    exp = 'arch'
     cfgs = list(product(
         # arch
         [
@@ -97,7 +97,8 @@ def paper_foundation(
     if debug:
         hparams.update(DEBUG_PARAMS)
         results_dir = 'rdev'
-    exp = f'foundation'
+    exp = 'foundation'
+    net_weights = 'i21k'
     cfgs = list(product(
         # image_size, net_backbone
         [
@@ -118,6 +119,7 @@ def paper_foundation(
             run=run,
             image_size=image_size,
             net_backbone=net_backbone,
+            net_weights=net_weights,
             mtrn_batch_size=mtrn_batch_size,
             seed=seed,
             **hparams
@@ -183,7 +185,7 @@ def paper_resolution(
     if debug:
         hparams.update(DEBUG_PARAMS)
         results_dir = 'rdev'
-    exp = f'resolution'
+    exp = 'resolution'
     cfgs = list(product(
         # image_size, net_backbone
         [
