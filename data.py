@@ -13,6 +13,7 @@ from torchvision.io import ImageReadMode, read_image
 from utils import load_config, read_toml
 
 
+IMAGE_SIZES = {224, 336, 384, 512, 768, 1024}
 TRN_IDX, TST_IDX = 0, 1
 
 
@@ -67,7 +68,7 @@ class XRayDS(Dataset):
 
         if mset not in {'mtrn'}:
             raise ValueError(f'Invalid mset={mset}')
-        if hparams.image_size not in {224, 384, 512, 768, 1024}:
+        if hparams.image_size not in IMAGE_SIZES:
             raise ValueError(f'Invalid image_size={hparams.image_size}')
 
         metachest_dir = load_config()['metachest_dir']
@@ -125,7 +126,7 @@ class XRayMetaDS(Dataset):
 
         if mset not in {'mtrn', 'mval', 'mtst'}:
             raise ValueError(f'invalid mset={mset}')
-        if hparams.image_size not in {224, 384, 512, 768, 1024}:
+        if hparams.image_size not in IMAGE_SIZES:
             raise ValueError(f'invalid image_size={hparams.image_size}')
 
         metachest_dir = load_config()['metachest_dir']
