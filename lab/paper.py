@@ -91,26 +91,28 @@ def paper_arch(
 def paper_foundation(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
+        mtrn_batch_size=48,
         debug=False):
     hparams = {}
     if debug:
         hparams.update(DEBUG_PARAMS)
         results_dir = 'rdev'
     exp = 'foundation'
-    net_weights = 'i21k'
     cfgs = list(product(
-        # image_size, net_backbone
+        # image_size, net_backbone, net_weights
         [
-            [ 336, 'eva02-tiny'],
-            [ 336, 'eva02-small'],
+            [ 336, 'eva02-tiny', 'i21k'],
+            [ 336, 'eva02-small', 'i21k'],
+            # [ 448, 'eva02-small', 'mim_m38m_ft_in22k_in1k'],
+            # [ 448, 'eva02-small', 'mim_in22k_ft_in22k_in1k'],
         ],
         seeds,
     ))
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        (image_size, net_backbone), seed = cfg
+        (image_size, net_backbone, net_weights), seed = cfg
         run = '_'.join([
-            f'{image_size:04d}',
             net_backbone,
+            net_weights
         ])
         train_model(
             results_dir=results_dir,
@@ -119,6 +121,7 @@ def paper_foundation(
             image_size=image_size,
             net_backbone=net_backbone,
             net_weights=net_weights,
+            mtrn_batch_size=mtrn_batch_size,
             seed=seed,
             **hparams
         )

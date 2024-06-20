@@ -34,7 +34,8 @@ def _create(model_name, timm_name, weights, features_only):
     if not timm_name:
         raise NotImplementedError('Pretrained model not implemented '
                                   f'model={model_name} weights={weights}')
-    if weights in {'random', 'i1k', 'i21k'}:
+    if weights in {'random', 'i1k', 'i21k',
+                   'mim_in22k_ft_in22k_in1k', 'mim_m38m_ft_in22k_in1k'}:
         create_fn = _create_with_timm
     else:
         create_fn = _create_with_checkpoint
@@ -91,6 +92,20 @@ def convnext_tiny(weights, features_only):
     }.get(weights, 'convnext_tiny')
     model = _create(model_name, timm_name, weights, features_only)
     model.out_features = 768
+    return model
+
+
+@BACKBONES.register('eva02-large')
+def eva02_large(weights, features_only):
+    model_name = 'eva02_large_patch14_448'
+    timm_name = {
+        'random': 'eva02_large_patch14_448.mim_m38m_ft_in22k_in1k',
+        'i1k': None,
+        'mim_in22k_ft_in22k_in1k': 'eva02_large_patch14_448.mim_in22k_ft_in22k_in1k',
+        'mim_m38m_ft_in22k_in1k': 'eva02_large_patch14_448.mim_m38m_ft_in22k_in1k',
+    }.get(weights, 'eva02_large_patch14_448.mim_m38m_ft_in22k_in1k')
+    model = _create(model_name, timm_name, weights, features_only)
+    model.out_features = 192
     return model
 
 
@@ -188,7 +203,7 @@ def mobilevitv2_200(weights, features_only):
 __all__ = [
     'densenet121', 'densenet161',
     'convnext_atto', 'convnext_tiny',
-    'eva02_small', 'eva02_tiny',
+    'eva02_large', 'eva02_small', 'eva02_tiny',
     'mobilenetv3_small_075', 'mobilenetv3_large_100',
     'mobilevitv2_050', 'mobilevitv2_100', 'mobilevitv2_200',
 ]
