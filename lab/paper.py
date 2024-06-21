@@ -101,8 +101,8 @@ def paper_foundation(
         [
             # [336, 'eva02-tiny', 'i21k'],
             # [336, 'eva02-small', 'i21k'],
-            [448, 'eva02-small', 'mim_m38m_ft_in22k_in1k'],
-            # [448, 'eva02-small', 'mim_in22k_ft_in22k_in1k'],
+            [448, 'eva02-large', 'mim_m38m_ft_in22k_in1k'],
+            # [448, 'eva02-large', 'mim_in22k_ft_in22k_in1k'],
         ],
         seeds,
     ))
