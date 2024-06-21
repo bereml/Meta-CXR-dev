@@ -202,7 +202,7 @@ def paper_resolution(
             [ 384, 'densenet121'],
             [ 512, 'densenet121'],
             [ 768, 'densenet121'],
-            [1024, 'densenet121'],
+            # [1024, 'densenet121'],
         ],
         seeds,
     ))
