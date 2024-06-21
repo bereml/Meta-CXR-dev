@@ -178,7 +178,7 @@ def paper_nway_unseen(
 def paper_resolution(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
-        mtrn_batch_size=32,
+        mtrn_batch_size=24,
         debug=False):
     hparams = {}
     if debug:
@@ -209,8 +209,8 @@ def paper_resolution(
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
         (image_size, net_backbone), seed = cfg
         run = '_'.join([
-            f'{image_size:04d}',
             net_backbone,
+            f'{image_size:04d}',
         ])
         train_model(
             results_dir=results_dir,
