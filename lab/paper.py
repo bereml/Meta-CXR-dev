@@ -99,10 +99,10 @@ def paper_foundation(
     cfgs = list(product(
         # image_size, net_backbone, net_weights
         [
-            [ 336, 'eva02-tiny', 'i21k'],
-            [ 336, 'eva02-small', 'i21k'],
-            # [ 448, 'eva02-small', 'mim_m38m_ft_in22k_in1k'],
-            # [ 448, 'eva02-small', 'mim_in22k_ft_in22k_in1k'],
+            # [336, 'eva02-tiny', 'i21k'],
+            # [336, 'eva02-small', 'i21k'],
+            [448, 'eva02-small', 'mim_m38m_ft_in22k_in1k'],
+            # [448, 'eva02-small', 'mim_in22k_ft_in22k_in1k'],
         ],
         seeds,
     ))
@@ -196,9 +196,13 @@ def paper_resolution(
             [ 224, 'convnext-tiny'],
             [ 384, 'convnext-tiny'],
             [ 512, 'convnext-tiny'],
+            [ 768, 'convnext-tiny'],
+            [1024, 'convnext-tiny'],
             [ 224, 'densenet121'],
             [ 384, 'densenet121'],
             [ 512, 'densenet121'],
+            [ 768, 'densenet121'],
+            [1024, 'densenet121'],
         ],
         seeds,
     ))
