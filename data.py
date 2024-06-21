@@ -13,7 +13,7 @@ from torchvision.io import ImageReadMode, read_image
 from utils import load_config, read_toml
 
 
-IMAGE_SIZES = {224, 336, 384, 512, 768, 1024}
+IMAGE_SIZES = {224, 336, 384, 448, 512, 768, 1024}
 TRN_IDX, TST_IDX = 0, 1
 
 
