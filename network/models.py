@@ -105,7 +105,7 @@ def eva02_large(weights, features_only):
         'mim_m38m_ft_in22k_in1k': 'eva02_large_patch14_448.mim_m38m_ft_in22k_in1k',
     }.get(weights, 'eva02_large_patch14_448.mim_m38m_ft_in22k_in1k')
     model = _create(model_name, timm_name, weights, features_only)
-    model.out_features = 192
+    model.out_features = 1024
     return model
 
 
