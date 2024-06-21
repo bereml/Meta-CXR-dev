@@ -197,7 +197,7 @@ def paper_resolution(
             [ 384, 'convnext-tiny'],
             [ 512, 'convnext-tiny'],
             [ 768, 'convnext-tiny'],
-            [1024, 'convnext-tiny'],
+            # [1024, 'convnext-tiny'],
             [ 224, 'densenet121'],
             [ 384, 'densenet121'],
             [ 512, 'densenet121'],
