@@ -153,7 +153,7 @@ class ProtoNet(FewShotMethod):
     @staticmethod
     def add_args(parser):
         parser.add_argument('--protonet_encoder_type',
-                            type=str, default='avg',
+                            type=str, default='fc',
                             choices=['avg', 'fc'],
                             help='protonet encoder type')
         parser.add_argument('--protonet_encoder_size',
