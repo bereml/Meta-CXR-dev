@@ -12,7 +12,14 @@ from utils import aggregate_exp_df, eval_model, train_model
 
 SEEDS = [0]
 RESULTS_DIR = 'rpaper'
-DEBUG_PARAMS = {
+DEBUG_HPARAMS = {
+    'mtrn_episodes': 1,
+    'mval_episodes': 1,
+    'mtst_episodes': 1,
+    'max_epochs': 1,
+}
+
+DEBUG_HPARAMS_BB = {
     'batchbased_train_batches': 1,
     'mtrn_episodes': 1,
     'mval_episodes': 1,
@@ -26,15 +33,15 @@ def paper_base(
         results_dir=RESULTS_DIR,
         checkpoint_name='base',
         debug=False):
-    hparams = {}
-    if debug:
-        hparams.update(DEBUG_PARAMS)
-        results_dir = 'rdev'
     exp = 'base'
     run = 'base'
     cfgs = seeds
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
         seed = cfg
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB)
+            results_dir = 'rdev'
         train_model(
             results_dir=results_dir,
             exp=exp,
@@ -50,10 +57,6 @@ def paper_arch(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         debug=False):
-    hparams = {}
-    if debug:
-        hparams.update(DEBUG_PARAMS)
-        results_dir = 'rdev'
     exp = 'arch'
     cfgs = list(product(
         # arch
@@ -75,6 +78,10 @@ def paper_arch(
         run = '_'.join([
             backbone,
         ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB)
+            results_dir = 'rdev'
         train_model(
             results_dir=results_dir,
             exp=exp,
@@ -91,10 +98,6 @@ def paper_foundation(
         results_dir=RESULTS_DIR,
         mtrn_batch_size=48,
         debug=False):
-    hparams = {}
-    if debug:
-        hparams.update(DEBUG_PARAMS)
-        results_dir = 'rdev'
     exp = 'foundation'
     cfgs = list(product(
         # image_size, net_backbone, net_weights
@@ -112,6 +115,10 @@ def paper_foundation(
             net_backbone,
             net_weights
         ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB)
+            results_dir = 'rdev'
         train_model(
             results_dir=results_dir,
             exp=exp,
@@ -131,10 +138,6 @@ def paper_nway_unseen(
         results_dir=RESULTS_DIR,
         checkpoint_name='base',
         debug=False):
-    hparams = {}
-    if debug:
-        hparams.update(DEBUG_PARAMS)
-        results_dir = 'rdev'
     exp = 'nway-unseen'
     cfgs = list(product(
         # n_way, n_unseen
@@ -160,6 +163,10 @@ def paper_nway_unseen(
             f'nway-{n_way}',
             f'unseen-{n_unseen}',
         ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB)
+            results_dir = 'rdev'
         eval_model(
             results_dir=results_dir,
             exp=exp,
@@ -175,15 +182,63 @@ def paper_nway_unseen(
         aggregate_exp_df(join(results_dir, exp))
 
 
+def paper_pretraining(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'pretraining'
+    net_backbone = 'mobilenetv3-large-100'
+    cfgs = list(product(
+        #   [net_weights,      method,       checkpoint_name]
+        [
+            ['random',         'batchbased', 'metachest'],
+            ['i1k',            'batchbased', 'i1k-metachest'],
+            ['i21k',           'batchbased', 'i21k-metachest'],
+            ['random',         'protonet',   None],
+            ['i1k',            'protonet',   None],
+            ['i21k',           'protonet',   None],
+            ['metachest',      'protonet',   None],
+            ['i1k-metachest',  'protonet',   None],
+            ['i21k-metachest', 'protonet',   None],
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (net_weights, method, checkpoint_name), seed = cfg
+        run = '_'.join([
+            net_weights,
+            method,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+                           else DEBUG_HPARAMS)
+            results_dir = 'rdev'
+
+        # include backbone name in net_weights & checkpoint_name
+        if 'metachest' in net_weights:
+            net_weights = '_'.join([net_backbone, net_weights, f'seed{seed}'])
+        if checkpoint_name:
+            checkpoint_name = '_'.join([net_backbone, checkpoint_name, f'seed{seed}'])
+            hparams['checkpoint_name'] = checkpoint_name
+
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            net_weights=net_weights,
+            method=method,
+            seed=seed,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
 def paper_resolution(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         mtrn_batch_size=24,
         debug=False):
-    hparams = {}
-    if debug:
-        hparams.update(DEBUG_PARAMS)
-        results_dir = 'rdev'
     exp = 'resolution'
     cfgs = list(product(
         # image_size, net_backbone
@@ -212,6 +267,10 @@ def paper_resolution(
             net_backbone,
             f'{image_size:04d}',
         ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB)
+            results_dir = 'rdev'
         train_model(
             results_dir=results_dir,
             exp=exp,
@@ -230,10 +289,6 @@ def paper_shift_ds(
         results_dir=RESULTS_DIR,
         checkpoint_name='base',
         debug=False):
-    hparams = {}
-    if debug:
-        hparams.update(DEBUG_PARAMS)
-        results_dir = 'rdev'
     exp = 'shift_ds'
     cfgs = list(product(
         # data_distro
@@ -251,6 +306,10 @@ def paper_shift_ds(
         run = '_'.join([
             data_distro,
         ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB)
+            results_dir = 'rdev'
         eval_model(
             results_dir=results_dir,
             exp=exp,
@@ -268,10 +327,6 @@ def paper_shift_pop(
         results_dir=RESULTS_DIR,
         checkpoint_name='base',
         debug=False):
-    hparams = {}
-    if debug:
-        hparams.update(DEBUG_PARAMS)
-        results_dir = 'rdev'
     exp = 'shift_pop'
     cfgs = list(product(
         # data_distro
@@ -289,6 +344,10 @@ def paper_shift_pop(
         run = '_'.join([
             data_distro,
         ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB)
+            results_dir = 'rdev'
         eval_model(
             results_dir=results_dir,
             exp=exp,
@@ -306,10 +365,6 @@ def paper_shift_view(
         results_dir=RESULTS_DIR,
         checkpoint_name='base',
         debug=False):
-    hparams = {}
-    if debug:
-        hparams.update(DEBUG_PARAMS)
-        results_dir = 'rdev'
     exp = 'shift_view'
     cfgs = list(product(
         # data_distro
@@ -325,6 +380,10 @@ def paper_shift_view(
         run = '_'.join([
             data_distro,
         ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB)
+            results_dir = 'rdev'
         eval_model(
             results_dir=results_dir,
             exp=exp,

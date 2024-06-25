@@ -47,7 +47,8 @@ def eval(run=None):
 
     seed_everything(hparams.seed, workers=True)
 
-    if not hparams.checkpoint_name:
+    if run:
+    # if not hparams.checkpoint_name:
         ckpt_pattern = join(get_run_dir(hparams), 'checkpoints', '*.ckpt')
         best_model_path = glob.glob(ckpt_pattern)[0]
 
