@@ -18,7 +18,6 @@ DEBUG_HPARAMS = {
     'mtst_episodes': 1,
     'max_epochs': 1,
 }
-
 DEBUG_HPARAMS_BB = {
     'batchbased_train_batches': 1,
     'mtrn_episodes': 1,
