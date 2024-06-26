@@ -55,8 +55,9 @@ def paper_base(
 def paper_arch(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
+        mtrn_batch_size=48,
         debug=False):
-    exp = 'arch'
+    exp = f'arch_batch-size-{mtrn_batch_size}'
     cfgs = list(product(
         # arch
         [
@@ -86,6 +87,7 @@ def paper_arch(
             exp=exp,
             run=run,
             net_backbone=backbone,
+            mtrn_batch_size=mtrn_batch_size,
             seed=seed,
             **hparams
         )
