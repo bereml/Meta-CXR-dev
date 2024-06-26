@@ -43,32 +43,6 @@ def _create(model_name, timm_name, weights, features_only):
     return model
 
 
-@BACKBONES.register('densenet121')
-def densenet121(weights, features_only):
-    model_name = 'densenet121'
-    timm_name = {
-        'random': 'densenet121.ra_in1k',
-        'i1k': 'densenet121.ra_in1k',
-        'i21k': None,
-    }.get(weights, 'densenet121.ra_in1k')
-    model = _create(model_name, timm_name, weights, features_only)
-    model.out_features = 1024
-    return model
-
-
-@BACKBONES.register('densenet161')
-def densenet161(weights, features_only):
-    model_name = 'densenet161'
-    timm_name = {
-        'random': 'densenet161.tv_in1k',
-        'i1k': 'densenet161.tv_in1k',
-        'i21k': None,
-    }.get(weights, 'densenet161.tv_in1k')
-    model = _create(model_name, timm_name, weights, features_only)
-    model.out_features = 2208
-    return model
-
-
 @BACKBONES.register('convnext-atto')
 def convnext_atto(weights, features_only):
     model_name = 'convnext-atto'
@@ -92,6 +66,32 @@ def convnext_tiny(weights, features_only):
     }.get(weights, 'convnext_tiny')
     model = _create(model_name, timm_name, weights, features_only)
     model.out_features = 768
+    return model
+
+
+@BACKBONES.register('densenet121')
+def densenet121(weights, features_only):
+    model_name = 'densenet121'
+    timm_name = {
+        'random': 'densenet121.ra_in1k',
+        'i1k': 'densenet121.ra_in1k',
+        'i21k': None,
+    }.get(weights, 'densenet121.ra_in1k')
+    model = _create(model_name, timm_name, weights, features_only)
+    model.out_features = 1024
+    return model
+
+
+@BACKBONES.register('densenet161')
+def densenet161(weights, features_only):
+    model_name = 'densenet161'
+    timm_name = {
+        'random': 'densenet161.tv_in1k',
+        'i1k': 'densenet161.tv_in1k',
+        'i21k': None,
+    }.get(weights, 'densenet161.tv_in1k')
+    model = _create(model_name, timm_name, weights, features_only)
+    model.out_features = 2208
     return model
 
 
