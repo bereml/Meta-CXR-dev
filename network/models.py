@@ -69,6 +69,45 @@ def convnext_tiny(weights, features_only):
     return model
 
 
+@BACKBONES.register('convnextv2-atto')
+def convnextv2_atto(weights, features_only):
+    model_name = 'convnextv2-atto'
+    timm_name = {
+        'random': 'convnextv2_atto',
+        'i1k': 'convnextv2_atto.fcmae_ft_in1k',
+        'i21k': None,
+    }.get(weights, 'convnextv2_atto')
+    model = _create(model_name, timm_name, weights, features_only)
+    model.out_features = 320
+    return model
+
+
+@BACKBONES.register('convnextv2-nano')
+def convnextv2_nano(weights, features_only):
+    model_name = 'convnextv2-nano'
+    timm_name = {
+        'random': 'convnextv2_nano',
+        'i1k': 'convnextv2_nano.fcmae_ft_in1k',
+        'i21k': 'convnextv2_nano.fcmae_ft_in22k_in1k_384',
+    }.get(weights, 'convnextv2_nano')
+    model = _create(model_name, timm_name, weights, features_only)
+    model.out_features = 640
+    return model
+
+
+@BACKBONES.register('convnextv2-tiny')
+def convnextv2_tiny(weights, features_only):
+    model_name = 'convnextv2-tiny'
+    timm_name = {
+        'random': 'convnextv2_tiny',
+        'i1k': 'convnextv2_tiny.fcmae_ft_in1k',
+        'i21k': 'convnextv2_tiny.fcmae_ft_in22k_in1k_384',
+    }.get(weights, 'convnextv2_tiny')
+    model = _create(model_name, timm_name, weights, features_only)
+    model.out_features = 768
+    return model
+
+
 @BACKBONES.register('densenet121')
 def densenet121(weights, features_only):
     model_name = 'densenet121'
@@ -135,19 +174,6 @@ def eva02_tiny(weights, features_only):
     return model
 
 
-@BACKBONES.register('mobilenetv3-small-075')
-def mobilenetv3_small_075(weights, features_only):
-    model_name = 'mobilenetv3-small-075'
-    timm_name = {
-        'random': 'tf_mobilenetv3_small_075.in1k',
-        'i1k': 'tf_mobilenetv3_small_075.in1k',
-        'i21k': None,
-    }.get(weights, 'tf_mobilenetv3_small_075.in1k')
-    model = _create(model_name, timm_name, weights, features_only)
-    model.out_features = 1024
-    return model
-
-
 @BACKBONES.register('mobilenetv3-large-100')
 def mobilenetv3_large_100(weights, features_only):
     model_name = 'mobilenetv3-large-100'
@@ -158,6 +184,19 @@ def mobilenetv3_large_100(weights, features_only):
     }.get(weights, 'mobilenetv3_large_100.miil_in21k')
     model = _create(model_name, timm_name, weights, features_only)
     model.out_features = 1280
+    return model
+
+
+@BACKBONES.register('mobilenetv3-small-075')
+def mobilenetv3_small_075(weights, features_only):
+    model_name = 'mobilenetv3-small-075'
+    timm_name = {
+        'random': 'tf_mobilenetv3_small_075.in1k',
+        'i1k': 'tf_mobilenetv3_small_075.in1k',
+        'i21k': None,
+    }.get(weights, 'tf_mobilenetv3_small_075.in1k')
+    model = _create(model_name, timm_name, weights, features_only)
+    model.out_features = 1024
     return model
 
 
@@ -201,9 +240,10 @@ def mobilevitv2_200(weights, features_only):
 
 
 __all__ = [
-    'densenet121', 'densenet161',
     'convnext_atto', 'convnext_tiny',
+    'convnextv2_atto', 'convnextv2_nano', 'convnextv2_tiny',
+    'densenet121', 'densenet161',
     'eva02_large', 'eva02_small', 'eva02_tiny',
-    'mobilenetv3_small_075', 'mobilenetv3_large_100',
+    'mobilenetv3_large_100', 'mobilenetv3_small_075',
     'mobilevitv2_050', 'mobilevitv2_100', 'mobilevitv2_200',
 ]
