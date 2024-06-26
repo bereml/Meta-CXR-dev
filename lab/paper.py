@@ -61,15 +61,20 @@ def paper_arch(
     cfgs = list(product(
         # arch
         [
+            # efficient
             'mobilenetv3-small-075',
-            'mobilenetv3-large-100',
             'mobilevitv2-050',
-            'mobilevitv2-100',
+            'mobilenetv3-large-100',
             'convnext-atto',
+            'convnextv2-atto',
+            'mobilevitv2-100',
+            # large
             'densenet121',
+            'mobilevitv2-200',
+            'convnextv2-nano',
             'densenet161',
             'convnext-tiny',
-            'mobilevitv2-200',
+            'convnextv2-tiny',
         ],
         seeds,
     ))
