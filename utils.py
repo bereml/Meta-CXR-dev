@@ -56,7 +56,9 @@ def agregate_run_df_aux(df):
     data = {}
     for col_name, col_vals in df.iloc[:, 1:].T.iterrows():
         values = col_vals.dropna().values
-        if len(values) == 1:
+        if len(values) == 0:
+            mean_ci = ''
+        elif len(values) == 1:
             mean_ci = values[0]
         else:
             values = [float(v[:5]) for v in values]

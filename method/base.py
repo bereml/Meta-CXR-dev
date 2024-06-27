@@ -38,12 +38,18 @@ def compute_track_metrics(y_true, y_prob, unseen, seen):
     n_unseen, n_seen = len(unseen), len(seen)
     y_true = y_true.int()
     metrics = {}
+    metrics['combined'] = auroc(y_prob, y_true, 'micro').item() * 100
     if n_unseen and n_seen:
         metrics['unseen'] = auroc(
             y_prob[:, :n_unseen], y_true[:, :n_unseen], 'micro').item() * 100
         metrics['seen'] = auroc(
             y_prob[:, n_unseen:], y_true[:, n_unseen:], 'micro').item() * 100
-    metrics['combined'] = auroc(y_prob, y_true, 'micro').item() * 100
+    elif n_unseen:
+        metrics['unseen'] = metrics['combined']
+        metrics['seen'] = ''
+    else:
+        metrics['unseen'] = ''
+        metrics['seen'] = metrics['combined']
     return metrics
 
 
@@ -52,12 +58,18 @@ def compute_full_metrics(y_true, y_prob, unseen, seen):
     n_unseen, n_seen = len(unseen), len(seen)
     y_true = y_true.int()
     metrics = {}
+    metrics['combined'] = auroc(y_prob, y_true, 'micro').item() * 100
     if n_unseen and n_seen:
         metrics['unseen'] = auroc(
             y_prob[:, :n_unseen], y_true[:, :n_unseen], 'micro').item() * 100
         metrics['seen'] = auroc(
             y_prob[:, n_unseen:], y_true[:, n_unseen:], 'micro').item() * 100
-    metrics['combined'] = auroc(y_prob, y_true, 'micro').item() * 100
+    elif n_unseen:
+        metrics['unseen'] = metrics['combined']
+        metrics['seen'] = ''
+    else:
+        metrics['unseen'] = ''
+        metrics['seen'] = metrics['combined']
     metrics.update(zip(unseen + seen,
                        auroc(y_prob, y_true, 'none').cpu().numpy() * 100))
     return metrics
