@@ -111,7 +111,8 @@ class FewShotMethod(pl.LightningModule):
 
     def log_metrics(self, meta_set, metrics):
         metrics = {f'{k}/{meta_set}': v
-                   for k, v, in metrics.items()}
+                   for k, v, in metrics.items()
+                   if isinstance(v, float)}
         metrics[f'loss/{meta_set}'] *= 100
         self.log_dict(metrics, on_epoch=True,
                       on_step=self.hparams['log_on_step'])
