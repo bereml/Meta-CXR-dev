@@ -22,7 +22,7 @@ DEBUG_HPARAMS_BB = {
     'batchbased_train_batches': 1,
     'mtrn_episodes': 1,
     'mval_episodes': 1,
-    'mtst_episodes': 1,
+    'mtst_episodes': 5,
     'max_epochs': 1,
 }
 
@@ -99,6 +99,57 @@ def paper_arch(
         aggregate_exp_df(join(results_dir, exp))
 
 
+def paper_gfsl(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        checkpoint_name='base',
+        debug=False):
+    exp = 'gfsl'
+    cfgs = list(product(
+        # n_way, n_unseen
+        [
+            [3, 1],
+            [3, 2],
+            [3, 3],
+            [4, 1],
+            [4, 2],
+            [4, 3],
+            [4, 4],
+            [5, 1],
+            [5, 2],
+            [5, 3],
+            [5, 4],
+            [5, 5],
+        ],
+        # k_shot
+        [1, 5, 15],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (mtst_n_way, mtst_n_unseen), mtst_trn_k_shot, seed = cfg
+        run = '_'.join([
+            f'nway-{mtst_n_way}',
+            f'unseen-{mtst_n_unseen}',
+            f'kshot-{mtst_trn_k_shot:02d}',
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB)
+            results_dir = 'rdev'
+        eval_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            mtst_n_way=mtst_n_way,
+            mtst_n_unseen=mtst_n_unseen,
+            mtst_trn_k_shot=mtst_trn_k_shot,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
 def paper_foundation(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
@@ -134,55 +185,6 @@ def paper_foundation(
             net_weights=net_weights,
             mtrn_batch_size=mtrn_batch_size,
             seed=seed,
-            **hparams
-        )
-        aggregate_exp_df(join(results_dir, exp))
-
-
-def paper_nway_unseen(
-        seeds=SEEDS,
-        results_dir=RESULTS_DIR,
-        checkpoint_name='base',
-        debug=False):
-    exp = 'nway-unseen'
-    cfgs = list(product(
-        # n_way, n_unseen
-        [
-            [3, 1],
-            [3, 2],
-            [3, 3],
-            [4, 1],
-            [4, 2],
-            [4, 3],
-            [4, 4],
-            [5, 1],
-            [5, 2],
-            [5, 3],
-            [5, 4],
-            [5, 5],
-        ],
-        seeds,
-    ))
-    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        (n_way, n_unseen), seed = cfg
-        run = '_'.join([
-            f'nway-{n_way}',
-            f'unseen-{n_unseen}',
-        ])
-        hparams = {}
-        if debug:
-            hparams.update(DEBUG_HPARAMS_BB)
-            results_dir = 'rdev'
-        eval_model(
-            results_dir=results_dir,
-            exp=exp,
-            run=run,
-            mval_n_way=n_way,
-            mval_n_unseen=n_unseen,
-            mtst_n_way=n_way,
-            mtst_n_unseen=n_unseen,
-            seed=seed,
-            checkpoint_name=checkpoint_name,
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
