@@ -22,7 +22,7 @@ DEBUG_HPARAMS_BB = {
     'batchbased_train_batches': 1,
     'mtrn_episodes': 1,
     'mval_episodes': 1,
-    'mtst_episodes': 5,
+    'mtst_episodes': 1,
     'max_epochs': 1,
 }
 
