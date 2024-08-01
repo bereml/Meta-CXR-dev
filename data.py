@@ -70,9 +70,7 @@ def _load_data(config, mset, distro):
                 classes.remove(clazz)
 
     df = df[['dataset', 'name'] + unseen + seen]
-    df[unseen + seen] = df[classes].fillna(0).astype(int)
-
-    # print(df)
+    df[unseen + seen] = df[unseen + seen].fillna(0).astype(int)
 
     return seen, unseen, df
 
