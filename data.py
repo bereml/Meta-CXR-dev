@@ -17,34 +17,94 @@ IMAGE_SIZES = {224, 336, 384, 448, 512, 768, 1024}
 TRN_IDX, TST_IDX = 0, 1
 
 
-def _load_data(metachest_dir, distro, mset):
+def _filter_mset(mset, mclasses, df, n_metadata_cols=5):
+    mval_mtst_examples = df[mclasses['mval'] + mclasses['mtst']].any(axis=1)
+    if mset == 'mtrn':
+        # keep examples with only mtrn classes
+        mtrn_only_examples = ~mval_mtst_examples
+        df = df[mtrn_only_examples]
+        classes = mclasses['mtrn']
+    else:
+        # discarding examples with only mtrn classes
+        df = df[mval_mtst_examples]
+        # keep examples with mtrn+mset clases
+        mtrn_mset_classes = mclasses['mtrn'] + mclasses[mset]
+        mtrn_mset_examples = df[mtrn_mset_classes].any(axis=1)
+        df = df[mtrn_mset_examples]
+        classes = mtrn_mset_classes
+    cols = list(df.columns[:n_metadata_cols]) + classes
+    df = df[cols]
+    return df
+
+
+# def _load_data(metachest_dir, distro, mset):
+#     df_path = join(metachest_dir, f'metachest.csv')
+#     if not isfile(df_path):
+#         raise ValueError(f"MetaChest CSV not found {df_path}")
+
+#     mtl_dir = join(metachest_dir, 'mtl')
+#     filter_df_path = join(mtl_dir, f'{distro}.csv')
+#     if not isfile(filter_df_path):
+#         raise ValueError(f"Distro CSV not found {filter_df_path}")
+#     config_path = join(mtl_dir, f'{distro}.toml')
+#     if not isfile(config_path):
+#         raise ValueError(f"Distro classes not found {config_path}")
+
+#     df = pd.read_csv(df_path)
+#     filter_df = pd.read_csv(filter_df_path)
+#     mclasses = read_toml(config_path)
+
+#     unseen, seen = {
+#         'mtrn': (mclasses['mtrn'], []),
+#         'mval': (mclasses['mval'], mclasses['mtrn']),
+#         'mtst': (mclasses['mtst'], mclasses['mtrn']),
+#     }[mset]
+
+#     classes = unseen + seen
+#     df = df.loc[filter_df[mset] == 1, ['dataset', 'name'] + classes]
+#     df[classes] = df[classes].fillna(0).astype(int)
+
+#     return df, unseen, seen
+
+
+def _load_data(config, mset, distro):
+
+    metachest_dir = config['metachest_dir']
     df_path = join(metachest_dir, f'metachest.csv')
     if not isfile(df_path):
         raise ValueError(f"MetaChest CSV not found {df_path}")
-
-    mtl_dir = join(metachest_dir, 'mtl')
-    filter_df_path = join(mtl_dir, f'{distro}.csv')
-    if not isfile(filter_df_path):
-        raise ValueError(f"Distro CSV not found {filter_df_path}")
-    config_path = join(mtl_dir, f'{distro}.toml')
-    if not isfile(config_path):
-        raise ValueError(f"Distro classes not found {config_path}")
-
     df = pd.read_csv(df_path)
-    filter_df = pd.read_csv(filter_df_path)
-    mclasses = read_toml(config_path)
 
-    unseen, seen = {
-        'mtrn': (mclasses['mtrn'], []),
-        'mval': (mclasses['mval'], mclasses['mtrn']),
-        'mtst': (mclasses['mtst'], mclasses['mtrn']),
+    if distro != 'complete':
+        distro_path = join(metachest_dir, 'distro', f'{distro}.csv')
+        if not isfile(distro_path):
+            raise ValueError(f"Distro CSV not found {distro_path}")
+        distro_mask = pd.read_csv(distro_path).iloc[:, 0].astype(bool)
+        df = df[distro_mask]
+
+    mclasses = {'mtrn': config['mtrn'],
+                'mval': config['mval'],
+                'mtst': config['mtst']}
+    df = _filter_mset(mset, mclasses, df)
+
+    seen, unseen = {
+        'mtrn': ([],               mclasses['mtrn']),
+        'mval': (mclasses['mtrn'], mclasses['mval']),
+        'mtst': (mclasses['mtrn'], mclasses['mtst']),
     }[mset]
 
-    classes = unseen + seen
-    df = df.loc[filter_df[mset] == 1, ['dataset', 'name'] + classes]
-    df[classes] = df[classes].fillna(0).astype(int)
+    for classes in [seen, unseen]:
+        for clazz in classes:
+            if not df[clazz].any():
+                df = df.drop(columns=clazz)
+                classes.remove(clazz)
 
-    return df, unseen, seen
+    df = df[['dataset', 'name'] + unseen + seen]
+    df[unseen + seen] = df[classes].fillna(0).astype(int)
+
+    # print(df)
+
+    return seen, unseen, df
 
 
 class XRayDS(Dataset):
@@ -71,16 +131,17 @@ class XRayDS(Dataset):
         if hparams.image_size not in IMAGE_SIZES:
             raise ValueError(f'Invalid image_size={hparams.image_size}')
 
-        metachest_dir = load_config()['metachest_dir']
+        config = load_config()
+        metachest_dir = config['metachest_dir']
         images_dir = join(metachest_dir, f'images-{hparams.image_size}')
         if not isdir(images_dir):
             raise ValueError(f'Dir not found images_dir={images_dir}')
 
-        df, unseen, seen = _load_data(metachest_dir, hparams.data_distro, mset)
+        seen, unseen, df = _load_data(config, mset, hparams.data_distro)
         self.mset = mset
         self.df = df
-        self.unseen = unseen
         self.seen = seen
+        self.unseen = unseen
         self.images_dir = images_dir
         self.tsfm = tsfm
         self.samples = df[['dataset', 'name']].values.tolist()
@@ -129,12 +190,13 @@ class XRayMetaDS(Dataset):
         if hparams.image_size not in IMAGE_SIZES:
             raise ValueError(f'invalid image_size={hparams.image_size}')
 
-        metachest_dir = load_config()['metachest_dir']
+        config = load_config()
+        metachest_dir = config['metachest_dir']
         images_dir = join(metachest_dir, f'images-{hparams.image_size}')
         if not isdir(images_dir):
             raise ValueError(f'invalid images_dir={images_dir}')
 
-        df, unseen, seen = _load_data(metachest_dir, hparams.data_distro, mset)
+        seen, unseen, df = _load_data(config, mset, hparams.data_distro)
         self.mset = mset
         self.df = df
         self.unseen = unseen
