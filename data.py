@@ -37,36 +37,6 @@ def _filter_mset(mset, mclasses, df, n_metadata_cols=5):
     return df
 
 
-# def _load_data(metachest_dir, distro, mset):
-#     df_path = join(metachest_dir, f'metachest.csv')
-#     if not isfile(df_path):
-#         raise ValueError(f"MetaChest CSV not found {df_path}")
-
-#     mtl_dir = join(metachest_dir, 'mtl')
-#     filter_df_path = join(mtl_dir, f'{distro}.csv')
-#     if not isfile(filter_df_path):
-#         raise ValueError(f"Distro CSV not found {filter_df_path}")
-#     config_path = join(mtl_dir, f'{distro}.toml')
-#     if not isfile(config_path):
-#         raise ValueError(f"Distro classes not found {config_path}")
-
-#     df = pd.read_csv(df_path)
-#     filter_df = pd.read_csv(filter_df_path)
-#     mclasses = read_toml(config_path)
-
-#     unseen, seen = {
-#         'mtrn': (mclasses['mtrn'], []),
-#         'mval': (mclasses['mval'], mclasses['mtrn']),
-#         'mtst': (mclasses['mtst'], mclasses['mtrn']),
-#     }[mset]
-
-#     classes = unseen + seen
-#     df = df.loc[filter_df[mset] == 1, ['dataset', 'name'] + classes]
-#     df[classes] = df[classes].fillna(0).astype(int)
-
-#     return df, unseen, seen
-
-
 def _load_data(config, mset, distro):
 
     metachest_dir = config['metachest_dir']
