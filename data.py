@@ -63,14 +63,11 @@ def _load_data(config, mset, distro):
         'mtst': (mclasses['mtrn'], mclasses['mtst']),
     }[mset]
 
-    for classes in [seen, unseen]:
-        for clazz in classes:
-            if not df[clazz].any():
-                df = df.drop(columns=clazz)
-                classes.remove(clazz)
+    seen = [clazz for clazz in seen if df[clazz].any()]
+    unseen = [clazz for clazz in unseen if df[clazz].any()]
 
-    df = df[['dataset', 'name'] + unseen + seen]
-    df[unseen + seen] = df[unseen + seen].fillna(0).astype(int)
+    df = df[['dataset', 'name'] + seen + unseen]
+    df[seen + unseen] = df[seen + unseen].fillna(0).astype(int)
 
     return seen, unseen, df
 
@@ -572,7 +569,7 @@ def test_build_mdl(
         mset='mtrn',
         image_size=384, data_aug=False,
         n_episodes=1, n_way=3, n_unseen=1,
-        trn_k_shot=2, tst_k_shot=6,
+        trn_k_shot=3, tst_k_shot=5,
         norm={'mean': [0.0, 0.0, 0.0], 'std': [1.0, 1.0, 1.0]},
         num_workers=0,
         data_distro='complete',
@@ -592,8 +589,8 @@ def test_build_mdl(
     episode_size = []
 
     for episode in take(mdl, n_episodes):
-        unseen = episode['unseen']
         seen = episode['seen']
+        unseen = episode['unseen']
         n_trn = episode['n_trn']
         n_tst = episode['n_tst']
         dataset = episode['dataset']
@@ -601,13 +598,13 @@ def test_build_mdl(
         x = episode['x']
         y = episode['y']
 
+        print(f'seen={seen} unseen={unseen}')
         print(f'n_trn={n_trn} n_tst={n_tst}')
         print(f'name shape={len(name)}')
         print(f'x shape={x.shape} dtype={x.dtype} '
               f'mean={x.type(torch.float).mean().round(decimals=2)} '
               f'min={x.min()} max={x.max()}')
         print(f'y shape={y.shape} dtype={y.dtype}')
-        print(unseen, seen)
 
         subset = n_trn * ['trn'] + n_tst * ['tst']
         datasets = np.array(dataset)
