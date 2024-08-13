@@ -1,6 +1,5 @@
 """ base.py """
 
-import warnings
 from argparse import Namespace
 
 import pandas as pd
@@ -23,75 +22,23 @@ class Registry(dict):
 METHODS = Registry()
 
 
-# def auroc(y_true, y_prob, average='micro'):
-#     n_classes = y_true.shape[1]
-#     with warnings.catch_warnings():
-#         warnings.simplefilter('ignore')
-#         if n_classes == 1:
-#             return binary_auroc(y_prob.view(-1), y_true.view(-1))
-#         else:
-#             return multilabel_auroc(y_prob, y_true, n_classes, average)
-
-# @torch.inference_mode(True)
-# def compute_track_metrics(y_true, y_prob, unseen, seen):
-#     n_unseen, n_seen = len(unseen), len(seen)
-#     y_true = y_true.int()
-#     metrics = {}
-#     metrics['combined'] = auroc(y_prob, y_true, 'micro').item() * 100
-#     if n_unseen and n_seen:
-#         metrics['unseen'] = auroc(
-#             y_prob[:, :n_unseen], y_true[:, :n_unseen], 'micro').item() * 100
-#         metrics['seen'] = auroc(
-#             y_prob[:, n_unseen:], y_true[:, n_unseen:], 'micro').item() * 100
-#     elif n_unseen:
-#         metrics['unseen'] = metrics['combined']
-#         metrics['seen'] = ''
-#     else:
-#         metrics['unseen'] = ''
-#         metrics['seen'] = metrics['combined']
-#     return metrics
-
-
-# @torch.inference_mode(True)
-# def compute_full_metrics(y_true, y_prob, unseen, seen):
-#     n_unseen, n_seen = len(unseen), len(seen)
-#     y_true = y_true.int()
-#     metrics = {}
-#     metrics['combined'] = auroc(y_prob, y_true, 'micro').item() * 100
-#     if n_unseen and n_seen:
-#         metrics['unseen'] = auroc(
-#             y_prob[:, :n_unseen], y_true[:, :n_unseen], 'micro').item() * 100
-#         metrics['seen'] = auroc(
-#             y_prob[:, n_unseen:], y_true[:, n_unseen:], 'micro').item() * 100
-#     elif n_unseen:
-#         metrics['unseen'] = metrics['combined']
-#         metrics['seen'] = ''
-#     else:
-#         metrics['unseen'] = ''
-#         metrics['seen'] = metrics['combined']
-#     metrics.update(zip(unseen + seen,
-#                        auroc(y_prob, y_true, 'none').cpu().numpy() * 100))
-
-#     print(f'unseen={unseen} seen={seen}')
-#     print(y_true)
-#     print(y_prob.round(decimals=2))
-#     print(metrics)
-#     print()
-#     return metrics
-
-
 def patch_only_one_class(y_true, y_prob):
-    one_class = y_true.all(dim=0)
-    for i, only_one in enumerate(one_class):
-        if only_one:
+    only1s = y_true.all(dim=0)
+    only0s = (1 - y_true).all(dim=0)
+    for i, (only1, only0) in enumerate(zip(only1s, only0s)):
+        if only1:
             j = y_prob[i].argmax()
+            y_true[i, j] = 1 - y_true[i, j]
+            y_prob[i, j] = 1 - y_prob[i, j]
+        elif only0:
+            j = y_prob[i].argmin()
             y_true[i, j] = 1 - y_true[i, j]
             y_prob[i, j] = 1 - y_prob[i, j]
 
 
 def auroc(y_true, y_prob, average='micro'):
     n_classes = y_true.shape[1]
-    # TODO: fix only label
+    # FIXME: fix only label
     patch_only_one_class(y_true, y_prob)
     if n_classes == 1:
         return binary_auroc(y_prob.view(-1), y_true.view(-1))
