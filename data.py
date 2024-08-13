@@ -10,7 +10,7 @@ import torchvision.transforms.functional as F
 from torch.utils.data import Dataset, DataLoader, Sampler
 from torchvision.io import ImageReadMode, read_image
 
-from utils import load_config, read_toml
+from utils import load_config
 
 
 IMAGE_SIZES = {224, 336, 384, 448, 512, 768, 1024}
@@ -58,6 +58,7 @@ def _load_data(config, mset, distro):
     df = _filter_mset(mset, mclasses, df)
 
     seen, unseen = {
+        #        seen              unseen
         'mtrn': ([],               mclasses['mtrn']),
         'mval': (mclasses['mtrn'], mclasses['mval']),
         'mtst': (mclasses['mtrn'], mclasses['mtst']),
@@ -122,7 +123,7 @@ class XRayDS(Dataset):
         y = self.labels[i]
         y = torch.tensor(y, dtype=torch.float32)
 
-        example = [self.unseen, self.seen, dataset, name, x, y]
+        example = [self.seen, self.unseen, dataset, name, x, y]
         return example
 
     def __len__(self):
@@ -164,8 +165,8 @@ class XRayMetaDS(Dataset):
         seen, unseen, df = _load_data(config, mset, hparams.data_distro)
         self.mset = mset
         self.df = df
-        self.unseen = unseen
         self.seen = seen
+        self.unseen = unseen
         self.images_dir = images_dir
         self.trn_tsfm = trn_tsfm
         self.tst_tsfm = tst_tsfm
@@ -177,14 +178,14 @@ class XRayMetaDS(Dataset):
         Parameters
         ----------
         example : [int, str, str, [str], [str], [int]]
-            Example with [subset, dataset, name, unseen, seen, labels]
+            Example with [subset, dataset, name, seen, unseen, labels]
 
         Returns
         -------
         [int, [int], [str], str, torch.tensor, torch.tensor]
-            List of [subset, unseen, seen, dataset, name, x, y].
+            List of [subset, seen, unseen, dataset, name, x, y].
         """
-        subset, dataset, name, unseen, seen, labels = example
+        subset, dataset, name, seen, unseen, labels = example
 
         path = join(self.images_dir, dataset, f'{name}.jpg')
         x = read_image(path, ImageReadMode.RGB)
@@ -192,7 +193,7 @@ class XRayMetaDS(Dataset):
 
         y = torch.tensor(labels, dtype=torch.float32)
 
-        example = [subset, unseen, seen, dataset, name, x, y]
+        example = [subset, seen, unseen, dataset, name, x, y]
         return example
 
     def __len__(self):
@@ -272,19 +273,20 @@ class EpisodeSampler(Sampler):
         Returns
         -------
         [int, str, str, [str], [str], [int]]
-            A list of [subset, dataset, name, unseen, seen, labels] for each example.
+            A list of [subset, dataset, name, seen, unseen, labels] for each example.
         """
         # select classes
-        random.shuffle(self.unseen)
         random.shuffle(self.seen)
-        unseen, seen = self.unseen[:self.n_unseen], self.seen[:self.n_seen]
-        classes = unseen + seen
-        exclude = self.unseen[self.n_unseen:] + self.seen[self.n_seen:]
+        random.shuffle(self.unseen)
+        seen = self.seen[:self.n_seen]
+        unseen = self.unseen[:self.n_unseen]
+        classes = seen + unseen
+        exclude_classes = self.seen[self.n_seen:] + self.unseen[self.n_unseen:]
 
-
-        # exclude examples and classes
-        df = self.df.loc[~self.df[exclude].astype(bool).any(axis=1),
-                         ['dataset', 'name'] + classes]
+        # exclude examples with non selected clases
+        df = self.df.loc[~(self.df[exclude_classes].any(axis=1))]
+        # filter columns
+        df = df[['dataset', 'name'] + classes]
         df = df.reset_index(drop=True)
 
         # sort classes by frequency
@@ -299,7 +301,6 @@ class EpisodeSampler(Sampler):
         trn_df['set'] = trn_df.shape[0] * [TRN_IDX]
         tst_df['set'] = tst_df.shape[0] * [TST_IDX]
         episode_df = pd.concat([trn_df, tst_df])
-        classes = unseen + seen
         episode_df = episode_df[['set', 'dataset', 'name'] + classes]
 
         episode = [
@@ -307,8 +308,8 @@ class EpisodeSampler(Sampler):
                 example['set'],
                 example['dataset'],
                 example['name'],
-                unseen,
                 seen,
+                unseen,
                 [example[c] for c in classes]
             ]
             for example in episode_df.to_dict('records')
@@ -353,7 +354,7 @@ def build_tsfm(data_aug, hparams, debug):
 
 def collate_batch(batch):
     datasets, names, xs, ys = [], [], [], []
-    for unseen, seen, dataset, name, x, y in batch:
+    for seen, unseen, dataset, name, x, y in batch:
         datasets.append(dataset)
         names.append(name)
         xs.append(x)
@@ -361,8 +362,8 @@ def collate_batch(batch):
     x = torch.stack(xs)
     y = torch.stack(ys)
     episode = {
-        'unseen': unseen,
         'seen': seen,
+        'unseen': unseen,
         'dataset': datasets,
         'name': names,
         'x': x,
@@ -375,7 +376,7 @@ def collate_episode(episode):
     # assuming TRN_IDX, TST_IDX = 0, 1
     size = [0, 0]
     datasets, names, xs, ys = [], [], [], []
-    for subset, unseen, seen, dataset, name, x, y in episode:
+    for subset, seen, unseen, dataset, name, x, y in episode:
         size[subset] += 1
         datasets.append(dataset)
         names.append(name)
@@ -551,7 +552,7 @@ def test_build_dl(
               f'mean={x.type(torch.float).mean().round(decimals=2)} '
               f'min={x.min()} max={x.max()}')
         print(f'y shape={y.shape} dtype={y.dtype}')
-        print(unseen, seen)
+        print(seen, unseen)
 
         datasets = np.array(dataset)
         names = np.array(name)
@@ -569,7 +570,7 @@ def test_build_mdl(
         mset='mtrn',
         image_size=384, data_aug=False,
         n_episodes=1, n_way=3, n_unseen=1,
-        trn_k_shot=3, tst_k_shot=5,
+        trn_k_shot=5, tst_k_shot=15,
         norm={'mean': [0.0, 0.0, 0.0], 'std': [1.0, 1.0, 1.0]},
         num_workers=0,
         data_distro='complete',

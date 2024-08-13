@@ -16,7 +16,7 @@ from method import METHODS
 from utils import get_run_dir
 
 
-def save_evaluation(df, unseen, seen, hparams):
+def save_evaluation(df, seen, unseen, hparams):
     path = join(hparams.results_dir, hparams.exp,
                 hparams.run, hparams.episodes_mtst_csv)
     if isfile(path):
@@ -24,14 +24,10 @@ def save_evaluation(df, unseen, seen, hparams):
                        axis=0, ignore_index=True)
     df = df.round(2)
     cols = df.columns[1:]
-    base_cols = ['seed']
-    for col_metric in ('unseen', 'seen'):
-        if col_metric in cols:
-            base_cols.append(col_metric)
-    base_cols.append('combined')
-    unseen = [clazz for clazz in unseen if clazz in cols]
+    base_cols = ['seed', 'seen', 'unseen', 'combined']
     seen = [clazz for clazz in seen if clazz in cols]
-    df = df[base_cols + unseen + seen]
+    unseen = [clazz for clazz in unseen if clazz in cols]
+    df = df[base_cols + seen + unseen]
     df.to_csv(path, index=False)
     print(f'Episodes results: {path}')
 
@@ -97,8 +93,8 @@ def eval(run=None):
         warnings.simplefilter("ignore")
         trainer.test(method, mtst_dl, verbose=False)
 
-    save_evaluation(method.test_df, mtst_dl.dataset.unseen,
-                    mtst_dl.dataset.seen, hparams)
+    save_evaluation(
+        method.test_df, mtst_dl.dataset.seen, mtst_dl.dataset.unseen, hparams)
 
 
 if __name__ == '__main__':

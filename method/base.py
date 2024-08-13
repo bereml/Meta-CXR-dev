@@ -23,55 +23,115 @@ class Registry(dict):
 METHODS = Registry()
 
 
-def auroc(y_prob, y_true, average):
+# def auroc(y_true, y_prob, average='micro'):
+#     n_classes = y_true.shape[1]
+#     with warnings.catch_warnings():
+#         warnings.simplefilter('ignore')
+#         if n_classes == 1:
+#             return binary_auroc(y_prob.view(-1), y_true.view(-1))
+#         else:
+#             return multilabel_auroc(y_prob, y_true, n_classes, average)
+
+# @torch.inference_mode(True)
+# def compute_track_metrics(y_true, y_prob, unseen, seen):
+#     n_unseen, n_seen = len(unseen), len(seen)
+#     y_true = y_true.int()
+#     metrics = {}
+#     metrics['combined'] = auroc(y_prob, y_true, 'micro').item() * 100
+#     if n_unseen and n_seen:
+#         metrics['unseen'] = auroc(
+#             y_prob[:, :n_unseen], y_true[:, :n_unseen], 'micro').item() * 100
+#         metrics['seen'] = auroc(
+#             y_prob[:, n_unseen:], y_true[:, n_unseen:], 'micro').item() * 100
+#     elif n_unseen:
+#         metrics['unseen'] = metrics['combined']
+#         metrics['seen'] = ''
+#     else:
+#         metrics['unseen'] = ''
+#         metrics['seen'] = metrics['combined']
+#     return metrics
+
+
+# @torch.inference_mode(True)
+# def compute_full_metrics(y_true, y_prob, unseen, seen):
+#     n_unseen, n_seen = len(unseen), len(seen)
+#     y_true = y_true.int()
+#     metrics = {}
+#     metrics['combined'] = auroc(y_prob, y_true, 'micro').item() * 100
+#     if n_unseen and n_seen:
+#         metrics['unseen'] = auroc(
+#             y_prob[:, :n_unseen], y_true[:, :n_unseen], 'micro').item() * 100
+#         metrics['seen'] = auroc(
+#             y_prob[:, n_unseen:], y_true[:, n_unseen:], 'micro').item() * 100
+#     elif n_unseen:
+#         metrics['unseen'] = metrics['combined']
+#         metrics['seen'] = ''
+#     else:
+#         metrics['unseen'] = ''
+#         metrics['seen'] = metrics['combined']
+#     metrics.update(zip(unseen + seen,
+#                        auroc(y_prob, y_true, 'none').cpu().numpy() * 100))
+
+#     print(f'unseen={unseen} seen={seen}')
+#     print(y_true)
+#     print(y_prob.round(decimals=2))
+#     print(metrics)
+#     print()
+#     return metrics
+
+
+def patch_only_one_class(y_true, y_prob):
+    one_class = y_true.all(dim=0)
+    for i, only_one in enumerate(one_class):
+        if only_one:
+            j = y_prob[i].argmax()
+            y_true[i, j] = 1 - y_true[i, j]
+            y_prob[i, j] = 1 - y_prob[i, j]
+
+
+def auroc(y_true, y_prob, average='micro'):
     n_classes = y_true.shape[1]
-    with warnings.catch_warnings():
-        warnings.simplefilter('ignore')
-        if n_classes == 1:
-            return binary_auroc(y_prob.view(-1), y_true.view(-1))
-        else:
-            return multilabel_auroc(y_prob, y_true, n_classes, average)
+    # TODO: fix only label
+    patch_only_one_class(y_true, y_prob)
+    if n_classes == 1:
+        return binary_auroc(y_prob.view(-1), y_true.view(-1))
+    else:
+        return multilabel_auroc(y_prob, y_true, n_classes, average)
 
 
 @torch.inference_mode(True)
-def compute_track_metrics(y_true, y_prob, unseen, seen):
-    n_unseen, n_seen = len(unseen), len(seen)
+def compute_metrics(y_true, y_prob, seen, unseen, per_class):
+    n_seen, n_unseen = len(seen), len(unseen)
     y_true = y_true.int()
-    metrics = {}
-    metrics['combined'] = auroc(y_prob, y_true, 'micro').item() * 100
-    if n_unseen and n_seen:
-        metrics['unseen'] = auroc(
-            y_prob[:, :n_unseen], y_true[:, :n_unseen], 'micro').item() * 100
-        metrics['seen'] = auroc(
-            y_prob[:, n_unseen:], y_true[:, n_unseen:], 'micro').item() * 100
-    elif n_unseen:
-        metrics['unseen'] = metrics['combined']
-        metrics['seen'] = ''
+    if n_seen and n_unseen:
+        y_true_seen = y_true[:, :n_seen]
+        y_prob_seen = y_prob[:, :n_seen]
+        y_true_unseen = y_true[:, n_seen:]
+        y_prob_unseen = y_prob[:, n_seen:]
+        auroc_seen = auroc(y_true_seen, y_prob_seen).item() * 100
+        auroc_unseen = auroc(y_true_unseen, y_prob_unseen).item() * 100
+        auroc_combined = ((2 * auroc_seen * auroc_unseen) /
+                          (auroc_seen + auroc_unseen))
+    elif n_seen:
+        y_true_seen = y_true[:, :n_seen]
+        y_prob_seen = y_prob[:, :n_seen]
+        auroc_seen = auroc(y_true_seen, y_prob_seen).item() * 100
+        auroc_unseen = ''
+        auroc_combined = auroc_seen
     else:
-        metrics['unseen'] = ''
-        metrics['seen'] = metrics['combined']
-    return metrics
-
-
-@torch.inference_mode(True)
-def compute_full_metrics(y_true, y_prob, unseen, seen):
-    n_unseen, n_seen = len(unseen), len(seen)
-    y_true = y_true.int()
-    metrics = {}
-    metrics['combined'] = auroc(y_prob, y_true, 'micro').item() * 100
-    if n_unseen and n_seen:
-        metrics['unseen'] = auroc(
-            y_prob[:, :n_unseen], y_true[:, :n_unseen], 'micro').item() * 100
-        metrics['seen'] = auroc(
-            y_prob[:, n_unseen:], y_true[:, n_unseen:], 'micro').item() * 100
-    elif n_unseen:
-        metrics['unseen'] = metrics['combined']
-        metrics['seen'] = ''
-    else:
-        metrics['unseen'] = ''
-        metrics['seen'] = metrics['combined']
-    metrics.update(zip(unseen + seen,
-                       auroc(y_prob, y_true, 'none').cpu().numpy() * 100))
+        y_true_unseen = y_true[:, n_seen:]
+        y_prob_unseen = y_prob[:, n_seen:]
+        auroc_seen = ''
+        auroc_unseen = auroc(y_true_unseen, y_prob_unseen).item() * 100
+        auroc_combined = auroc_unseen
+    metrics = {
+        'seen': auroc_seen,
+        'unseen': auroc_unseen,
+        'combined': auroc_combined
+    }
+    if per_class:
+        auroc_classes = auroc(y_true, y_prob, 'none').cpu().numpy() * 100
+        metrics.update(zip(seen + unseen, auroc_classes))
     return metrics
 
 
@@ -118,13 +178,13 @@ class FewShotMethod(pl.LightningModule):
                       on_step=self.hparams['log_on_step'])
 
     def compute_metrics_and_log(self, meta_set, y_true, y_prob,
-                                unseen, seen, loss):
-        metrics = compute_track_metrics(y_true, y_prob, unseen, seen)
+                                seen, unseen, loss):
+        metrics = compute_metrics(y_true, y_prob, seen, unseen, False)
         metrics['loss'] = loss.item()
         self.log_metrics(meta_set, metrics)
 
-    def compute_full_metrics(self, y_true_tst, y_prob_tst, unseen, seen):
-        return compute_full_metrics(y_true_tst, y_prob_tst, unseen, seen)
+    def compute_full_metrics(self, y_true_tst, y_prob_tst, seen, unseen):
+        return compute_metrics(y_true_tst, y_prob_tst, seen, unseen, True)
 
     def add_episode_metrics(self, metrics):
         self.episodes_metrics.append(metrics)

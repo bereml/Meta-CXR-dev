@@ -58,13 +58,13 @@ class BatchBased(FewShotMethod):
 
     def training_step(self, batch, _):
         if self.net.head_classes == 0:
-            self.net.new_head('fc', len(batch['unseen']) + len(batch['seen']))
+            self.net.new_head('fc', len(batch['seen']) + len(batch['unseen']))
         y_true, y_prob, loss = self.train_batch(batch)
         if (self.hparams.batchbased_reset_head != 0 and
             (self.current_epoch + 1) % self.hparams.batchbased_reset_head == 0):
             self.net.reset_head()
         self.compute_metrics_and_log('mtrn', y_true, y_prob,
-                                     batch['unseen'], batch['seen'], loss)
+                                     batch['seen'], batch['unseen'], loss)
 
 
     def adapt_episode_inner(self, x, y_true, net, opt, steps, batch_size):
@@ -123,13 +123,15 @@ class BatchBased(FewShotMethod):
         y_true_tst, y_prob_tst, loss = self.adapt_episode(episode)
         self.compute_metrics_and_log(
             'mval', y_true_tst, y_prob_tst,
-            episode['unseen'], episode['seen'], loss)
+            episode['seen'], episode['unseen'],
+            loss
+        )
 
     @torch.enable_grad()
     def test_step(self, episode, _):
         y_true_tst, y_prob_tst, _ = self.adapt_episode(episode)
         metrics = self.compute_full_metrics(
-            y_true_tst, y_prob_tst, episode['unseen'], episode['seen'])
+            y_true_tst, y_prob_tst, episode['seen'], episode['unseen'])
         self.add_episode_metrics(metrics)
 
     @staticmethod
