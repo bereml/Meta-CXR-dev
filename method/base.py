@@ -1,5 +1,6 @@
 """ base.py """
 
+import warnings
 from argparse import Namespace
 
 import pandas as pd
@@ -40,10 +41,12 @@ def auroc(y_true, y_prob, average='micro'):
     n_classes = y_true.shape[1]
     # FIXME: fix only label
     patch_only_one_class(y_true, y_prob)
-    if n_classes == 1:
-        return binary_auroc(y_prob.view(-1), y_true.view(-1))
-    else:
-        return multilabel_auroc(y_prob, y_true, n_classes, average)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        if n_classes == 1:
+            return binary_auroc(y_prob.view(-1), y_true.view(-1))
+        else:
+            return multilabel_auroc(y_prob, y_true, n_classes, average)
 
 
 @torch.inference_mode(True)
