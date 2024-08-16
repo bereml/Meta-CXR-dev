@@ -18,7 +18,8 @@ TRN_IDX, TST_IDX = 0, 1
 
 
 def _filter_mset(mset, mclasses, df, n_metadata_cols=5):
-    mval_mtst_examples = df[mclasses['mval'] + mclasses['mtst']].any(axis=1)
+    mval_mtst_classes = mclasses['mval'] + mclasses['mtst']
+    mval_mtst_examples = df[mval_mtst_classes].any(axis=1)
     if mset == 'mtrn':
         # keep examples with only mtrn classes
         mtrn_only_examples = ~mval_mtst_examples
