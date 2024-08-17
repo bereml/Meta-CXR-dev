@@ -40,7 +40,7 @@ def patch_only_one_class(y_true, y_prob):
 def auroc(y_true, y_prob, average='micro'):
     n_classes = y_true.shape[1]
     # FIXME: fix only label
-    patch_only_one_class(y_true, y_prob)
+    # patch_only_one_class(y_true, y_prob)
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         if n_classes == 1:

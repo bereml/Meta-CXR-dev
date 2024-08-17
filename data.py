@@ -28,11 +28,13 @@ def _filter_mset(mset, mclasses, df, n_metadata_cols=5):
     else:
         # discarding examples with only mtrn classes
         df = df[mval_mtst_examples]
+        # TODO: remove if include-0s works
         # keep examples with mtrn+mset clases
-        mtrn_mset_classes = mclasses['mtrn'] + mclasses[mset]
-        mtrn_mset_examples = df[mtrn_mset_classes].any(axis=1)
-        df = df[mtrn_mset_examples]
-        classes = mtrn_mset_classes
+        # mtrn_mset_classes = mclasses['mtrn'] + mclasses[mset]
+        # mtrn_mset_examples = df[mtrn_mset_classes].any(axis=1)
+        # df = df[mtrn_mset_examples]
+        # classes = mtrn_mset_classes
+        classes = mclasses['mtrn'] + mclasses[mset]
     cols = list(df.columns[:n_metadata_cols]) + classes
     df = df[cols]
     return df
@@ -216,18 +218,24 @@ def sample_at_least_k_shot(df, k_shot):
         pd.DataFrame
             Episode dataframe.
         """
-    kdf = pd.DataFrame(columns=df.columns)
-    for clazz in df.columns[2:].values:
+    episode_df = pd.DataFrame(columns=df.columns)
+    classes = df.columns[2:].values
+    for clazz in classes:
         # count missing examples for the class
-        k_miss = k_shot - kdf[clazz].sum()
+        k_miss = k_shot - episode_df[clazz].sum()
         if k_miss > 0:
             # select the k missing examples
-            cdf = df[df[clazz] == 1].iloc[:k_miss]
+            class_df = df[df[clazz] == 1].iloc[:k_miss]
             # append them
-            kdf = pd.concat([kdf, cdf])
+            episode_df = pd.concat([episode_df, class_df])
             # remove them
-            df.drop(cdf.index, inplace=True)
-    return kdf
+            df.drop(class_df.index, inplace=True)
+    # TODO: remove if include-0s does not work
+    k_miss = len(classes) * k_shot - episode_df.shape[0]
+    if k_miss > 0:
+        class_df = df[(1 - df[classes]).all(axis=1)].iloc[:k_miss]
+        episode_df = pd.concat([episode_df, class_df])
+    return episode_df
 
 
 class EpisodeSampler(Sampler):
@@ -285,7 +293,9 @@ class EpisodeSampler(Sampler):
         exclude_classes = self.seen[self.n_seen:] + self.unseen[self.n_unseen:]
 
         # exclude examples with non selected clases
-        df = self.df.loc[~(self.df[exclude_classes].any(axis=1))]
+        # TODO: remove if include-0s works
+        # df = self.df.loc[~(self.df[exclude_classes].any(axis=1))]
+        df = self.df
         # filter columns
         df = df[['dataset', 'name'] + classes]
         df = df.reset_index(drop=True)
