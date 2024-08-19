@@ -5,6 +5,7 @@ from types import SimpleNamespace
 
 import torch
 import torch.optim as optim
+from torch.amp import GradScaler
 
 from network import create_net
 from .base import FewShotMethod, METHODS
@@ -47,7 +48,7 @@ class EpisodeBased(FewShotMethod):
 
 
     def adapt_inner(self, x, y_true, net, opt, steps, batch_size):
-        scaler = torch.cuda.amp.GradScaler()
+        scaler = GradScaler()
         for _ in range(steps):
             idx = torch.randperm(len(y_true))[:batch_size]
             x_batch, y_true_batch = x[idx], y_true[idx]

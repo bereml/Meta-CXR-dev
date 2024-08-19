@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import torch
 import torch.optim as optim
-
+from torch.amp import GradScaler
 
 from network import create_net
 from utils import str2list
@@ -33,7 +33,7 @@ class BatchBased(FewShotMethod):
 
     def on_train_start(self):
         super().on_train_start()
-        self.scaler = torch.cuda.amp.GradScaler()
+        self.scaler = GradScaler()
 
     def train_batch(self, batch):
         x, y_true = batch['x'], batch['y']
@@ -63,7 +63,7 @@ class BatchBased(FewShotMethod):
 
 
     def adapt_episode_inner(self, x, y_true, net, opt, steps, batch_size):
-        scaler = torch.cuda.amp.GradScaler()
+        scaler = GradScaler()
         for _ in range(steps):
             idx = torch.randperm(len(y_true))[:batch_size]
             x_batch, y_true_batch = x[idx], y_true[idx]
