@@ -14,7 +14,7 @@ from .base import FewShotMethod, METHODS
 class EpisodeBased(FewShotMethod):
 
     def __init__(self, hparams):
-        super().__init__()
+        super().__init__(hparams)
         hparams = self.convert_hparams(hparams)
         self.net = create_net(
             backbone=hparams.net_backbone,
@@ -22,11 +22,6 @@ class EpisodeBased(FewShotMethod):
         )
         self.save_hparams(hparams, self.net)
         self.automatic_optimization = False
-        self.float_type = {
-            16: torch.bfloat16,
-            32: torch.float32,
-        }[self.hparams.precision]
-
 
     def _mset_hparams(self, mset):
         return SimpleNamespace(**{

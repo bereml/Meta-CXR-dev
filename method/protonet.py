@@ -81,7 +81,7 @@ def compute_similarity(p, z):
 class ProtoNet(FewShotMethod):
 
     def __init__(self, hparams):
-        super().__init__()
+        super().__init__(hparams)
         hparams = self.convert_hparams(hparams)
         self.net = create_net(
             backbone=hparams.net_backbone,
