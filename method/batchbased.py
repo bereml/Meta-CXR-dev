@@ -65,13 +65,15 @@ class BatchBased(FewShotMethod):
     def adapt_episode_inner(self, x, y_true, net, opt, steps, batch_size):
         scaler = GradScaler()
         for _ in range(steps):
-            idx = torch.randperm(len(y_true))[:batch_size]
+            idx = torch.randperm(x.shape[0])[:batch_size]
             x_batch, y_true_batch = x[idx], y_true[idx]
             with torch.autocast(self.device.type, self.float_type):
                 y_lgts_batch = net(x_batch)
                 loss = self.loss_fn(y_lgts_batch, y_true_batch)
             opt.zero_grad()
-            scaler.scale(loss).backward()
+            loss = scaler.scale(loss)
+            # got same results loss.backward() or self.manual_backward(loss)
+            loss.backward()
             scaler.step(opt)
             scaler.update()
 
@@ -131,39 +133,36 @@ class BatchBased(FewShotMethod):
 
     @staticmethod
     def add_args(parser):
+        # mtrn
         parser.add_argument('--batchbased_trn_lr',
                             type=float, default=0.0001,
                             help='meta-trn lr')
         parser.add_argument('--batchbased_sch_milestones',
                             type=str2list, default=[1],
                             help='scheduler milestones')
-        parser.add_argument('--batchbased_mval_lr',
-                            type=float, default=0.005,
-                            help='meta-val learning rate')
-        parser.add_argument('--batchbased_inner_steps',
-                            type=int, default=100,
-                            help='number of inner update steps')
-        parser.add_argument('--batchbased_mval_net_steps',
-                            type=int, default=0,
-                            help='meta-val full net learning steps')
-        parser.add_argument('--batchbased_mval_net_lr',
-                            type=float, default=0.005,
-                            help='meta-val full net learning rate')
-        parser.add_argument('--batchbased_mval_net_batch_pct',
-                            type=float, default=1.0,
-                            help='number of inner update steps')
-        parser.add_argument('--batchbased_mval_head_steps',
-                            type=int, default=100,
-                            help='meta-val head only learning steps')
-        parser.add_argument('--batchbased_mval_head_lr',
-                            type=float, default=0.005,
-                            help='meta-val head only learning rate')
-        parser.add_argument('--batchbased_mval_head_batch_pct',
-                            type=float, default=0.5,
-                            help='number of inner update steps')
-        parser.add_argument('--batchbased_train_batches',
-                            type=int, default=0,
-                            help='number of train batches, 0 means all')
         parser.add_argument('--batchbased_reset_head',
                             type=int, default=0,
                             help='reset head every given epochs')
+        # mval
+        parser.add_argument('--batchbased_mval_net_batch_pct',
+                            type=float, default=1.00,
+                            help='meta-val data batch percentage used for inner step')
+        parser.add_argument('--batchbased_mval_net_lr',
+                            type=float, default=0.005,
+                            help='meta-val full net learning rate')
+        parser.add_argument('--batchbased_mval_net_steps',
+                            type=int, default=0,
+                            help='meta-val full net learning steps')
+        parser.add_argument('--batchbased_mval_head_batch_pct',
+                            type=float, default=0.50,
+                            help='data batch percentage used for inner step')
+        parser.add_argument('--batchbased_mval_head_lr',
+                            type=float, default=0.005,
+                            help='meta-val head only learning rate')
+        parser.add_argument('--batchbased_mval_head_steps',
+                            type=int, default=100,
+                            help='meta-val head only learning steps')
+        # other
+        parser.add_argument('--batchbased_train_batches',
+                            type=int, default=0,
+                            help='number of train batches, 0 means all')

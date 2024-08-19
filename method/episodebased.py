@@ -50,14 +50,14 @@ class EpisodeBased(FewShotMethod):
     def adapt_inner(self, x, y_true, net, opt, steps, batch_size):
         scaler = GradScaler()
         for _ in range(steps):
-            idx = torch.randperm(len(y_true))[:batch_size]
+            idx = torch.randperm(x.shape[0])[:batch_size]
             x_batch, y_true_batch = x[idx], y_true[idx]
             with torch.autocast(self.device.type, self.float_type):
                 y_lgts_batch = net(x_batch)
                 loss = self.loss_fn(y_lgts_batch, y_true_batch)
             opt.zero_grad()
             loss = scaler.scale(loss)
-            # same results loss.backward() or self.manual_backward(loss)
+            # got same results loss.backward() or self.manual_backward(loss)
             loss.backward()
             scaler.step(opt)
             scaler.update()
@@ -66,9 +66,9 @@ class EpisodeBased(FewShotMethod):
         # prepare data & model
         x_trn, y_true_trn, x_tst, y_true_tst = self.split(episode)
         n_examples, n_classes = y_true_trn.shape
-        # HORROR
         net = self.net if mtrn else deepcopy(self.net)
         net.new_head('fc', n_classes)
+
         # adapt full net
         batch_size = int(n_examples * hparams.net_batch_pct)
         net.unfreeze_and_train_backbone()
@@ -76,22 +76,23 @@ class EpisodeBased(FewShotMethod):
         opt = optim.AdamW(net.parameters(), lr=hparams.net_lr)
         self.adapt_inner(
             x_trn, y_true_trn, net, opt,
-            hparams.net_steps, batch_size
-        )
+            hparams.net_steps, batch_size)
+
         # adapt head only
         batch_size = int(n_examples * hparams.head_batch_pct)
         net.freeze_and_eval_backbone()
         opt = optim.AdamW(net.head.parameters(), lr=hparams.head_lr)
         self.adapt_inner(
             x_trn, y_true_trn, net, opt,
-            hparams.head_steps, batch_size
-        )
+            hparams.head_steps, batch_size)
+
         # evaluation
         net.eval()
         with torch.no_grad():
             y_lgts_tst = net(x_tst)
             y_prob_tst = torch.sigmoid(y_lgts_tst)
             loss = self.loss_fn(y_lgts_tst, y_true_tst)
+
         return y_true_tst, y_prob_tst, loss
 
     def training_step(self, episode, _):
@@ -121,26 +122,28 @@ class EpisodeBased(FewShotMethod):
 
     @staticmethod
     def add_args(parser):
+        # mtrn
         parser.add_argument('--episodebased_mtrn_net_batch_pct',
-                            type=float, default=0.5,
+                            type=float, default=0.50,
                             help='data batch percentage used for inner step')
         parser.add_argument('--episodebased_mtrn_net_lr',
                             type=float, default=0.0001,
                             help='learning rate')
         parser.add_argument('--episodebased_mtrn_net_steps',
-                            type=int, default=5,
+                            type=int, default=100,
                             help='number of inner training steps')
         parser.add_argument('--episodebased_mtrn_head_batch_pct',
-                            type=float, default=1.0,
-                            help='data batch percentage used for inner step')
+                            type=float, default=0.75,
+                            help='meta-trn data batch percentage used for inner step')
         parser.add_argument('--episodebased_mtrn_head_lr',
                             type=float, default=0.005,
-                            help='learning rate')
+                            help='meta-trn head learning rate')
         parser.add_argument('--episodebased_mtrn_head_steps',
                             type=int, default=100,
                             help='number of inner training steps')
+        # mtst
         parser.add_argument('--episodebased_mtst_net_batch_pct',
-                            type=float, default=1.0,
+                            type=float, default=1.00,
                             help='data batch percentage used for inner step')
         parser.add_argument('--episodebased_mtst_net_lr',
                             type=float, default=0.005,
@@ -149,7 +152,7 @@ class EpisodeBased(FewShotMethod):
                             type=int, default=0,
                             help='number of inner training steps')
         parser.add_argument('--episodebased_mtst_head_batch_pct',
-                            type=float, default=1.0,
+                            type=float, default=0.50,
                             help='data batch percentage used for inner step')
         parser.add_argument('--episodebased_mtst_head_lr',
                             type=float, default=0.005,
