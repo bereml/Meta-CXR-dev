@@ -91,10 +91,8 @@ class FewShotMethod(pl.LightningModule):
         super().__init__()
         self.loss_fn = self.build_loss()
         self.episodes_metrics = []
-        self.float_type = {
-            16: torch.bfloat16,
-            32: torch.float32,
-        }[hparams.precision]
+        self.float_type = {16: torch.bfloat16, 32: torch.float32
+                           }[hparams.precision]
 
     def convert_hparams(self, hparams):
         if isinstance(hparams, dict):
