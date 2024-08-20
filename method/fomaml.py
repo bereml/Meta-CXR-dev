@@ -14,7 +14,7 @@ from .base import FewShotMethod, METHODS
 class FOMAML(FewShotMethod):
 
     def __init__(self, hparams):
-        super().__init__()
+        super().__init__(hparams)
         hparams = self.convert_hparams(hparams)
         self.net = create_net(
             backbone=hparams.net_backbone,
