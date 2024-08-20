@@ -52,7 +52,8 @@ def _load_data(config, mset, distro):
         distro_path = join(metachest_dir, 'distro', f'{distro}.csv')
         if not isfile(distro_path):
             raise ValueError(f"Distro CSV not found {distro_path}")
-        distro_mask = pd.read_csv(distro_path).iloc[:, 0].astype(bool)
+        distro_df = pd.read_csv(distro_path)
+        distro_mask = distro_df[mset].astype(bool)
         df = df[distro_mask]
 
     mclasses = {'mtrn': config['mtrn'],
