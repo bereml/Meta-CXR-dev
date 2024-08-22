@@ -100,8 +100,8 @@ def parse_args():
                         type=int, default=500,
                         help='maximum number of epochs')
     parser.add_argument('--stop_metric',
-                        type=str, default='combined',
-                        choices=['combined', 'loss'],
+                        type=str, default='hm',
+                        choices=['hm', 'loss'],
                         help='early stopping metric')
     parser.add_argument('--stop_patience',
                         type=int, default=25,
