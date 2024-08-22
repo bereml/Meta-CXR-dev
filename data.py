@@ -204,7 +204,41 @@ class XRayMetaDS(Dataset):
         return len(self.df)
 
 
-def sample_at_least_k_shot(df, k_shot):
+# def sample_at_least_k_shot(df, k_shot):
+#     """Samples an episode with at least `k` examples per class.
+
+#         Parameters
+#         ----------
+#         df : pd.DataFrame
+#             Array of labels with first column as index.
+#         k_shot : int
+#             Numbers of k-shot examples for the episode.
+
+#         Returns
+#         -------
+#         pd.DataFrame
+#             Episode dataframe.
+#         """
+#     episode_df = pd.DataFrame(columns=df.columns)
+#     classes = df.columns[2:].values
+#     for clazz in classes:
+#         # count missing examples for the class
+#         k_miss = k_shot - episode_df[clazz].sum()
+#         if k_miss > 0:
+#             # select the k missing examples
+#             class_df = df[df[clazz] == 1].iloc[:k_miss]
+#             # append them
+#             episode_df = pd.concat([episode_df, class_df])
+#             # remove them
+#             df.drop(class_df.index, inplace=True)
+#     # TODO: remove if include-0s does not work
+#     k_miss = len(classes) * k_shot - episode_df.shape[0]
+#     if k_miss > 0:
+#         class_df = df[(1 - df[classes]).all(axis=1)].iloc[:k_miss]
+#         episode_df = pd.concat([episode_df, class_df])
+#     return episode_df
+
+def sample_at_least_k_shot(df, k_shot, excluded_df):
     """Samples an episode with at least `k` examples per class.
 
         Parameters
@@ -231,12 +265,15 @@ def sample_at_least_k_shot(df, k_shot):
             episode_df = pd.concat([episode_df, class_df])
             # remove them
             df.drop(class_df.index, inplace=True)
-    # TODO: remove if include-0s does not work
-    k_miss = len(classes) * k_shot - episode_df.shape[0]
-    if k_miss > 0:
-        class_df = df[(1 - df[classes]).all(axis=1)].iloc[:k_miss]
+
+    # if all 1s in any class:
+    if episode_df[classes].all(axis=0).any():
+        class_df = excluded_df.iloc[:1]
+        excluded_df.drop(class_df.index, inplace=True)
         episode_df = pd.concat([episode_df, class_df])
+
     return episode_df
+
 
 
 class EpisodeSampler(Sampler):
@@ -295,8 +332,13 @@ class EpisodeSampler(Sampler):
 
         # exclude examples with non selected clases
         # TODO: remove if include-0s works
+        excluded_mask = self.df[exclude_classes].any(axis=1)
+        df = self.df.loc[~excluded_mask].copy()
+        excluded_df = self.df[excluded_mask].copy()
         # df = self.df.loc[~(self.df[exclude_classes].any(axis=1))]
-        df = self.df
+        # excluded_df = self.df.loc[self.df[exclude_classes].any(axis=1)]
+        # df = self.df
+
         # filter columns
         df = df[['dataset', 'name'] + classes]
         df = df.reset_index(drop=True)
@@ -308,13 +350,16 @@ class EpisodeSampler(Sampler):
         # shuffle dataset
         df = df.sample(df.shape[0]).reset_index(drop=True)
 
-        trn_df = sample_at_least_k_shot(df, self.trn_k_shot)
-        tst_df = sample_at_least_k_shot(df, self.tst_k_shot)
+        trn_df = sample_at_least_k_shot(df, self.trn_k_shot, excluded_df)
+        tst_df = sample_at_least_k_shot(df, self.tst_k_shot, excluded_df)
         trn_df['set'] = trn_df.shape[0] * [TRN_IDX]
         tst_df['set'] = tst_df.shape[0] * [TST_IDX]
         episode_df = pd.concat([trn_df, tst_df])
-        episode_df = episode_df[['set', 'dataset', 'name'] + classes]
 
+        # restore original order of seen, unseen
+        classes = seen + unseen
+
+        episode_df = episode_df[['set', 'dataset', 'name'] + classes]
         episode = [
             [
                 example['set'],
@@ -399,8 +444,8 @@ def collate_episode(episode):
     episode = {
         'n_trn': size[TRN_IDX],
         'n_tst': size[TST_IDX],
-        'unseen': unseen,
         'seen': seen,
+        'unseen': unseen,
         'dataset': datasets,
         'name': names,
         'x': x,
@@ -596,6 +641,9 @@ def test_build_mdl(
 
     hparams = SimpleNamespace(**hparams)
 
+    np.random.seed(seed)
+    random.seed(seed)
+
     mdl = build_mdl(
         mset, n_episodes, n_way, n_unseen, trn_k_shot, tst_k_shot, hparams)
 
@@ -623,7 +671,7 @@ def test_build_mdl(
         datasets = np.array(dataset)
         names = np.array(name)
         data = np.column_stack([subset, datasets, names, y.type(torch.int)])
-        cols = ['subset', 'dataset', 'name'] + unseen + seen
+        cols = ['subset', 'dataset', 'name'] + seen + unseen
         df = pd.DataFrame(data, columns=cols)
         pd.set_option('display.max_colwidth', 500)
         print(df)

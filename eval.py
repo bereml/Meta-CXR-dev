@@ -24,7 +24,7 @@ def save_evaluation(df, seen, unseen, hparams):
                        axis=0, ignore_index=True)
     df = df.round(2)
     cols = df.columns[1:]
-    base_cols = ['seed', 'seen', 'unseen', '']
+    base_cols = ['seed', 'seen', 'unseen', 'hm']
     seen = [clazz for clazz in seen if clazz in cols]
     unseen = [clazz for clazz in unseen if clazz in cols]
     df = df[base_cols + seen + unseen]
