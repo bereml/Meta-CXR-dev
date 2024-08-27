@@ -268,8 +268,9 @@ def sample_at_least_k_shot(df, k_shot, excluded_df):
 
     # if all 1s in any class:
     if episode_df[classes].all(axis=0).any():
-        class_df = excluded_df.iloc[:1]
-        excluded_df.drop(class_df.index, inplace=True)
+        # class_df = excluded_df.iloc[:1]
+        # excluded_df.drop(class_df.index, inplace=True)
+        class_df = excluded_df.sample(1)
         episode_df = pd.concat([episode_df, class_df])
 
     return episode_df
