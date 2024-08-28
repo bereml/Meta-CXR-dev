@@ -230,6 +230,7 @@ def study_shift_ds(
         data_distro, data_complete_with_norm, seed = cfg
         run = '_'.join([
             data_distro,
+            data_complete_with_norm,
         ])
         hparams = {}
         if debug:
