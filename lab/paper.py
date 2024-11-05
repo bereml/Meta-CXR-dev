@@ -106,7 +106,7 @@ def paper_gfsl(
         debug=False):
     exp = 'gfsl'
     cfgs = list(product(
-        # n_way, n_unseen
+        # mtst_n_way, mtst_n_unseen
         [
             [3, 1],
             [3, 2],
@@ -121,7 +121,7 @@ def paper_gfsl(
             [5, 4],
             [5, 5],
         ],
-        # k_shot
+        # mtst_trn_k_shot
         [1, 5, 15],
         seeds,
     ))
@@ -229,6 +229,50 @@ def paper_pretraining(
         if checkpoint_name:
             checkpoint_name = '_'.join([net_backbone, checkpoint_name, f'seed{seed}'])
             hparams['checkpoint_name'] = checkpoint_name
+
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            net_weights=net_weights,
+            method=method,
+            seed=seed,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
+def paper_batchbased(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'batchbased'
+    net_backbone = 'mobilenetv3-large-100'
+    cfgs = list(product(
+        #   [net_weights,      method,       checkpoint_name]
+        [
+            ['random',         'batchbased', 'metachest'],
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (net_weights, method, checkpoint_name), seed = cfg
+        run = '_'.join([
+            net_weights,
+            method,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+                           else DEBUG_HPARAMS)
+            results_dir = 'rdev'
+
+        # include backbone name in net_weights & checkpoint_name
+        # if 'metachest' in net_weights:
+        #     net_weights = '_'.join([net_backbone, net_weights, f'seed{seed}'])
+        # if checkpoint_name:
+        #     checkpoint_name = '_'.join([net_backbone, checkpoint_name, f'seed{seed}'])
+        #     hparams['checkpoint_name'] = checkpoint_name
 
         train_model(
             results_dir=results_dir,
