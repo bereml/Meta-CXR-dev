@@ -60,24 +60,24 @@ def compute_metrics(y_true, y_prob, seen, unseen, per_class):
         y_prob_unseen = y_prob[:, n_seen:]
         auroc_seen = auroc(y_true_seen, y_prob_seen).item() * 100
         auroc_unseen = auroc(y_true_unseen, y_prob_unseen).item() * 100
-        auroc_combined = ((2 * auroc_seen * auroc_unseen) /
+        auroc_hm = ((2 * auroc_seen * auroc_unseen) /
                           (auroc_seen + auroc_unseen))
     elif n_seen:
         y_true_seen = y_true[:, :n_seen]
         y_prob_seen = y_prob[:, :n_seen]
         auroc_seen = auroc(y_true_seen, y_prob_seen).item() * 100
         auroc_unseen = ''
-        auroc_combined = auroc_seen
+        auroc_hm = auroc_seen
     else:
         y_true_unseen = y_true[:, n_seen:]
         y_prob_unseen = y_prob[:, n_seen:]
         auroc_seen = ''
         auroc_unseen = auroc(y_true_unseen, y_prob_unseen).item() * 100
-        auroc_combined = auroc_unseen
+        auroc_hm = auroc_unseen
     metrics = {
         'seen': auroc_seen,
         'unseen': auroc_unseen,
-        'combined': auroc_combined
+        'hm': auroc_hm
     }
     if per_class:
         auroc_classes = auroc(y_true, y_prob, 'none').cpu().numpy() * 100

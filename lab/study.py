@@ -7,7 +7,7 @@ from os.path import join, isfile
 
 from tqdm import tqdm
 
-from utils import aggregate_exp_df, train_model
+from utils import aggregate_exp_df, eval_model, train_model
 
 
 SEEDS = [0]
@@ -321,6 +321,49 @@ def study_repro(
             exp=exp,
             run=run,
             seed=seed,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
+
+def study_shift_ds(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        checkpoint_name='base',
+        debug=False):
+    exp = 'shift_ds'
+    cfgs = list(product(
+        # data_distro
+        [
+            'ds_chestxray14',
+            'ds_chexpert',
+            'ds_mimic',
+            'ds_padchest',
+            'complete',
+        ],
+        # data_complete_with_norm
+        ['1', 'nk'],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        data_distro, data_complete_with_norm, seed = cfg
+        run = '_'.join([
+            data_distro,
+            data_complete_with_norm,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB)
+            results_dir = 'rdev'
+        eval_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            data_distro=data_distro,
+            data_complete_with_norm=data_complete_with_norm,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))

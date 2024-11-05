@@ -150,44 +150,44 @@ def paper_gfsl(
         aggregate_exp_df(join(results_dir, exp))
 
 
-def paper_foundation(
-        seeds=SEEDS,
-        results_dir=RESULTS_DIR,
-        mtrn_batch_size=48,
-        debug=False):
-    exp = 'foundation'
-    cfgs = list(product(
-        # image_size, net_backbone, net_weights
-        [
-            # [336, 'eva02-tiny', 'i21k'],
-            # [336, 'eva02-small', 'i21k'],
-            [448, 'eva02-large', 'mim_m38m_ft_in22k_in1k'],
-            # [448, 'eva02-large', 'mim_in22k_ft_in22k_in1k'],
-        ],
-        seeds,
-    ))
-    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        (image_size, net_backbone, net_weights), seed = cfg
-        run = '_'.join([
-            net_backbone,
-            net_weights
-        ])
-        hparams = {}
-        if debug:
-            hparams.update(DEBUG_HPARAMS_BB)
-            results_dir = 'rdev'
-        train_model(
-            results_dir=results_dir,
-            exp=exp,
-            run=run,
-            image_size=image_size,
-            net_backbone=net_backbone,
-            net_weights=net_weights,
-            mtrn_batch_size=mtrn_batch_size,
-            seed=seed,
-            **hparams
-        )
-        aggregate_exp_df(join(results_dir, exp))
+# def paper_foundation(
+#         seeds=SEEDS,
+#         results_dir=RESULTS_DIR,
+#         mtrn_batch_size=48,
+#         debug=False):
+#     exp = 'foundation'
+#     cfgs = list(product(
+#         # image_size, net_backbone, net_weights
+#         [
+#             # [336, 'eva02-tiny', 'i21k'],
+#             # [336, 'eva02-small', 'i21k'],
+#             [448, 'eva02-large', 'mim_m38m_ft_in22k_in1k'],
+#             # [448, 'eva02-large', 'mim_in22k_ft_in22k_in1k'],
+#         ],
+#         seeds,
+#     ))
+#     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+#         (image_size, net_backbone, net_weights), seed = cfg
+#         run = '_'.join([
+#             net_backbone,
+#             net_weights
+#         ])
+#         hparams = {}
+#         if debug:
+#             hparams.update(DEBUG_HPARAMS_BB)
+#             results_dir = 'rdev'
+#         train_model(
+#             results_dir=results_dir,
+#             exp=exp,
+#             run=run,
+#             image_size=image_size,
+#             net_backbone=net_backbone,
+#             net_weights=net_weights,
+#             mtrn_batch_size=mtrn_batch_size,
+#             seed=seed,
+#             **hparams
+#         )
+#         aggregate_exp_df(join(results_dir, exp))
 
 
 def paper_pretraining(

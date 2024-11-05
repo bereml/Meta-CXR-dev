@@ -75,6 +75,11 @@ def parse_args():
     parser.add_argument('--num_workers',
                         type=int, default=8,
                         help='dataloaders number of workers')
+    # TODO: remove
+    parser.add_argument('--data_complete_with_norm',
+                        type=str, default='1',
+                        choices=['1', 'nk'],
+                        help='enable data augmentation')
     # NETWORK
     parser.add_argument('--net_backbone',
                         type=str, default='mobilenetv3-large-100',
@@ -100,8 +105,8 @@ def parse_args():
                         type=int, default=500,
                         help='maximum number of epochs')
     parser.add_argument('--stop_metric',
-                        type=str, default='combined',
-                        choices=['combined', 'loss'],
+                        type=str, default='hm',
+                        choices=['hm', 'loss'],
                         help='early stopping metric')
     parser.add_argument('--stop_patience',
                         type=int, default=25,

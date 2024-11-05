@@ -134,6 +134,24 @@ class XRayDS(Dataset):
         return len(self.samples)
 
 
+def _load_norm(metachest_dir, hparams, config, mset):
+    norm_images_dir = join(metachest_dir, f'norm_images-{hparams.image_size}')
+    norm_df = pd.read_csv(join(config['metachest_dir'], f'norm_metachest.csv'))
+
+    distro = hparams.data_distro
+    if distro != 'complete':
+        distro_path = join(metachest_dir, 'norm_distro', f'{distro}.csv')
+        if not isfile(distro_path):
+            raise ValueError(f"Distro CSV not found {distro_path}")
+        distro_df = pd.read_csv(distro_path)
+        distro_mask = distro_df[mset].astype(bool)
+        norm_df = norm_df[distro_mask]
+
+    PATHOLOGIES = sorted(list(norm_df.columns[5:]))
+    norm_df[PATHOLOGIES] = norm_df[PATHOLOGIES].fillna(0).astype(int)
+    norm_df = norm_df[(~norm_df[PATHOLOGIES].astype(bool)).all(axis=1)]
+
+    return norm_df, norm_images_dir
 class XRayMetaDS(Dataset):
     """XRay Meta-Dataset."""
 
@@ -166,6 +184,9 @@ class XRayMetaDS(Dataset):
         if not isdir(images_dir):
             raise ValueError(f'invalid images_dir={images_dir}')
 
+        self.norm_df, self.norm_images_dir = _load_norm(metachest_dir, hparams, config, mset)
+        self.data_complete_with_norm = hparams.data_complete_with_norm
+
         seen, unseen, df = _load_data(config, mset, hparams.data_distro)
         self.mset = mset
         self.df = df
@@ -186,12 +207,19 @@ class XRayMetaDS(Dataset):
 
         Returns
         -------
-        [int, [int], [str], str, torch.tensor, torch.tensor]
+        [int, [str], [str], str, torch.tensor, torch.tensor]
             List of [subset, seen, unseen, dataset, name, x, y].
         """
         subset, dataset, name, seen, unseen, labels = example
 
-        path = join(self.images_dir, dataset, f'{name}.jpg')
+        # TODO: refactor
+        # print(dataset, name, labels)
+        if any(labels):
+            images_dir = self.images_dir
+        else:
+            images_dir = self.norm_images_dir
+
+        path = join(images_dir, dataset, f'{name}.jpg')
         x = read_image(path, ImageReadMode.RGB)
         x = self.tsfm[subset](x)
 
@@ -204,7 +232,41 @@ class XRayMetaDS(Dataset):
         return len(self.df)
 
 
-def sample_at_least_k_shot(df, k_shot):
+# def sample_at_least_k_shot(df, k_shot):
+#     """Samples an episode with at least `k` examples per class.
+
+#         Parameters
+#         ----------
+#         df : pd.DataFrame
+#             Array of labels with first column as index.
+#         k_shot : int
+#             Numbers of k-shot examples for the episode.
+
+#         Returns
+#         -------
+#         pd.DataFrame
+#             Episode dataframe.
+#         """
+#     episode_df = pd.DataFrame(columns=df.columns)
+#     classes = df.columns[2:].values
+#     for clazz in classes:
+#         # count missing examples for the class
+#         k_miss = k_shot - episode_df[clazz].sum()
+#         if k_miss > 0:
+#             # select the k missing examples
+#             class_df = df[df[clazz] == 1].iloc[:k_miss]
+#             # append them
+#             episode_df = pd.concat([episode_df, class_df])
+#             # remove them
+#             df.drop(class_df.index, inplace=True)
+#     # TODO: remove if include-0s does not work
+#     k_miss = len(classes) * k_shot - episode_df.shape[0]
+#     if k_miss > 0:
+#         class_df = df[(1 - df[classes]).all(axis=1)].iloc[:k_miss]
+#         episode_df = pd.concat([episode_df, class_df])
+#     return episode_df
+
+def sample_at_least_k_shot(df, k_shot, norm_df, data_complete_with_norm):
     """Samples an episode with at least `k` examples per class.
 
         Parameters
@@ -231,12 +293,19 @@ def sample_at_least_k_shot(df, k_shot):
             episode_df = pd.concat([episode_df, class_df])
             # remove them
             df.drop(class_df.index, inplace=True)
-    # TODO: remove if include-0s does not work
-    k_miss = len(classes) * k_shot - episode_df.shape[0]
-    if k_miss > 0:
-        class_df = df[(1 - df[classes]).all(axis=1)].iloc[:k_miss]
-        episode_df = pd.concat([episode_df, class_df])
+
+    # if all 1s in any class:
+    if episode_df[classes].all(axis=0).any():
+        if data_complete_with_norm == '1':
+            k_miss = 1
+        else:
+            k_miss = len(classes) * k_shot - episode_df.shape[0]
+        miss_df = norm_df.sample(k_miss)[episode_df.columns]
+        miss_df[classes] = miss_df[classes].fillna(0).astype(int)
+        episode_df = pd.concat([episode_df, miss_df])
+
     return episode_df
+
 
 
 class EpisodeSampler(Sampler):
@@ -276,6 +345,9 @@ class EpisodeSampler(Sampler):
             self.n_unseen = n_way
             self.n_seen = 0
 
+        self.norm_df = dataset.norm_df
+        self.data_complete_with_norm = dataset.data_complete_with_norm
+
 
     def generate_episode(self):
         """Generates an episode.
@@ -295,8 +367,13 @@ class EpisodeSampler(Sampler):
 
         # exclude examples with non selected clases
         # TODO: remove if include-0s works
+        excluded_mask = self.df[exclude_classes].any(axis=1)
+        df = self.df.loc[~excluded_mask].copy()
+        excluded_df = self.df[excluded_mask].copy()
         # df = self.df.loc[~(self.df[exclude_classes].any(axis=1))]
-        df = self.df
+        # excluded_df = self.df.loc[self.df[exclude_classes].any(axis=1)]
+        # df = self.df
+
         # filter columns
         df = df[['dataset', 'name'] + classes]
         df = df.reset_index(drop=True)
@@ -308,13 +385,16 @@ class EpisodeSampler(Sampler):
         # shuffle dataset
         df = df.sample(df.shape[0]).reset_index(drop=True)
 
-        trn_df = sample_at_least_k_shot(df, self.trn_k_shot)
-        tst_df = sample_at_least_k_shot(df, self.tst_k_shot)
+        trn_df = sample_at_least_k_shot(df, self.trn_k_shot, self.norm_df, self.data_complete_with_norm)
+        tst_df = sample_at_least_k_shot(df, self.tst_k_shot, self.norm_df, self.data_complete_with_norm)
         trn_df['set'] = trn_df.shape[0] * [TRN_IDX]
         tst_df['set'] = tst_df.shape[0] * [TST_IDX]
         episode_df = pd.concat([trn_df, tst_df])
-        episode_df = episode_df[['set', 'dataset', 'name'] + classes]
 
+        # restore original order of seen, unseen
+        classes = seen + unseen
+
+        episode_df = episode_df[['set', 'dataset', 'name'] + classes]
         episode = [
             [
                 example['set'],
@@ -399,8 +479,8 @@ def collate_episode(episode):
     episode = {
         'n_trn': size[TRN_IDX],
         'n_tst': size[TST_IDX],
-        'unseen': unseen,
         'seen': seen,
+        'unseen': unseen,
         'dataset': datasets,
         'name': names,
         'x': x,
@@ -586,6 +666,7 @@ def test_build_mdl(
         norm={'mean': [0.0, 0.0, 0.0], 'std': [1.0, 1.0, 1.0]},
         num_workers=0,
         data_distro='complete',
+        data_complete_with_norm='1',
         seed=0,
         debug=True):
 
@@ -595,6 +676,9 @@ def test_build_mdl(
     from types import SimpleNamespace
 
     hparams = SimpleNamespace(**hparams)
+
+    np.random.seed(seed)
+    random.seed(seed)
 
     mdl = build_mdl(
         mset, n_episodes, n_way, n_unseen, trn_k_shot, tst_k_shot, hparams)
@@ -623,7 +707,7 @@ def test_build_mdl(
         datasets = np.array(dataset)
         names = np.array(name)
         data = np.column_stack([subset, datasets, names, y.type(torch.int)])
-        cols = ['subset', 'dataset', 'name'] + unseen + seen
+        cols = ['subset', 'dataset', 'name'] + seen + unseen
         df = pd.DataFrame(data, columns=cols)
         pd.set_option('display.max_colwidth', 500)
         print(df)
