@@ -184,9 +184,6 @@ class XRayMetaDS(Dataset):
         if not isdir(images_dir):
             raise ValueError(f'invalid images_dir={images_dir}')
 
-        self.norm_df, self.norm_images_dir = _load_norm(metachest_dir, hparams, config, mset)
-        self.data_complete_with_norm = hparams.data_complete_with_norm
-
         seen, unseen, df = _load_data(config, mset, hparams.data_distro)
         self.mset = mset
         self.df = df
@@ -196,6 +193,12 @@ class XRayMetaDS(Dataset):
         self.trn_tsfm = trn_tsfm
         self.tst_tsfm = tst_tsfm
         self.tsfm = [trn_tsfm, tst_tsfm]
+
+        # TODO: refactor
+        # normals
+        self.norm_df, self.norm_images_dir = _load_norm(metachest_dir, hparams, config, mset)
+        self.data_complete_with_norm = hparams.data_complete_with_norm
+
 
     def __getitem__(self, example):
         """Returns the example.
