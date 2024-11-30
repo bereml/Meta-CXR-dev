@@ -247,3 +247,35 @@ def study_shift_ds(
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
+
+
+def study_filter(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        checkpoint_name='base',
+        debug=False):
+    exp = 'filter_mset_strict'
+    cfgs = list(product(
+        # filter_mset_strict
+        [True, False],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        filter_mset_strict, seed = cfg
+        run = '_'.join([
+            f'filter_mset_strict={filter_mset_strict}',
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB)
+            results_dir = 'rdev'
+        eval_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            filter_mset_strict=filter_mset_strict,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
