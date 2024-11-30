@@ -144,6 +144,126 @@ def study_method_episodebase(
         aggregate_exp_df(join(results_dir, exp))
 
 
+
+# TODO: determine which HPs are important
+def study_method_episodebase_data(
+        net_backbone='mobilenetv3-small-075',
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'method_episodebase'
+    cfgs = list(product(
+        # ------------------
+        # mtrn_net_batch_pct
+        [
+            0.25,
+            # 0.50,
+            0.75,
+        ],
+        # mtrn_net_lr
+        [
+            0.00001,
+            0.0005,
+        ],
+        # mtrn_net_steps
+        [
+            1,
+            5,
+        ],
+        # mtrn_head_batch_pct
+        [
+            0.25,
+            # 0.50,
+            0.75,
+        ],
+        # mtrn_head_lr
+        [
+            0.005,
+            0.001,
+        ],
+        # mtrn_head_steps
+        [
+            25,
+            100,
+        ],
+        # ------------------
+        # mtst_net_batch_pct
+        [
+            1.0,
+        ],
+        # mtst_net_lr
+        [
+            0.005,
+        ],
+        # mtst_net_steps
+        [
+            0,
+        ],
+        # mtst_head_batch_pct
+        [
+            0.5,
+        ],
+        # mtst_head_lr
+        [
+            0.005,
+        ],
+        # mtst_head_steps
+        [
+            100,
+        ],
+        # seed
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (mtrn_net_batch_pct, mtrn_net_lr, mtrn_net_steps,
+         mtrn_head_batch_pct, mtrn_head_lr, mtrn_head_steps,
+         mtst_net_batch_pct, mtst_net_lr, mtst_net_steps,
+         mtst_head_batch_pct, mtst_head_lr, mtst_head_steps,
+         seed) = cfg
+        run = '_'.join([
+            f'tnb-{mtrn_net_batch_pct}',
+            f'tnl-{mtrn_net_lr}',
+            f'tns-{mtrn_net_steps}',
+            f'thb-{mtrn_head_batch_pct}',
+            f'thl-{mtrn_head_lr}',
+            f'ths-{mtrn_head_steps}',
+            f'vnb-{mtst_net_batch_pct}',
+            f'vnl-{mtst_net_lr}',
+            f'vns-{mtst_net_steps}',
+            f'vhb-{mtst_head_batch_pct}',
+            f'vhl-{mtst_head_lr}',
+            f'vhs-{mtst_head_steps}',
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS)
+            results_dir = 'rdev'
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            net_backbone=net_backbone,
+            method='episodebased',
+            episodebased_mtrn_net_batch_pct=mtrn_net_batch_pct,
+            episodebased_mtrn_net_lr=mtrn_net_lr,
+            episodebased_mtrn_net_steps=mtrn_net_steps,
+            episodebased_mtrn_head_batch_pct=mtrn_head_batch_pct,
+            episodebased_mtrn_head_lr=mtrn_head_lr,
+            episodebased_mtrn_head_steps=mtrn_head_steps,
+            episodebased_mtst_net_batch_pct=mtst_net_batch_pct,
+            episodebased_mtst_net_lr=mtst_net_lr,
+            episodebased_mtst_net_steps=mtst_net_steps,
+            episodebased_mtst_head_batch_pct=mtst_head_batch_pct,
+            episodebased_mtst_head_lr=mtst_head_lr,
+            episodebased_mtst_head_steps=mtst_head_steps,
+            seed=seed,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
+
+
 def study_method_protonet(
         net_backbone='mobilenetv3-small-075',
         seeds=SEEDS,
