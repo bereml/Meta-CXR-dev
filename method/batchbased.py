@@ -72,7 +72,7 @@ class BatchBased(FewShotMethod):
                 loss = self.loss_fn(y_lgts_batch, y_true_batch)
             opt.zero_grad()
             loss = scaler.scale(loss)
-            # got same results loss.backward() or self.manual_backward(loss)
+            # same results with loss.backward() or self.manual_backward(loss)
             loss.backward()
             scaler.step(opt)
             scaler.update()
