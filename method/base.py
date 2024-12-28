@@ -23,24 +23,8 @@ class Registry(dict):
 METHODS = Registry()
 
 
-def patch_only_one_class(y_true, y_prob):
-    only1s = y_true.all(dim=0)
-    only0s = (1 - y_true).all(dim=0)
-    for i, (only1, only0) in enumerate(zip(only1s, only0s)):
-        if only1:
-            j = y_prob[i].argmax()
-            y_true[i, j] = 1 - y_true[i, j]
-            y_prob[i, j] = 1 - y_prob[i, j]
-        elif only0:
-            j = y_prob[i].argmin()
-            y_true[i, j] = 1 - y_true[i, j]
-            y_prob[i, j] = 1 - y_prob[i, j]
-
-
 def auroc(y_true, y_prob, average='micro'):
     n_classes = y_true.shape[1]
-    # FIXME: fix only label
-    # patch_only_one_class(y_true, y_prob)
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         if n_classes == 1:
