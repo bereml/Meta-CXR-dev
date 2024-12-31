@@ -75,11 +75,6 @@ def parse_args():
     parser.add_argument('--num_workers',
                         type=int, default=8,
                         help='dataloaders number of workers')
-    # TODO: remove
-    parser.add_argument('--data_complete_with_norm',
-                        type=str, default='1',
-                        choices=['1', 'nk'],
-                        help='enable data augmentation')
     # NETWORK
     parser.add_argument('--net_backbone',
                         type=str, default='mobilenetv3-large-100',
@@ -152,6 +147,7 @@ def parse_args():
     parser.add_argument('--episodes_mtst_csv',
                         type=str, default='episodes_mtst.csv',
                         help='episodes csv results name')
+
     # method specific args
     parsed, _ = parser.parse_known_args()
     method_add_args(parsed.method, parser)
