@@ -95,7 +95,19 @@ Observations
 ## Reproducibility
 
 
+
+## Include/exclude train images
+
 | run                  | seen       | unseen     | hm         |
 |----------------------|------------|------------|------------|
 | Include train images | 93.51±0.12 | 86.63±0.23 | 89.59±0.17 |
 | Exclude train images | 79.86±0.32 | 75.37±0.35 | 76.13±0.30 |
+
+
+## Using No-finding images
+
+| run               | seen       | unseen     | hm         |
+|-------------------|------------|------------|------------|
+| random_batchbased | 78.01±0.22 | 77.64±0.28 | 77.23±0.23 |
+| random_protonet   | 77.13±0.23 | 75.98±0.33 | 75.81±0.27 |
+

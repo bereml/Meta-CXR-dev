@@ -97,15 +97,15 @@ Observations
 
 | ImageNet | MetaChest  | Method       | Unseen     | Seen       | Combined   |
 | -------: | ---------: | -----------: | ---------: | ---------: | ---------: |
-|          | ✅         | BatchBased   | 89.11±0.21 | 93.49±0.13 | 91.94±0.14 |
-| 1k       | ✅         | BatchBased   | 87.99±0.22 | 94.11±0.12 | 92.17±0.13 |
-| 21k      | ✅         | BatchBased   | 87.10±0.23 | 93.76±0.13 | 91.62±0.14 |
-|          |            | ProtoNet     | 76.67±0.33 | 87.03±0.25 | 83.74±0.25 |
-| 1k       |            | ProtoNet     | 76.24±0.33 | 89.34±0.23 | 85.59±0.24 |
-| 21k      |            | ProtoNet     | 74.77±0.32 | 88.07±0.25 | 84.10±0.24 |
-|          | ✅         | ProtoNet     | 77.35±0.33 | 93.64±0.16 | 89.57±0.18 |
-| 1k       | ✅         | ProtoNet     | 77.68±0.33 | 93.31±0.17 | 89.31±0.19 |
-| 21k      | ✅         | ProtoNet     | 76.63±0.33 | 95.01±0.12 | 90.85±0.15 |
+|          | ✅         | BatchBased   |  |  |  |
+| 1k       | ✅         | BatchBased   |  |  |  |
+| 21k      | ✅         | BatchBased   |  |  |  |
+|          |            | ProtoNet     |  |  |  |
+| 1k       |            | ProtoNet     |  |  |  |
+| 21k      |            | ProtoNet     |  |  |  |
+|          | ✅         | ProtoNet     |  |  |  |
+| 1k       | ✅         | ProtoNet     |  |  |  |
+| 21k      | ✅         | ProtoNet     |  |  |  |
 
 Observations
 * ProtoNet: 1k improves Random by 1.85
@@ -203,11 +203,11 @@ Observations
 
 | Subdataset          | Unseen     | Seen       | Combined   |
 | ------------------- | ---------: | ---------: | ---------: |
-| ChestXray14         | 92.57±0.18 | 94.34±0.10 | 93.55±0.11 |
-| CheXpert            | 94.87±0.19 | 95.21±0.14 | 95.01±0.14 |
-| MIMIC               | 94.29±0.18 | 95.37±0.13 | 94.89±0.13 |
-| PadChest            | 80.30±0.65 | 96.26±0.09 | 95.50±0.09 |
-| Complete            | 88.29±0.22 | 94.14±0.12 | 92.25±0.13 |
+| ChestXray14         |  |  |  |
+| CheXpert            |  |  |  |
+| MIMIC               |  |  |  |
+| PadChest            |  |  |  |
+| Complete            |  |  |  |
 
 
 Observations
@@ -219,11 +219,11 @@ Observations
 
 | Subpopulation       | Unseen     | Seen       | Combined   |
 | ------------------- | ---------: | ---------: | ---------: |
-| Age [31-62]         | 88.29±0.22 | 94.14±0.12 | 92.26±0.13 |
-| Age [10,30]∪[63,80] | 88.34±0.22 | 94.07±0.12 | 92.25±0.13 |
-| Female              | 88.13±0.22 | 94.13±0.12 | 92.24±0.13 |
-| Male                | 88.35±0.22 | 94.09±0.12 | 92.26±0.13 |
-| Complete            | 88.29±0.22 | 94.14±0.12 | 92.25±0.13 |
+| Age [31-62]         |  |  |  |
+| Age [10,30]∪[63,80] |  |  |  |
+| Female              |  |  |  |
+| Male                |  |  |  |
+| Complete            |  |  |  |
 
 Observations
 * Anatomy Shift?
@@ -234,9 +234,9 @@ Observations
 
 | Subpopulation       | Unseen     | Seen       | Combined   |
 | ------------------- | ---------: | ---------: | ---------: |
-| AP                  | 89.14±0.22 | 93.57±0.14 | 92.06±0.14 |
-| PA                  | 87.12±0.23 | 94.84±0.09 | 92.56±0.11 |
-| Complete            | 88.29±0.22 | 94.14±0.12 | 92.25±0.13 |
+| AP                  |  |  |  |
+| PA                  |  |  |  |
+| Complete            |  |  |  |
 
 
 --------------------------------------------------
@@ -244,18 +244,18 @@ Observations
 
 | n-way | n-unseen | Unseen     | Seen       | Combined   |
 | ----: | -------: | ---------: | ---------: | ---------: |
-| 3     | 1        | 88.29±0.22 | 94.14±0.12 | 92.25±0.13 |
-|       | 2        | 68.90±0.20 | 87.67±0.29 | 76.79±0.22 |
-|       | 3        |            |            | 56.53±0.14 |
-| 4     | 1        | 84.78±0.21 | 95.36±0.07 | 93.24±0.08 |
-|       | 2        | 71.95±0.18 | 91.42±0.16 | 83.30±0.15 |
-|       | 3        | 63.17±0.15 | 85.97±0.31 | 70.97±0.20 |
-|       | 4        |            |            | 56.03±0.11 |
-| 5     | 1        | 81.87±0.21 | 95.79±0.05 | 93.70±0.06 |
-|       | 2        | 73.21±0.16 | 92.71±0.10 | 86.45±0.11 |
-|       | 3        | 66.48±0.14 | 89.50±0.19 | 77.76±0.15 |
-|       | 4        | 60.78±0.12 | 84.71±0.33 | 67.60±0.17 |
-|       | 5        |            |            | 55.79±0.09 |
+| 3     | 1        |  |  |  |
+|       | 2        |  |  |  |
+|       | 3        |  |  |  |
+| 4     | 1        |  |  |  |
+|       | 2        |  |  |  |
+|       | 3        |  |  |  |
+|       | 4        |  |  |  |
+| 5     | 1        |  |  |  |
+|       | 2        |  |  |  |
+|       | 3        |  |  |  |
+|       | 4        |  |  |  |
+|       | 5        |  |  |  |
 
 Observations
 * La Beye es un 🐶
@@ -268,28 +268,77 @@ Observations
 
 ## TODO
 
+### Reunión planeación
+- [ ] Bere: revisar literatura
+- [ ] Bere: acordar plan general
+- [ ] Bere: acordar sesiones de escritura
+
+### Plan general
 - [ ] Limpiar codigo, generar versión y correr 3 veces
-- [ ] Preparar experimentos mínimos del artículo
-- [ ] Correr experimentos mínimos del artículo
-- [ ] Preparar experimentos completos del artículo
-- [ ] Revisar con Bere que dice el artículo nuevo
+- [ ] Preparar & correr mínimos: Subdataset Shift, Subpopulation Shift, GFSL -> SFSL
+- [ ] Preparar & correr experimentos completos del artículo
+- [ ] Revisar TIMM/MobileNet-V4, MamabaOut
+- [ ] metachest-dev TODO.md
+- [ ] https://pixi.sh/
+
+### Experimentos
+- [ ] Exp Methods SetUp
+- [ ] Exp Methods Run
+- [ ] Exp Methods Analize
+
+- [ ] Exp Pretraining SetUp
+- [ ] Exp Pretraining Run
+- [ ] Exp Pretraining Analize
+
+- [ ] Exp Architectures SetUp
+- [ ] Exp Architectures Run
+- [ ] Exp Architectures Analize
+
+- [ ] Exp Image Resolution SetUp
+- [ ] Exp Image Resolution Run
+- [ ] Exp Image Resolution Analize
+
+- [ ] Exp Subdataset Shift SetUp
+- [ ] Exp Subdataset Shift Run
+- [ ] Exp Subdataset Shift Analize
+
+- [ ] Exp Subpopulation Shift SetUp
+- [ ] Exp Subpopulation Shift Run
+- [ ] Exp Subpopulation Shift Analize
+
+- [ ] Exp GFSL -> SFSL SetUp
+- [ ] Exp GFSL -> SFSL Run
+- [ ] Exp GFSL -> SFSL Analize
+
+
+
+
 
 
 --------------------------------------------------
-#### 06/12 Friday
+#### 27/11 Friday
 - [ ]
 
-#### 05/12 Tuesday
+#### 26/01 Thursday
 - [ ]
 
-#### 04/12 Tuesday
+#### 01/01 Wednesday
 - [ ]
 
-#### 03/12 Tuesday
+#### 31/12 Tuesday
 - [ ]
 
-#### 02/12 Monday
-- [ ] Limpiar codigo, generar versión y correr 3 veces
+#### 30/12 Monday
+- [ ] Code refactor of meta-cxr
+
+#### 23/12 Monday
+- [x] Code refactor of metachest
+
+
+--------------------------------------------------
+--------------------------------------------------
+--------------------------------------------------
+## Progress History
 
 --------------------------------------------------
 #### 25/10 Friday
