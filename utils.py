@@ -94,7 +94,9 @@ def aggregate_exp_df(exp_dir,
                      exp_mtst_csv='exp_mtst.csv',
                      run_mtst_csv='run_mtst.csv',
                      seeds_mtst_csv='seeds_mtst.csv',
-                     episodes_mtst_csv='episodes_mtst.csv'):
+                     episodes_mtst_csv='episodes_mtst.csv',
+                     exp_mtst_md='exp_mtst.md',
+                     exp_mtst_tex='exp_mtst.tex'):
     pattern = join(exp_dir, '*')
     runs_dirs = sorted(glob.glob(pattern, recursive=False))
     runs_dirs = [run_dir for run_dir in runs_dirs if isdir(run_dir)]
@@ -109,6 +111,14 @@ def aggregate_exp_df(exp_dir,
                 dfs.append(df)
         exp_df = pd.concat(dfs)
         exp_df.to_csv(join(exp_dir, exp_mtst_csv), index=False)
+        # save df main columns on md & tex
+        df_overview = df.iloc[:, :4]
+        with open(join(exp_dir, exp_mtst_md), 'w') as f:
+            f.write(df_overview.to_markdown(index=False))
+        with open(join(exp_dir, exp_mtst_tex), 'w') as f:
+            format_pm = lambda s: s.replace('±', '\\pm') if '±' in s else s
+            formatters = [format_pm] * len(df.columns)
+            f.write(df_overview.to_latex(index=False, formatters=formatters))
 
 
 def get_run_dir(hparams):
