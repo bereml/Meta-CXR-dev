@@ -278,6 +278,7 @@ Observations
 - [ ] Preparar & correr mínimos: Subdataset Shift, Subpopulation Shift, GFSL -> SFSL
 - [ ] Preparar & correr experimentos completos del artículo
 - [ ] Revisar TIMM/MobileNet-V4, MamabaOut
+        https://huggingface.co/collections/timm/mobilenetv4-pretrained-weights-6669c22cda4db4244def9637
 - [ ] metachest-dev TODO.md
 - [ ] https://pixi.sh/
 
@@ -306,33 +307,33 @@ Observations
 - [ ] Exp Subpopulation Shift Run
 - [ ] Exp Subpopulation Shift Analize
 
+- [ ] Exp View Shift SetUp
+- [ ] Exp View Shift Run
+- [ ] Exp View Shift Analize
+
 - [ ] Exp GFSL -> SFSL SetUp
 - [ ] Exp GFSL -> SFSL Run
 - [ ] Exp GFSL -> SFSL Analize
 
 
 
-
+--------------------------------------------------
+#### 01/06 - 01/12
 
 
 --------------------------------------------------
-#### 27/11 Friday
-- [ ]
+#### 01/01 - 01/05
+- [ ] Investigate div by zero at method/base.py:47
+    python eval.py --results_dir rpaper --exp shift_ds --run ds_padchest --data_distro ds_padchest --seed 0 --checkpoint_name base
+- [ ] Investigate why evaluation gives diferent results
+    | run                | seen       | unseen     | hm         |
+    | ------------------ | ---------- | ---------- | ---------- |
+    | base               | 84.54±0.15 | 74.50±0.47 | 76.51±0.36 |
+    | shift_ds/complete  | 79.74±0.18 | 69.16±0.44 | 71.67±0.31 |
+    | shift_pop/complete | 79.74±0.18 | 69.16±0.44 | 71.67±0.31 |
 
-#### 26/01 Thursday
-- [ ]
-
-#### 01/01 Wednesday
-- [ ]
-
-#### 31/12 Tuesday
-- [ ]
-
-#### 30/12 Monday
-- [ ] Code refactor of meta-cxr
-
-#### 23/12 Monday
 - [x] Code refactor of metachest
+- [x] Add results overview on md & tex formats
 
 
 --------------------------------------------------
