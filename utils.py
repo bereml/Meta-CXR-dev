@@ -114,7 +114,7 @@ def aggregate_exp_df(exp_dir,
         # save df main columns on md & tex
         df_overview = df.iloc[:, :4]
         with open(join(exp_dir, exp_mtst_md), 'w') as f:
-            f.write(df_overview.to_markdown(index=False))
+            f.write(df_overview.to_markdown(index=False) + '\n')
         with open(join(exp_dir, exp_mtst_tex), 'w') as f:
             format_pm = lambda s: s.replace('±', '\\pm') if '±' in s else s
             formatters = [format_pm] * len(df.columns)
