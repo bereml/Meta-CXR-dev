@@ -384,16 +384,24 @@ class EpisodeSampler(Sampler):
         [int, str, str, [str], [str], [int]]
             A list of [subset, dataset, name, seen, unseen, labels] for each example.
         """
-        # select classes
-        random.shuffle(self.seen)
-        random.shuffle(self.unseen)
-        seen = self.seen[:self.n_seen]
-        unseen = self.unseen[:self.n_unseen]
-        excluded_classes = self.seen[self.n_seen:] + self.unseen[self.n_unseen:]
 
-        # filter out examples with excluded classes
-        excluded_mask = self.df[excluded_classes].any(axis=1)
-        df = self.df[~excluded_mask].copy()
+        # repeat sampling until there are enough examples per class
+        while True:
+            # sample classes
+            random.shuffle(self.seen)
+            random.shuffle(self.unseen)
+            seen = self.seen[:self.n_seen]
+            unseen = self.unseen[:self.n_unseen]
+
+            # filter out examples with excluded classes
+            excluded_classes = self.seen[self.n_seen:] + self.unseen[self.n_unseen:]
+            excluded_mask = self.df[excluded_classes].any(axis=1)
+            df = self.df[~excluded_mask]
+            df = df[['dataset', 'name'] + seen + unseen].copy()
+
+            # break if there are enough examples per class
+            if (df[seen + unseen].sum(axis=0) > self.trn_k_shot).all():
+                break
 
         # sort classes by ascending frequency
         # unseen go first to enable unseen-only examples
@@ -424,7 +432,7 @@ class EpisodeSampler(Sampler):
                 example['name'],
                 seen,
                 unseen,
-                [example[c] for c in classes]
+                [example[c] for c in classes],
             ]
             for example in episode_df.to_dict('records')
         ]
@@ -498,6 +506,7 @@ def collate_episode(episode):
         ys.append(y)
     x = torch.stack(xs)
     y = torch.stack(ys)
+
     episode = {
         'n_trn': size[TRN_IDX],
         'n_tst': size[TST_IDX],
@@ -506,7 +515,7 @@ def collate_episode(episode):
         'dataset': datasets,
         'name': names,
         'x': x,
-        'y': y
+        'y': y,
     }
     return episode
 
