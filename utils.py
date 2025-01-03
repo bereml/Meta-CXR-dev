@@ -112,13 +112,13 @@ def aggregate_exp_df(exp_dir,
         exp_df = pd.concat(dfs)
         exp_df.to_csv(join(exp_dir, exp_mtst_csv), index=False)
         # save df main columns on md & tex
-        df_overview = df.iloc[:, :4]
+        exp_df_overview = exp_df.iloc[:, :4]
         with open(join(exp_dir, exp_mtst_md), 'w') as f:
-            f.write(df_overview.to_markdown(index=False) + '\n')
+            f.write(exp_df_overview.to_markdown(index=False) + '\n')
         with open(join(exp_dir, exp_mtst_tex), 'w') as f:
             format_pm = lambda s: s.replace('±', '\\pm') if '±' in s else s
             formatters = [format_pm] * len(df.columns)
-            f.write(df_overview.to_latex(index=False, formatters=formatters))
+            f.write(exp_df_overview.to_latex(index=False, formatters=formatters))
 
 
 def get_run_dir(hparams):
