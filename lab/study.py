@@ -366,3 +366,33 @@ def studt_nf(
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
+
+
+
+def paper_base_stops(
+        seed=0,
+        results_dir=RESULTS_DIR,
+        max_epochs=150,
+        debug=False):
+    exp = 'base'
+    # cfgs = [50, 100, 150]
+    cfgs = [50]
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        stop_patience = cfg
+        checkpoint_name = f'base_stop_patience-{stop_patience}'
+        run = checkpoint_name
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB)
+            results_dir = 'rdev'
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            seed=seed,
+            max_epochs=max_epochs,
+            stop_patience=stop_patience,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))

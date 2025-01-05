@@ -1,7 +1,8 @@
 """ eval.py """
 
-import warnings
 import glob
+import yaml
+import warnings
 from os import makedirs
 from os.path import isdir, isfile, join
 
@@ -51,6 +52,7 @@ def eval(run=None):
         Method = METHODS[hparams.method]
         method = Method.load_from_checkpoint(best_model_path, strict=False)
         method.hparams.episodes_mtst_csv = hparams.episodes_mtst_csv
+
     else:
         checkpoints_dir = 'checkpoints'
         checkpoint_path = join(checkpoints_dir, f'{hparams.checkpoint_name}.pth')
@@ -68,6 +70,9 @@ def eval(run=None):
 
         method = Method(hparams)
         method.net.backbone.load_state_dict(torch.load(checkpoint_path))
+
+        with open(join(run_dir, 'hparams.yml'), 'w') as f:
+            yaml.dump(vars(hparams), f, default_flow_style=False)
 
     hparams.norm = method.hparams.norm
 

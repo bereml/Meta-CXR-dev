@@ -317,21 +317,56 @@ Observations
 
 
 
+
+
+seed = 0
+| run            | seen       | unseen     | hm         |
+|:---------------|:-----------|:-----------|:-----------|
+| complete       | 79.74±0.18 | 69.16±0.44 | 71.67±0.31 |
+| ds_chestxray14 | 62.14±0.17 | 64.58±0.37 | 61.70±0.24 |
+| ds_chexpert    | 67.55±0.20 | 70.96±0.27 | 68.52±0.21 |
+| ds_mimic       | 65.25±0.19 | 66.53±0.29 | 64.96±0.21 |
+| ds_padchest    | 72.40±0.21 | 69.13±0.37 | 69.19±0.27 |
+
+seed = 1
+| run            | seen       | unseen     | hm         |
+|:---------------|:-----------|:-----------|:-----------|
+| complete       | 79.74±0.18 | 69.66±0.43 | 72.00±0.31 |
+| ds_chestxray14 | 62.14±0.17 | 64.73±0.37 | 61.82±0.23 |
+| ds_chexpert    | 67.50±0.20 | 71.07±0.27 | 68.56±0.20 |
+| ds_mimic       | 65.29±0.19 | 66.76±0.29 | 65.06±0.21 |
+| ds_padchest    | 72.40±0.21 | 68.64±0.38 | 68.85±0.28 |
+
+
+seed = 0
+| run               | seen       | unseen     | hm         |
+|:------------------|:-----------|:-----------|:-----------|
+| random_batchbased | 78.01±0.22 | 77.64±0.28 | 77.23±0.23 |
+| random_protonet   | 77.13±0.23 | 75.98±0.33 | 75.81±0.27 |
+
+
+
 --------------------------------------------------
 #### 01/06 - 01/12
 
 
 --------------------------------------------------
 #### 01/01 - 01/05
-- [ ] Investigate div by zero at method/base.py:47
-    python eval.py --results_dir rpaper --exp shift_ds --run ds_padchest --data_distro ds_padchest --seed 0 --checkpoint_name base
-- [ ] Investigate why evaluation gives diferent results
-    | run                | seen       | unseen     | hm         |
-    | ------------------ | ---------- | ---------- | ---------- |
-    | base               | 84.54±0.15 | 74.50±0.47 | 76.51±0.36 |
-    | shift_ds/complete  | 79.74±0.18 | 69.16±0.44 | 71.67±0.31 |
-    | shift_pop/complete | 79.74±0.18 | 69.16±0.44 | 71.67±0.31 |
+--checkpoint_name base
+- [ ] Investigate why evaluation gives diferent results than fulll traninig
+  * The stop patience is bigger
+| run        | hm         | max_epochs | stop_patience | best_epoch |
+|:-----------|:-----------|:-----------|:--------------|:-----------|
+| eval-only  | 72.00±0.31 |        500 |            25 |          2 |
+| full-train | 77.23±0.23 |        150 |            50 |          5 |
 
+
+- [ ] Save HP when eval
+
+
+
+- [x] Investigate div by zero at method/base.py:47
+    python eval.py --results_dir rpaper --exp shift_ds --run ds_padchest --data_distro ds_padchest --seed 0
 - [x] Code refactor of metachest
 - [x] Add results overview on md & tex formats
 
