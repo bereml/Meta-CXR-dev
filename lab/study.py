@@ -369,14 +369,13 @@ def studt_nf(
 
 
 
-def paper_base_stops(
+def study_base_stops(
         seed=0,
         results_dir=RESULTS_DIR,
         max_epochs=150,
         debug=False):
     exp = 'base'
-    # cfgs = [50, 100, 150]
-    cfgs = [50]
+    cfgs = [50, 100, 150]
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
         stop_patience = cfg
         checkpoint_name = f'base_stop_patience-{stop_patience}'
