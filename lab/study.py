@@ -375,10 +375,11 @@ def study_base_stops(
         max_epochs=150,
         debug=False):
     exp = 'base'
-    cfgs = [50, 100, 150]
+    cfgs = [50]
+    batchbased_trn_lr = .00001
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
         stop_patience = cfg
-        checkpoint_name = f'base_stop_patience-{stop_patience}'
+        checkpoint_name = f'base_stop_patience-{stop_patience}-{batchbased_trn_lr}'
         run = checkpoint_name
         hparams = {}
         if debug:
@@ -391,6 +392,7 @@ def study_base_stops(
             seed=seed,
             max_epochs=max_epochs,
             stop_patience=stop_patience,
+            batchbased_trn_lr=batchbased_trn_lr,
             checkpoint_name=checkpoint_name,
             **hparams
         )
