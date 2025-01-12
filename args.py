@@ -97,7 +97,7 @@ def parse_args():
                         type=int, default=10000,
                         help='number of meta-test episodes')
     parser.add_argument('--max_epochs',
-                        type=int, default=500,
+                        type=int, default=100,
                         help='maximum number of epochs')
     parser.add_argument('--stop_metric',
                         type=str, default='hm',
