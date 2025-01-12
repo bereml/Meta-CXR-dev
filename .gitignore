@@ -175,5 +175,5 @@ cython_debug/
 /config.toml
 /checkpoints
 /rdev
-/rlab
 /rpaper
+/rstudy
