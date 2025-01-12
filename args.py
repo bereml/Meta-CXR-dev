@@ -104,7 +104,7 @@ def parse_args():
                         choices=['hm', 'loss'],
                         help='early stopping metric')
     parser.add_argument('--stop_patience',
-                        type=int, default=25,
+                        type=int, default=10,
                         help='early stopping patience')
     parser.add_argument('--eval_after_train',
                         type=str2bool, default=True, nargs='?', const=False,
