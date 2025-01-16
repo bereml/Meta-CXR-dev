@@ -42,7 +42,7 @@ Default hyper-params:
 |   mval_episodes   | 100       |
 |   mtst_episodes   | 100000    |
 |   max_epochs      | 150       |
-|   stop_metric     | combined↑ |
+|   stop_metric     | HM↑ |
 |   stop_patience   | 10        |
 |   deterministic   | warn      |
 |   precision       | 16        |
@@ -73,7 +73,7 @@ Default hyper-params:
 
 | Pretraining    |            |            |            |  MetaChest |  MetaChest | MetaChest  |
 | -------------- | ---------: | ---------: | ---------: | ---------: | ---------: | ---------: |
-|                | Unseen     | Seen       | Combined   | Unseen     | Seen       | Combined   |
+|                | Unseen     | Seen       | HM   | Unseen     | Seen       | HM   |
 | *STL*          |            |            |            |            |            |            |
 |   BatchBased   |  |  |  |  |  |  |
 |   EpisodeBased |  |  |  |  |  |  |
@@ -95,7 +95,7 @@ Observations
 
 * Batchbased with/without MetaChest pretraning is the same as Batchbased is the method for pretraning.
 
-| ImageNet | MetaChest  | Method       | Unseen     | Seen       | Combined   |
+| ImageNet | MetaChest  | Method       | Unseen     | Seen       | HM   |
 | -------: | ---------: | -----------: | ---------: | ---------: | ---------: |
 |          | ✅         | BatchBased   |  |  |  |
 | 1k       | ✅         | BatchBased   |  |  |  |
@@ -117,7 +117,7 @@ Observations
 --------------------------------------------------
 ## ImageNet vs Foundation
 
-| Backbone              | Pretraining | Params     | MACs (G)  | Unseen     | Seen       | Combined   |
+| Backbone              | Pretraining | Params     | MACs (G)  | Unseen     | Seen       | HM   |
 | --------------------- | ----------: | ---------: | --------: | ---------: | ---------: | ---------: |
 | MobileNetV3Large100   | I1K         |  4,201,744 |      0.62 |       1280 |  |  |  |
 | MobileNetV3Large100   | I21K        |  4,201,744 |      0.62 |       1280 |  |  |  |
@@ -133,7 +133,7 @@ Observations
 --------------------------------------------------
 ## RX Resolution
 
-| Backbone            | Resolution | Unseen     | Seen       | Combined   |
+| Backbone            | Resolution | Unseen     | Seen       | HM   |
 | ------------------: | ---------: | ---------: | ---------: | ---------: |
 | MobileNetV3Large100 |        224 |  |  |  |
 |                     |        384 |  |  |  |
@@ -160,7 +160,7 @@ Observations
 * Batch size 64, missing values were uneble to run due to memory
 
 
-| Backbone              | Unseen     | Seen       | Combined   | Params     | MACs (G)  | Encoding |
+| Backbone              | Unseen     | Seen       | HM         | Params     | MACs (G)  | Encoding |
 | --------------------- | ---------: | ---------: | ---------: | ---------: | --------: | -------: |
 | Efficient             |            |            |            |            |           |          |
 |   MobileNetV3Small075 | 84.42±0.25 | 92.76±0.14 | 90.24±0.15 |  1,016,584 |      0.11 |     1024 |
@@ -176,7 +176,7 @@ Observations
 
 * Batch size 48
 
-| Backbone              | Unseen     | Seen       | Combined   | Params     | MACs (G)  | Encoding |
+| Backbone              | Unseen     | Seen       | HM         | Params     | MACs (G)  | Encoding |
 | --------------------- | ---------: | ---------: | ---------: | ---------: | --------: | -------: |
 | Efficient             |            |            |            |            |           |          |
 |   MobileNetV3Small075 |  |  |  |  1,016,584 |      0.11 |     1024 |
@@ -201,48 +201,47 @@ Observations
 * Meta-val is the same when possible.
 * Meta-tst consider clasees/examples only of the subdataset.
 
-| Subdataset          | Unseen     | Seen       | Combined   |
+| Subdataset          | Unseen     | Seen       | HM         |
 | ------------------- | ---------: | ---------: | ---------: |
-| ChestXray14         |  |  |  |
-| CheXpert            |  |  |  |
-| MIMIC               |  |  |  |
-| PadChest            |  |  |  |
-| Complete            |  |  |  |
-
+| Complete            | 84.54±0.15 | 74.50±0.47 | 76.51±0.36 |
+| ChestXray14         | 69.08±0.16 | 71.78±0.43 | 68.29±0.30 |
+| CheXpert            | 74.87±0.20 | 80.67±0.25 | 77.08±0.20 |
+| MIMIC               | 72.07±0.19 | 75.67±0.28 | 72.95±0.20 |
+| PadChest            | 79.66±0.18 | 75.90±0.40 | 75.89±0.31 |
 
 Observations
-* La Beye es un 🐶
+* Analyze how ech dataset result relats to the class distribution, imbalance, labeling quality
 
 
 --------------------------------------------------
 ## Subpopulation Shift
 
-| Subpopulation       | Unseen     | Seen       | Combined   |
+| Subpopulation       | Unseen     | Seen       | HM         |
 | ------------------- | ---------: | ---------: | ---------: |
-| Age [31-62]         |  |  |  |
-| Age [10,30]∪[63,80] |  |  |  |
-| Female              |  |  |  |
-| Male                |  |  |  |
-| Complete            |  |  |  |
+| Complete            | 84.54±0.15 | 74.50±0.47 | 76.51±0.36 |
+| Age [31-62]         | 84.18±0.15 | 75.83±0.44 | 77.52±0.33 |
+| Age [10,30]∪[63,80] | 84.56±0.14 | 73.83±0.45 | 76.28±0.35 |
+| Female              | 83.70±0.15 | 75.52±0.45 | 76.97±0.34 |
+| Male                | 84.83±0.14 | 74.17±0.45 | 76.58±0.35 |
 
 Observations
-* Anatomy Shift?
+* Age [31-62] > Age [10,30]∪[63,80] is expected
+* Female > Male is unexpected
 
 
 --------------------------------------------------
 ## View Shift
 
-| Subpopulation       | Unseen     | Seen       | Combined   |
-| ------------------- | ---------: | ---------: | ---------: |
-| AP                  |  |  |  |
-| PA                  |  |  |  |
-| Complete            |  |  |  |
+| Subpopulation       | Unseen     | Seen       | HM         |
+| Complete            | 84.54±0.15 | 74.50±0.47 | 76.51±0.36 |
+| AP                  | 84.46±0.15 | 67.39±0.41 | 72.59±0.32 |
+| PA                  | 82.61±0.16 | 77.31±0.45 | 77.43±0.34 |
 
 
 --------------------------------------------------
 ## From Generalized to Standard FSL
 
-| n-way | n-unseen | Unseen     | Seen       | Combined   |
+| n-way | n-unseen | Unseen     | Seen       | HM         |
 | ----: | -------: | ---------: | ---------: | ---------: |
 | 3     | 1        |  |  |  |
 |       | 2        |  |  |  |
