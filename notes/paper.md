@@ -233,10 +233,14 @@ Observations
 ## View Shift
 
 | Subpopulation       | Unseen     | Seen       | HM         |
+| ------------------- | ---------: | ---------: | ---------: |
 | Complete            | 84.54±0.15 | 74.50±0.47 | 76.51±0.36 |
 | AP                  | 84.46±0.15 | 67.39±0.41 | 72.59±0.32 |
 | PA                  | 82.61±0.16 | 77.31±0.45 | 77.43±0.34 |
 
+Observations
+* Age [31-62] > Age [10,30]∪[63,80] is expected
+* Female > Male is unexpected
 
 --------------------------------------------------
 ## From Generalized to Standard FSL
