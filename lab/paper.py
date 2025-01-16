@@ -220,48 +220,6 @@ def paper_gfsl(
 
 
 
-def paper_shift_ds_seed1(
-        seeds=[1],
-        results_dir=RESULTS_DIR,
-        checkpoint_name='base',
-        debug=False):
-    exp = 'shift_ds_seed1'
-    cfgs = list(product(
-        # data_distro
-        [
-            'ds_chestxray14',
-            'ds_chexpert',
-            'ds_mimic',
-            'ds_padchest',
-            'complete',
-        ],
-        seeds,
-    ))
-    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        data_distro, seed = cfg
-        run = '_'.join([
-            data_distro,
-        ])
-        hparams = {}
-        if debug:
-            hparams.update(DEBUG_HPARAMS_BB)
-            results_dir = 'rdev'
-        eval_model(
-            results_dir=results_dir,
-            exp=exp,
-            run=run,
-            data_distro=data_distro,
-            seed=seed,
-            checkpoint_name=checkpoint_name,
-            **hparams
-        )
-        aggregate_exp_df(join(results_dir, exp))
-
-
-
-
-
-
 
 
 # -----------------------------------------------
