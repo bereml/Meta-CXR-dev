@@ -117,7 +117,7 @@ def aggregate_exp_df(exp_dir,
             f.write(exp_df_overview.to_markdown(index=False) + '\n')
         with open(join(exp_dir, exp_mtst_tex), 'w') as f:
             format_pm = lambda s: s.replace('±', '\\pm') if '±' in s else s
-            formatters = [format_pm] * len(df.columns)
+            formatters = [format_pm] * exp_df_overview.shape[1]
             f.write(exp_df_overview.to_latex(index=False, formatters=formatters))
 
 
