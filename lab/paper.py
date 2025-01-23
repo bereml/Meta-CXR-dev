@@ -303,8 +303,6 @@ def paper_pretraining(
 #         hparams = {}
 #         if debug:
 #             hparams.update(DEBUG_HPARAMS_BB)
-#             hparams['batchbased_train_batches'] = 10
-#             hparams['mtst_episodes'] = 10
 #             results_dir = 'rdev'
 #         train_model(
 #             results_dir=results_dir,
@@ -333,11 +331,6 @@ def paper_resolution0(
             [ 512, 'mobilenetv3-large-100'],
             [ 768, 'mobilenetv3-large-100'],
             [1024, 'mobilenetv3-large-100'],
-            [ 224, 'convnext-tiny'],
-            [ 384, 'convnext-tiny'],
-            [ 512, 'convnext-tiny'],
-            [ 768, 'convnext-tiny'],
-            # [1024, 'convnext-tiny'],
         ],
         seeds,
     ))
@@ -375,11 +368,10 @@ def paper_resolution1(
     cfgs = list(product(
         # image_size, net_backbone
         [
-            [ 224, 'densenet121'],
-            [ 384, 'densenet121'],
-            [ 512, 'densenet121'],
-            # [ 768, 'densenet121'],
-            # [1024, 'densenet121'],
+            [ 224, 'convnext-tiny'],
+            [ 384, 'convnext-tiny'],
+            [ 512, 'convnext-tiny'],
+            [ 768, 'convnext-tiny'],
         ],
         seeds,
     ))
