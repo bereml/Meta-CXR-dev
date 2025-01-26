@@ -400,13 +400,54 @@ def paper_resolution1(
         aggregate_exp_df(join(results_dir, exp))
 
 
+# def paper_arch(
+#         seeds=SEEDS,
+#         results_dir=RESULTS_DIR,
+#         mtrn_batch_size=48,
+#         debug=False):
+#     exp = f'arch_batch-size-{mtrn_batch_size}'
+#     cfgs = list(product(
+#         # arch
+#         [
+#             # efficient
+#             'mobilenetv3-small-075',
+#             'mobilevitv2-050',
+#             'mobilenetv3-large-100',
+#             'convnext-atto',
+#             'convnextv2-atto',
+#             'mobilevitv2-100',
+#             # large
+#             'densenet121',
+#             'mobilevitv2-200',
+#             'convnextv2-nano',
+#             'densenet161',
+#             'convnext-tiny',
+#             'convnextv2-tiny',
+#         ],
+#         seeds,
+#     ))
+#     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+#         backbone, seed = cfg
+#         run = '_'.join([
+#             backbone,
+#         ])
+#         hparams = {}
+#         if debug:
+#             hparams.update(DEBUG_HPARAMS_BB)
+#             results_dir = 'rdev'
+#         train_model(
+#             results_dir=results_dir,
+#             exp=exp,
+#             run=run,
+#             net_backbone=backbone,
+#             mtrn_batch_size=mtrn_batch_size,
+#             seed=seed,
+#             **hparams
+#         )
+#         aggregate_exp_df(join(results_dir, exp))
 
 
-# -----------------------------------------------
-# unfinished
-
-
-def paper_arch(
+def paper_arch0(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         mtrn_batch_size=48,
@@ -422,6 +463,53 @@ def paper_arch(
             'convnext-atto',
             'convnextv2-atto',
             'mobilevitv2-100',
+            # large
+            # 'densenet121',
+            # 'mobilevitv2-200',
+            # 'convnextv2-nano',
+            # 'densenet161',
+            # 'convnext-tiny',
+            # 'convnextv2-tiny',
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        backbone, seed = cfg
+        run = '_'.join([
+            backbone,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB)
+            results_dir = 'rdev'
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            net_backbone=backbone,
+            mtrn_batch_size=mtrn_batch_size,
+            seed=seed,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
+def paper_arch1(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        mtrn_batch_size=48,
+        debug=False):
+    exp = f'arch_batch-size-{mtrn_batch_size}'
+    cfgs = list(product(
+        # arch
+        [
+            # efficient
+            # 'mobilenetv3-small-075',
+            # 'mobilevitv2-050',
+            # 'mobilenetv3-large-100',
+            # 'convnext-atto',
+            # 'convnextv2-atto',
+            # 'mobilevitv2-100',
             # large
             'densenet121',
             'mobilevitv2-200',
@@ -451,6 +539,10 @@ def paper_arch(
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
+
+
+# -----------------------------------------------
+# unfinished
 
 
 # def paper_foundation(
