@@ -181,8 +181,6 @@ Observations
 Observations
 - Analyze how ech dataset result relats to the class distribution, imbalance, labeling quality
 
-
---------------------------------------------------
 #### Subpopulation Shift
 
 | Subpopulation       | Unseen     | Seen       | HM         |
@@ -197,8 +195,6 @@ Observations
 - Age [31-62] > Age [10,30]∪[63,80] is expected
 - Female > Male is unexpected
 
-
---------------------------------------------------
 #### View Shift
 
 | View       | Unseen     | Seen       | HM         |
@@ -210,6 +206,7 @@ Observations
 Observations
 - Age [31-62] > Age [10,30]∪[63,80] is expected
 - Female > Male is unexpected
+
 
 --------------------------------------------------
 ### From Generalized to Standard FSL
