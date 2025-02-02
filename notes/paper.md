@@ -1,6 +1,8 @@
 # Paper 🩻 🐺 🐶 🤟🏽 😿
 
-Default hyper-params:
+## Experiments
+
+Default HPs:
 
 | HP                | Value     |
 | :---------------- | --------: |
@@ -48,13 +50,124 @@ Default hyper-params:
 |   precision       | 16        |
 
 
+--------------------------------------------------
+### Method
+
+- Data
+    - complete distro has 146292 examples
+    - batchbased needs around 150 epochs to converge
+    - each epoch episodes only use 0.36 of the whole data wrt batches
+    - each epoch episodes evaluates 2.76 faster wrt batches
+
+|                | Size  | # per epoch | % used  | eval freq |
+| -------------- | ----: | ----------: | ------: | --------: |
+| Batch          | 64    | 2286        | 1       | 1         |
+| Episode        | 52.96 | 1000        | 0.36    | 2.76      |
+
+
+- Hyper-params
+- MetaChest pretraining is a batch-based pretraning (BatchBased have it by design)
+
+
+| Pretraining    |            |            |            |  MetaChest |  MetaChest | MetaChest  |
+| -------------- | ---------: | ---------: | ---------: | ---------: | ---------: | ---------: |
+|                | Unseen     | Seen       | HM   | Unseen     | Seen       | HM   |
+| *STL-          |            |            |            |            |            |            |
+|   BatchBased   |  |  |  |  |  |  |
+|   EpisodeBased |  |  |  |  |  |  |
+| *MTL-          |            |            |            |            |            |            |
+|   ProtoNet     |  |  |  |  |  |  |
+|   FEAT         |  |  |  |  |  |  |
+
+
+Observations
+- La Beye es un 🐶
+
 
 --------------------------------------------------
-## Subdataset Shift
+### Pretraining
 
-* Meta-trn is the same to complete
-* Meta-val is the same when possible.
-* Meta-tst consider clasees/examples only of the subdataset.
+- Batchbased with/without MetaChest pretraning is the same as Batchbased is the method for pretraning.
+
+| ImageNet | MetaChest  | Method       | Unseen     | Seen       | HM   |
+| -------: | ---------: | -----------: | ---------: | ---------: | ---------: |
+|          | ✅         | BatchBased   |  |  |  |
+| 1k       | ✅         | BatchBased   |  |  |  |
+| 21k      | ✅         | BatchBased   |  |  |  |
+|          |            | ProtoNet     |  |  |  |
+| 1k       |            | ProtoNet     |  |  |  |
+| 21k      |            | ProtoNet     |  |  |  |
+|          | ✅         | ProtoNet     |  |  |  |
+| 1k       | ✅         | ProtoNet     |  |  |  |
+| 21k      | ✅         | ProtoNet     |  |  |  |
+
+Observations
+- ProtoNet: 1k improves Random by 1.85
+- ProtoNet: 1k+MetaChest improves 1k by 5.25
+- ProtoNet: prototypes imrpove with MetaChest pretraning
+- BatchBased: The improvement of 1k over Random is only 0.23
+
+
+--------------------------------------------------
+### Architecture
+
+- TODO: Check ConvNext FLOPS
+- Batch size 32
+
+| Backbone              | Unseen     | Seen       | HM         | Params     | MACs (G)  | Encoding |
+| --------------------- | ---------: | ---------: | ---------: | ---------: | --------: | -------: |
+| Efficient             |            |            |            |            |           |          |
+|   MobileNetV3Small075 |  |  |  |  1,016,584 |      0.11 |     1024 |
+|   MobileViTv2-050     |  |  |  |  1,113,305 |      1.04 |      256 |
+|   MobileNetV3Large100 |  |  |  |  4,201,744 |      0.62 |     1280 |
+|   MobileViTv2-100     |  |  |  |  4,388,265 |      4.06 |      512 |
+|   ConvNextAtto        |  |  |  |  3,373,240 |      1.62 |      320 |
+| Large                 |            |            |            |            |           |          |
+|   Densenet121         |  |  |  |  6,947,584 |      8.09 |     1024 |
+|   Densenet161         |  |  |  | 26,462,592 |     22.36 |     2208 |
+|   ConvNextTiny        |  |  |  | 27,817,056 |     18.36 |      768 |
+|   MobileViTv2-200     |  |  |  | 17,423,177 |     16.07 |      512 |
+
+Observations
+- La Beye es un 🐶
+
+
+--------------------------------------------------
+### RX Resolution
+
+| Backbone            | Resolution | Unseen     | Seen       | HM         |
+| ------------------: | ---------: | ---------: | ---------: | ---------: |
+| MobileNetV3Large100 |        224 | 80.82±0.17 | 71.20±0.44 | 73.36±0.31 |
+|                     |        384 | 84.42±0.15 | 75.25±0.46 | 76.95±0.35 |
+|                     |        512 | 84.65±0.15 | 75.63±0.45 | 77.34±0.35 |
+|                     |        768 | 83.69±0.15 | 74.99±0.46 | 76.55±0.35 |
+|                     |       1024 | 84.45±0.15 | 75.34±0.46 | 76.99±0.35 |
+| ConvNextTiny        |        224 | 84.58±0.15 | 74.76±0.44 | 76.95±0.34 |
+|                     |        384 | 84.53±0.15 | 76.45±0.43 | 78.05±0.33 |
+|                     |        512 | 84.75±0.15 | 76.58±0.43 | 78.17±0.33 |
+|                     |        768 | 84.85±0.15 | 76.89±0.43 | 78.45±0.32 |
+| Densenet121         |        224 | 83.03±0.16 | 76.84±0.42 | 77.62±0.32 |
+|                     |        384 | 82.36±0.17 | 77.99±0.43 | 77.91±0.33 |
+|                     |        512 | 82.33±0.17 | 77.60±0.41 | 77.92±0.30 |
+
+Observations
+- Resolution peeks (MH):
+  - 512 - MobileNetV3Large100
+  - 768 - ConvNextTiny
+  - 512 - Densenet121
+- ConvNextTiny outperforms (HM, 384):
+  - MobileNetV3Large100 by 1.09
+  - Densenet121 by 0.14
+
+
+--------------------------------------------------
+### Distribution Shift
+
+#### Subdataset Shift
+
+- Meta-trn is the same to complete
+- Meta-val is the same when possible.
+- Meta-tst consider clasees/examples only of the subdataset.
 
 | Subdataset          | Unseen     | Seen       | HM         |
 | ------------------- | ---------: | ---------: | ---------: |
@@ -65,11 +178,11 @@ Default hyper-params:
 | PadChest            | 79.66±0.18 | 75.90±0.40 | 75.89±0.31 |
 
 Observations
-* Analyze how ech dataset result relats to the class distribution, imbalance, labeling quality
+- Analyze how ech dataset result relats to the class distribution, imbalance, labeling quality
 
 
 --------------------------------------------------
-## Subpopulation Shift
+#### Subpopulation Shift
 
 | Subpopulation       | Unseen     | Seen       | HM         |
 | ------------------- | ---------: | ---------: | ---------: |
@@ -80,12 +193,12 @@ Observations
 | Male                | 84.83±0.14 | 74.17±0.45 | 76.58±0.35 |
 
 Observations
-* Age [31-62] > Age [10,30]∪[63,80] is expected
-* Female > Male is unexpected
+- Age [31-62] > Age [10,30]∪[63,80] is expected
+- Female > Male is unexpected
 
 
 --------------------------------------------------
-## View Shift
+#### View Shift
 
 | View       | Unseen     | Seen       | HM         |
 | ------------------- | ---------: | ---------: | ---------: |
@@ -94,11 +207,11 @@ Observations
 | PA                  | 82.61±0.16 | 77.31±0.45 | 77.43±0.34 |
 
 Observations
-* Age [31-62] > Age [10,30]∪[63,80] is expected
-* Female > Male is unexpected
+- Age [31-62] > Age [10,30]∪[63,80] is expected
+- Female > Male is unexpected
 
 --------------------------------------------------
-## From Generalized to Standard FSL
+### From Generalized to Standard FSL
 
 |   n-way |   n-unseen |   k-shot |   Unseen |   Seen |    HM |
 |--------:|-----------:|---------:|---------:|-------:|------:|
@@ -139,97 +252,45 @@ Observations
 |       5 |          5 |        5 |    65.45 | nan    | 65.45 |
 |       5 |          5 |       15 |    70.77 | nan    | 70.77 |
 
-| n-way | n-unseen | Unseen     | Seen       | HM         |
-| ----: | -------: | ---------: | ---------: | ---------: |
-| 3     | 1        |  |  |  |
-|       | 2        |  |  |  |
-|       | 3        |  |  |  |
-| 4     | 1        |  |  |  |
-|       | 2        |  |  |  |
-|       | 3        |  |  |  |
-|       | 4        |  |  |  |
-| 5     | 1        |  |  |  |
-|       | 2        |  |  |  |
-|       | 3        |  |  |  |
-|       | 4        |  |  |  |
-|       | 5        |  |  |  |
 
 Observations
-* La Beye es un 🐶
+- La Beye es un 🐶
 
 
 --------------------------------------------------
 --------------------------------------------------
 --------------------------------------------------
 
+## TODO & Progress
+
+
+### General Plan
+- [ ] Update HPs
+- [ ] Develop plots resolution, gfsl
+- [ ] Check TIMM/MobileNet-V4, MamabaOut
+        https://huggingface.co/collections/timm/mobilenetv4-pretrained-weights-6669c22cda4db4244def9637
+- [ ] metachest-dev TODO.md
+- [ ] https://pixi.sh/
+
+
+### Progress
+
 --------------------------------------------------
-## Method
+#### Feb 1st Week 09-15
 
-* Data
-    - complete distro has 146292 examples
-    - batchbased needs around 150 epochs to converge
-    - each epoch episodes only use 0.36 of the whole data wrt batches
-    - each epoch episodes evaluates 2.76 faster wrt batches
+--------------------------------------------------
+#### Feb 1st Week 02-08
+- [ ] RX Resolution Exp: analyze
+- [ ] Pretraning Exp: prepare
+- [ ] Pretraning Exp: run
+- [ ] Pretraning Exp: analize
 
-|                | Size  | # per epoch | % used  | eval freq |
-| -------------- | ----: | ----------: | ------: | --------: |
-| Batch          | 64    | 2286        | 1       | 1         |
-| Episode        | 52.96 | 1000        | 0.36    | 2.76      |
-
-
-* Hyper-params
-
-
-
-
-* MetaChest pretraining is a batch-based pretraning (BatchBased have it by design)
-
-
-| Pretraining    |            |            |            |  MetaChest |  MetaChest | MetaChest  |
-| -------------- | ---------: | ---------: | ---------: | ---------: | ---------: | ---------: |
-|                | Unseen     | Seen       | HM   | Unseen     | Seen       | HM   |
-| *STL*          |            |            |            |            |            |            |
-|   BatchBased   |  |  |  |  |  |  |
-|   EpisodeBased |  |  |  |  |  |  |
-| *MTL*          |            |            |            |            |            |            |
-|   ProtoNet     |  |  |  |  |  |  |
-|   FEAT         |  |  |  |  |  |  |
-
-
-
-
-
-
-Observations
-* La Beye es un 🐶
 
 
 --------------------------------------------------
-## Pretraining
+### Explore
 
-* Batchbased with/without MetaChest pretraning is the same as Batchbased is the method for pretraning.
-
-| ImageNet | MetaChest  | Method       | Unseen     | Seen       | HM   |
-| -------: | ---------: | -----------: | ---------: | ---------: | ---------: |
-|          | ✅         | BatchBased   |  |  |  |
-| 1k       | ✅         | BatchBased   |  |  |  |
-| 21k      | ✅         | BatchBased   |  |  |  |
-|          |            | ProtoNet     |  |  |  |
-| 1k       |            | ProtoNet     |  |  |  |
-| 21k      |            | ProtoNet     |  |  |  |
-|          | ✅         | ProtoNet     |  |  |  |
-| 1k       | ✅         | ProtoNet     |  |  |  |
-| 21k      | ✅         | ProtoNet     |  |  |  |
-
-Observations
-* ProtoNet: 1k improves Random by 1.85
-* ProtoNet: 1k+MetaChest improves 1k by 5.25
-* ProtoNet: prototypes imrpove with MetaChest pretraning
-* BatchBased: The improvement of 1k over Random is only 0.23
-
-
---------------------------------------------------
-## ImageNet vs Foundation
+### ImageNet vs Foundation
 
 | Backbone              | Pretraining | Params     | MACs (G)  | Unseen     | Seen       | HM   |
 | --------------------- | ----------: | ---------: | --------: | ---------: | ---------: | ---------: |
@@ -239,353 +300,14 @@ Observations
 | EVA02-Small           | M38M        |  4,201,744 |      0.62 |       1280 |  |  |  |
 
 Observations
-* Eva02 https://arxiv.org/pdf/2303.11331
-* M38M (Merged-38M): I21K, CC12M, CC3M, COCO, ADE20K, Object365, OpenImages
+- Eva02 https://arxiv.org/pdf/2303.11331
+- M38M (Merged-38M): I21K, CC12M, CC3M, COCO, ADE20K, Object365, OpenImages
 
-
-
---------------------------------------------------
-## RX Resolution
-
-| Backbone            | Resolution | Unseen     | Seen       | HM   |
-| ------------------: | ---------: | ---------: | ---------: | ---------: |
-| MobileNetV3Large100 |        224 |  |  |  |
-|                     |        384 |  |  |  |
-|                     |        512 |  |  |  |
-|                     |        768 |  |  |  |
-|                     |       1024 |  |  |  |
-| Densenet121         |        224 |  |  |  |
-|                     |        384 |  |  |  |
-|                     |        512 |  |  |  |
-|                     |        768 |  |  |  |
-|                     |       1024 |  |  |  |
-| ConvNextTiny        |        224 |  |  |  |
-|                     |        384 |  |  |  |
-|                     |        512 |  |  |  |
-|                     |        768 |  |  |  |
-|                     |       1024 |  |  |  |
-
-
---------------------------------------------------
-## Architecture
-
-* TODO: Check ConvNext FLOPS
-
-* Batch size 64, missing values were uneble to run due to memory
-
-
-| Backbone              | Unseen     | Seen       | HM         | Params     | MACs (G)  | Encoding |
-| --------------------- | ---------: | ---------: | ---------: | ---------: | --------: | -------: |
-| Efficient             |            |            |            |            |           |          |
-|   MobileNetV3Small075 | 84.42±0.25 | 92.76±0.14 | 90.24±0.15 |  1,016,584 |      0.11 |     1024 |
-|   MobileViTv2-050     | 86.68±0.25 | 93.47±0.13 | 91.38±0.15 |  1,113,305 |      1.04 |      256 |
-|   MobileNetV3Large100 | 87.99±0.22 | 94.11±0.12 | 92.17±0.13 |  4,201,744 |      0.62 |     1280 |
-|   MobileViTv2-100     | 87.59±0.25 | 93.87±0.13 | 91.94±0.14 |  4,388,265 |      4.06 |      512 |
-|   ConvNextAtto        | 88.24±0.23 | 94.96±0.11 | 92.99±0.12 |  3,373,240 |      1.62 |      320 |
-| Large                 |            |            |            |            |           |          |
-|   Densenet121         | 90.78±0.21 | 94.77±0.11 | 93.44±0.13 |  6,947,584 |      8.09 |     1024 |
-|   Densenet161         |            |            |            | 26,462,592 |     22.36 |     2208 |
-|   ConvNextTiny        | 89.62±0.23 | 94.99±0.11 | 93.46±0.12 | 27,817,056 |     18.36 |      768 |
-|   MobileViTv2-200     |            |            |            | 17,423,177 |     16.07 |      512 |
-
-* Batch size 48
-
-| Backbone              | Unseen     | Seen       | HM         | Params     | MACs (G)  | Encoding |
-| --------------------- | ---------: | ---------: | ---------: | ------Coyote01---: | --------: | -------: |
-| Efficient             |            |            |            |            |           |          |
-|   MobileNetV3Small075 |  |  |  |  1,016,584 |      0.11 |     1024 |
-|   MobileViTv2-050     |  |  |  |  1,113,305 |      1.04 |      256 |
-|   MobileNetV3Large100 |  |  |  |  4,201,744 |      0.62 |     1280 |
-|   MobileViTv2-100     |  |  |  |  4,388,265 |      4.06 |      512 |
-|   ConvNextAtto        |  |  |  |  3,373,240 |      1.62 |      320 |
-| Large                 |            |            |            |            |           |          |
-|   Densenet121         |  |  |  |  6,947,584 |      8.09 |     1024 |
-|   Densenet161         |  |  |  | 26,462,592 |     22.36 |     2208 |
-|   ConvNextTiny        |  |  |  | 27,817,056 |     18.36 |      768 |
-|   MobileViTv2-200     |  |  |  | 17,423,177 |     16.07 |      512 |
-
-
-Observations
-* La Beye es un 🐶
-
-
-
-
-
-
-
-
-
-
-
-
-
-
---------------------------------------------------
---------------------------------------------------
---------------------------------------------------
-
-## TODO
-
-### Reunión planeación
-- [ ] Bere: revisar literatura
-- [ ] Bere: acordar plan general
-- [ ] Bere: acordar sesiones de escritura
-
-### Plan general
-- [ ] Limpiar codigo, generar versión y correr 3 veces
-- [ ] Preparar & correr mínimos: Subdataset Shift, Subpopulation Shift, GFSL -> SFSL
-- [ ] Preparar & correr experimentos completos del artículo
-- [ ] Revisar TIMM/MobileNet-V4, MamabaOut
-        https://huggingface.co/collections/timm/mobilenetv4-pretrained-weights-6669c22cda4db4244def9637
-- [ ] metachest-dev TODO.md
-- [ ] https://pixi.sh/
-
-### Experimentos
-- [ ] Exp Methods SetUp
-- [ ] Exp Methods Run
-- [ ] Exp Methods Analize
-
-- [ ] Exp Pretraining SetUp
-- [ ] Exp Pretraining Run
-- [ ] Exp Pretraining Analize
-
-- [ ] Exp Architectures SetUp
-- [ ] Exp Architectures Run
-- [ ] Exp Architectures Analize
-
-- [ ] Exp Image Resolution SetUp
-- [ ] Exp Image Resolution Run
-- [ ] Exp Image Resolution Analize
-
-- [ ] Exp Subdataset Shift SetUp
-- [ ] Exp Subdataset Shift Run
-- [ ] Exp Subdataset Shift Analize
-
-- [ ] Exp Subpopulation Shift SetUp
-- [ ] Exp Subpopulation Shift Run
-- [ ] Exp Subpopulation Shift Analize
-
-- [ ] Exp View Shift SetUp
-- [ ] Exp View Shift Run
-- [ ] Exp View Shift Analize
-
-- [ ] Exp GFSL -> SFSL SetUp
-- [ ] Exp GFSL -> SFSL Run
-- [ ] Exp GFSL -> SFSL Analize
-
-
-
-
-
-seed = 0
-| run            | seen       | unseen     | hm         |
-|:---------------|:-----------|:-----------|:-----------|
-| complete       | 79.74±0.18 | 69.16±0.44 | 71.67±0.31 |
-| ds_chestxray14 | 62.14±0.17 | 64.58±0.37 | 61.70±0.24 |
-| ds_chexpert    | 67.55±0.20 | 70.96±0.27 | 68.52±0.21 |
-| ds_mimic       | 65.25±0.19 | 66.53±0.29 | 64.96±0.21 |
-| ds_padchest    | 72.40±0.21 | 69.13±0.37 | 69.19±0.27 |
-
-seed = 1
-| run            | seen       | unseen     | hm         |
-|:---------------|:-----------|:-----------|:-----------|
-| complete       | 79.74±0.18 | 69.66±0.43 | 72.00±0.31 |
-| ds_chestxray14 | 62.14±0.17 | 64.73±0.37 | 61.82±0.23 |
-| ds_chexpert    | 67.50±0.20 | 71.07±0.27 | 68.56±0.20 |
-| ds_mimic       | 65.29±0.19 | 66.76±0.29 | 65.06±0.21 |
-| ds_padchest    | 72.40±0.21 | 68.64±0.38 | 68.85±0.28 |
-
-
-seed = 0
-| run               | seen       | unseen     | hm         |
-|:------------------|:-----------|:-----------|:-----------|
-| random_batchbased | 78.01±0.22 | 77.64±0.28 | 77.23±0.23 |
-| random_protonet   | 77.13±0.23 | 75.98±0.33 | 75.81±0.27 |
-
-
-
---------------------------------------------------
-#### 01/06 - 01/12
-
-
---------------------------------------------------
-#### 01/01 - 01/05
---checkpoint_name base
-- [ ] Investigate why evaluation gives diferent results than fulll traninig
-  * The stop patience is bigger
-| run        | hm         | max_epochs | stop_patience | best_epoch |
-|:-----------|:-----------|:-----------|:--------------|:-----------|
-| eval-only  | 72.00±0.31 |        500 |            25 |          2 |
-| full-train | 77.23±0.23 |        150 |            50 |          5 |
-
-
-- [ ] Save HP when eval
-
-
-
-- [x] Investigate div by zero at method/base.py:47
-    python eval.py --results_dir rpaper --exp shift_ds --run ds_padchest --data_distro ds_padchest --seed 0
-- [x] Code refactor of metachest
-- [x] Add results overview on md & tex formats
-
-
---------------------------------------------------
---------------------------------------------------
---------------------------------------------------
-## Progress History
-
---------------------------------------------------
-#### 25/10 Friday
-- [x] Run an experiment dont excluding mtst in mtrn (modify _load_data)
-
---------------------------------------------------
-#### 26/08 Friday
-- [ ] Run exp: Resolution
-- [ ] Run exp: Arch
-- [ ] Run exp: Pretraining
-- [ ] Run exp: Method
-- [ ] Analize exp: DS Shift
-- [ ] Analize exp: Pop Shift
-- [ ] Run exp: View Shift
-- [ ] Run exp: GFSL
-- [ ] Check Pretraining vs Base
 - [ ] HP search EpisodeBased
 - [ ] Check FOMAML https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial16/Meta_Learning.html
 - [ ] Check Reptile or iMAML
 - [ ] Check FEAT
 - [ ] Check another method
-- [ ] Analize exp: Pretraining
-
-
-#### 25/08 Thusday
-
-#### 24/08 Wednesday
-
-#### 23/08 Tuesday
-
-#### 05/08 Monday
-- [x] Review ProtoNet
+- [ ] Review ProtoNet
 - [ ] Review EpisodeBased
 - [ ] Implemet EpisodeBased experiment with equivalence between batch and episode data size
-- [ ] Ryun new episode generation method
-- [ ] Analize more in depth only one class distro
-
---------------------------------------------------
-#### 26/07 Friday
-
-#### 25/07 Thusday
-
-#### 24/07 Wednesday
-
-#### 23/07 Tuesday
-- [x] Run exp: DS Shift
-- [x] Run exp: Pop Shift
-- [x] Verify the experiments are ready
-- [x] Check ProtoNet
-
-#### 05/08 Monday
-- [x] Implement episode generation with exclusion of mtrn only examples
-- [x] Develop coocurrence plot
-- [x] Clean cecav3: .config/projects , ssh keys
-
---------------------------------------------------
-#### 05/07 Friday
-- [ ] Analize viability of Foundation exp
-- [ ] Check another method
-- [ ] Implement methods exp
-- [ ] Run methods exp
-- [ ] Develop Resolution plot pipeline
-
-#### 04/07 Thusday
-- [ ] Run Resolution exp
-
-#### 03/07 Wednesday
-- [x] Run GFSL Exp
-- [x] Analyze Pretraining Exp results
-
-#### 02/07 Tuesday
-
-#### 01/07 Monday
-
---------------------------------------------------
-#### 28/06 Friday
-- [x] Run Pretraining exp
-
-#### 27/06 Thusday
-
-#### 26/06 Wednesday
-- [x] Update Arch Exp
-- [x] Run Arch Exp
-
-#### 25/06 Tuesday
-- [x] Run Protonet exp
-- [x] Implement Pretraining exp
-- [x] Check EpisodeBased method
-- [x] Run EpisodeBased study
-
-#### 24/06 Monday
-- [x] Check Protonet method
-
---------------------------------------------------
-#### 21/06 Friday
-- [x] Run arch exp
-
-#### 20/06 Thusday
-- [x] Run shift_pop exps
-- [x] Analyze shift ds exps
-- [x] Analyze nway exp
-
-#### 19/06 Wednesday
-
-#### 18/06 Tuesday
-- [x] Improve shift ds/pop exps to only eval
-- [x] Run shift_ds exps
-- [x] Run nway exps
-- [x] Analyze repro exp
-- [x] Implement foundation exp
-
-#### 17/06 Monday
-- [x] Sync repos
-
---------------------------------------------------
-#### 14/06 Friday
-- [x] How many examples are per batch/episode?
-- [x] How many batches are there in the train data loader?
-- [x] Batchbased will use all the batches before validation?
-
-#### 13/06 Thusday
-- [x] Fix resizing of padchest images
-- [x] Set default HP on args for data/method/precision
-- [x] Document HP
-
-#### 12/06 Wednesday
-
-#### 11/06 Tuesday
-
-#### 10/06 Monday
-
---------------------------------------------------
-#### 07/06 Friday
-
-#### 05/06 Thursday
-
-#### 04/06 Wednesday
-- [x] Results for SubPop/Complete wrote down
-- [x] Unify batchbased precision code
-
-#### 03/06 Tuesday
-- [x] Check generation of all resolutions for images
-- [x] Commit last version of metachest repo
-- [x] Run Complete Exp for SubPop
-- [x] Results for SubDS/complete wrote down
-- [x] Read ProtoNet
-- [x] Setup ProtoNet analysis exp
-
-#### 03/06 Monday
-- [x] Reproducibility verified for BatchBased
-- [x] Run arch exp
-- [x] Results for SubDS wrote down
-- [x] Results for SubPop wrote down
-- [x] Run Complete Exp for SubDS
-- [x] Run generation of all resolutions for images
