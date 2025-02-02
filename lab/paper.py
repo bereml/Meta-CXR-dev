@@ -267,57 +267,7 @@ def paper_pretraining(
         aggregate_exp_df(join(results_dir, exp))
 
 
-# def paper_resolution(
-#         seeds=SEEDS,
-#         results_dir=RESULTS_DIR,
-#         mtrn_batch_size=32,
-#         debug=False):
-#     exp = 'resolution'
-#     cfgs = list(product(
-#         # image_size, net_backbone
-#         [
-#             [ 224, 'mobilenetv3-large-100'],
-#             [ 384, 'mobilenetv3-large-100'],
-#             [ 512, 'mobilenetv3-large-100'],
-#             [ 768, 'mobilenetv3-large-100'],
-#             [1024, 'mobilenetv3-large-100'],
-#             [ 224, 'convnext-tiny'],
-#             [ 384, 'convnext-tiny'],
-#             [ 512, 'convnext-tiny'],
-#             [ 768, 'convnext-tiny'],
-#             # [1024, 'convnext-tiny'],
-#             [ 224, 'densenet121'],
-#             [ 384, 'densenet121'],
-#             [ 512, 'densenet121'],
-#             # [ 768, 'densenet121'],
-#             # [1024, 'densenet121'],
-#         ],
-#         seeds,
-#     ))
-#     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-#         (image_size, net_backbone), seed = cfg
-#         run = '_'.join([
-#             net_backbone,
-#             f'{image_size:04d}',
-#         ])
-#         hparams = {}
-#         if debug:
-#             hparams.update(DEBUG_HPARAMS_BB)
-#             results_dir = 'rdev'
-#         train_model(
-#             results_dir=results_dir,
-#             exp=exp,
-#             run=run,
-#             image_size=image_size,
-#             net_backbone=net_backbone,
-#             mtrn_batch_size=mtrn_batch_size,
-#             seed=seed,
-#             **hparams
-#         )
-#         aggregate_exp_df(join(results_dir, exp))
-
-
-def paper_resolution0(
+def paper_resolution(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         mtrn_batch_size=32,
@@ -331,47 +281,13 @@ def paper_resolution0(
             [ 512, 'mobilenetv3-large-100'],
             [ 768, 'mobilenetv3-large-100'],
             [1024, 'mobilenetv3-large-100'],
-        ],
-        seeds,
-    ))
-    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        (image_size, net_backbone), seed = cfg
-        run = '_'.join([
-            net_backbone,
-            f'{image_size:04d}',
-        ])
-        hparams = {}
-        if debug:
-            hparams.update(DEBUG_HPARAMS_BB)
-            hparams['batchbased_train_batches'] = 10
-            hparams['mtst_episodes'] = 10
-            results_dir = 'rdev'
-        train_model(
-            results_dir=results_dir,
-            exp=exp,
-            run=run,
-            image_size=image_size,
-            net_backbone=net_backbone,
-            mtrn_batch_size=mtrn_batch_size,
-            seed=seed,
-            **hparams
-        )
-        aggregate_exp_df(join(results_dir, exp))
-
-
-def paper_resolution1(
-        seeds=SEEDS,
-        results_dir=RESULTS_DIR,
-        mtrn_batch_size=32,
-        debug=False):
-    exp = 'resolution'
-    cfgs = list(product(
-        # image_size, net_backbone
-        [
             [ 224, 'convnext-tiny'],
             [ 384, 'convnext-tiny'],
             [ 512, 'convnext-tiny'],
             [ 768, 'convnext-tiny'],
+            [ 224, 'densenet121'],
+            [ 384, 'densenet121'],
+            [ 512, 'densenet121'],
         ],
         seeds,
     ))
@@ -384,8 +300,6 @@ def paper_resolution1(
         hparams = {}
         if debug:
             hparams.update(DEBUG_HPARAMS_BB)
-            hparams['batchbased_train_batches'] = 10
-            hparams['mtst_episodes'] = 10
             results_dir = 'rdev'
         train_model(
             results_dir=results_dir,

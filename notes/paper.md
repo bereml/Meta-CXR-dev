@@ -151,6 +151,7 @@ Observations
 |                     |        512 | 82.33±0.17 | 77.60±0.41 | 77.92±0.30 |
 
 Observations
+- mtrn_batch_size=32 to fit in memory
 - Resolution peeks (MH):
   - 512 - MobileNetV3Large100
   - 768 - ConvNextTiny
