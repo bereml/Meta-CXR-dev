@@ -52,113 +52,48 @@ def paper_base(
         aggregate_exp_df(join(results_dir, exp))
 
 
-def paper_shift_ds(
+def paper_arch(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
-        checkpoint_name='base',
+        mtrn_batch_size=48,
         debug=False):
-    exp = 'shift_ds'
+    exp = f'arch_batch-size-{mtrn_batch_size}'
     cfgs = list(product(
-        # data_distro
+        # arch
         [
-            'ds_chestxray14',
-            'ds_chexpert',
-            'ds_mimic',
-            'ds_padchest',
-            'complete',
+            # efficient
+            'mobilenetv3-small-075',
+            'mobilevitv2-050',
+            'mobilenetv3-large-100',
+            'convnext-atto',
+            'convnextv2-atto',
+            'mobilevitv2-100',
+            # large
+            'densenet121',
+            'mobilevitv2-200',
+            'convnextv2-nano',
+            'densenet161',
+            'convnext-tiny',
+            'convnextv2-tiny',
         ],
         seeds,
     ))
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        data_distro, seed = cfg
+        backbone, seed = cfg
         run = '_'.join([
-            data_distro,
+            backbone,
         ])
         hparams = {}
         if debug:
             hparams.update(DEBUG_HPARAMS_BB)
             results_dir = 'rdev'
-        eval_model(
+        train_model(
             results_dir=results_dir,
             exp=exp,
             run=run,
-            data_distro=data_distro,
+            net_backbone=backbone,
+            mtrn_batch_size=mtrn_batch_size,
             seed=seed,
-            checkpoint_name=checkpoint_name,
-            **hparams
-        )
-        aggregate_exp_df(join(results_dir, exp))
-
-
-def paper_shift_pop(
-        seeds=SEEDS,
-        results_dir=RESULTS_DIR,
-        checkpoint_name='base',
-        debug=False):
-    exp = 'shift_pop'
-    cfgs = list(product(
-        # data_distro
-        [
-            'age_center',
-            'age_tails',
-            'sex_female',
-            'sex_male',
-            'complete',
-        ],
-        seeds,
-    ))
-    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        (data_distro, seed) = cfg
-        run = '_'.join([
-            data_distro,
-        ])
-        hparams = {}
-        if debug:
-            hparams.update(DEBUG_HPARAMS_BB)
-            results_dir = 'rdev'
-        eval_model(
-            results_dir=results_dir,
-            exp=exp,
-            run=run,
-            data_distro=data_distro,
-            seed=seed,
-            checkpoint_name=checkpoint_name,
-            **hparams
-        )
-        aggregate_exp_df(join(results_dir, exp))
-
-
-def paper_shift_view(
-        seeds=SEEDS,
-        results_dir=RESULTS_DIR,
-        checkpoint_name='base',
-        debug=False):
-    exp = 'shift_view'
-    cfgs = list(product(
-        # data_distro
-        [
-            'view_ap',
-            'view_pa',
-            'complete',
-        ],
-        seeds,
-    ))
-    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        (data_distro, seed) = cfg
-        run = '_'.join([
-            data_distro,
-        ])
-        hparams = {}
-        if debug:
-            hparams.update(DEBUG_HPARAMS_BB)
-            results_dir = 'rdev'
-        eval_model(
-            results_dir=results_dir,
-            exp=exp,
-            run=run,
-            data_distro=data_distro,
-            seed=seed,
-            checkpoint_name=checkpoint_name,
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
@@ -314,142 +249,113 @@ def paper_resolution(
         aggregate_exp_df(join(results_dir, exp))
 
 
-# def paper_arch(
-#         seeds=SEEDS,
-#         results_dir=RESULTS_DIR,
-#         mtrn_batch_size=48,
-#         debug=False):
-#     exp = f'arch_batch-size-{mtrn_batch_size}'
-#     cfgs = list(product(
-#         # arch
-#         [
-#             # efficient
-#             'mobilenetv3-small-075',
-#             'mobilevitv2-050',
-#             'mobilenetv3-large-100',
-#             'convnext-atto',
-#             'convnextv2-atto',
-#             'mobilevitv2-100',
-#             # large
-#             'densenet121',
-#             'mobilevitv2-200',
-#             'convnextv2-nano',
-#             'densenet161',
-#             'convnext-tiny',
-#             'convnextv2-tiny',
-#         ],
-#         seeds,
-#     ))
-#     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-#         backbone, seed = cfg
-#         run = '_'.join([
-#             backbone,
-#         ])
-#         hparams = {}
-#         if debug:
-#             hparams.update(DEBUG_HPARAMS_BB)
-#             results_dir = 'rdev'
-#         train_model(
-#             results_dir=results_dir,
-#             exp=exp,
-#             run=run,
-#             net_backbone=backbone,
-#             mtrn_batch_size=mtrn_batch_size,
-#             seed=seed,
-#             **hparams
-#         )
-#         aggregate_exp_df(join(results_dir, exp))
-
-
-def paper_arch0(
+def paper_shift_ds(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
-        mtrn_batch_size=48,
+        checkpoint_name='base',
         debug=False):
-    exp = f'arch_batch-size-{mtrn_batch_size}'
+    exp = 'shift_ds'
     cfgs = list(product(
-        # arch
+        # data_distro
         [
-            # efficient
-            'mobilenetv3-small-075',
-            'mobilevitv2-050',
-            'mobilenetv3-large-100',
-            'convnext-atto',
-            'convnextv2-atto',
-            'mobilevitv2-100',
-            # large
-            # 'densenet121',
-            # 'mobilevitv2-200',
-            # 'convnextv2-nano',
-            # 'densenet161',
-            # 'convnext-tiny',
-            # 'convnextv2-tiny',
+            'ds_chestxray14',
+            'ds_chexpert',
+            'ds_mimic',
+            'ds_padchest',
+            'complete',
         ],
         seeds,
     ))
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        backbone, seed = cfg
+        data_distro, seed = cfg
         run = '_'.join([
-            backbone,
+            data_distro,
         ])
         hparams = {}
         if debug:
             hparams.update(DEBUG_HPARAMS_BB)
             results_dir = 'rdev'
-        train_model(
+        eval_model(
             results_dir=results_dir,
             exp=exp,
             run=run,
-            net_backbone=backbone,
-            mtrn_batch_size=mtrn_batch_size,
+            data_distro=data_distro,
             seed=seed,
+            checkpoint_name=checkpoint_name,
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
 
 
-def paper_arch1(
+def paper_shift_pop(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
-        mtrn_batch_size=48,
+        checkpoint_name='base',
         debug=False):
-    exp = f'arch_batch-size-{mtrn_batch_size}'
+    exp = 'shift_pop'
     cfgs = list(product(
-        # arch
+        # data_distro
         [
-            # efficient
-            # 'mobilenetv3-small-075',
-            # 'mobilevitv2-050',
-            # 'mobilenetv3-large-100',
-            # 'convnext-atto',
-            # 'convnextv2-atto',
-            # 'mobilevitv2-100',
-            # large
-            'densenet121',
-            'mobilevitv2-200',
-            'convnextv2-nano',
-            'densenet161',
-            'convnext-tiny',
-            'convnextv2-tiny',
+            'age_center',
+            'age_tails',
+            'sex_female',
+            'sex_male',
+            'complete',
         ],
         seeds,
     ))
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        backbone, seed = cfg
+        (data_distro, seed) = cfg
         run = '_'.join([
-            backbone,
+            data_distro,
         ])
         hparams = {}
         if debug:
             hparams.update(DEBUG_HPARAMS_BB)
             results_dir = 'rdev'
-        train_model(
+        eval_model(
             results_dir=results_dir,
             exp=exp,
             run=run,
-            net_backbone=backbone,
-            mtrn_batch_size=mtrn_batch_size,
+            data_distro=data_distro,
             seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
+def paper_shift_view(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        checkpoint_name='base',
+        debug=False):
+    exp = 'shift_view'
+    cfgs = list(product(
+        # data_distro
+        [
+            'view_ap',
+            'view_pa',
+            'complete',
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (data_distro, seed) = cfg
+        run = '_'.join([
+            data_distro,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB)
+            results_dir = 'rdev'
+        eval_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            data_distro=data_distro,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
@@ -497,56 +403,4 @@ def paper_arch1(
 #             **hparams
 #         )
 #         aggregate_exp_df(join(results_dir, exp))
-
-
-def paper_pretraining(
-        seeds=SEEDS,
-        results_dir=RESULTS_DIR,
-        debug=False):
-    exp = 'pretraining'
-    net_backbone = 'mobilenetv3-large-100'
-    cfgs = list(product(
-        #   [net_weights,      method,       checkpoint_name]
-        [
-            ['random',         'batchbased', 'metachest'],
-            ['i1k',            'batchbased', 'i1k-metachest'],
-            ['i21k',           'batchbased', 'i21k-metachest'],
-            ['random',         'protonet',   None],
-            ['i1k',            'protonet',   None],
-            ['i21k',           'protonet',   None],
-            ['metachest',      'protonet',   None],
-            ['i1k-metachest',  'protonet',   None],
-            ['i21k-metachest', 'protonet',   None],
-        ],
-        seeds,
-    ))
-    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        (net_weights, method, checkpoint_name), seed = cfg
-        run = '_'.join([
-            net_weights,
-            method,
-        ])
-        hparams = {}
-        if debug:
-            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
-                           else DEBUG_HPARAMS)
-            results_dir = 'rdev'
-
-        # include backbone name in net_weights & checkpoint_name
-        if 'metachest' in net_weights:
-            net_weights = '_'.join([net_backbone, net_weights, f'seed{seed}'])
-        if checkpoint_name:
-            checkpoint_name = '_'.join([net_backbone, checkpoint_name, f'seed{seed}'])
-            hparams['checkpoint_name'] = checkpoint_name
-
-        train_model(
-            results_dir=results_dir,
-            exp=exp,
-            run=run,
-            net_weights=net_weights,
-            method=method,
-            seed=seed,
-            **hparams
-        )
-        aggregate_exp_df(join(results_dir, exp))
 

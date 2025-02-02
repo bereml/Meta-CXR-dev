@@ -89,7 +89,7 @@ Observations
 
 - Batchbased with/without MetaChest pretraning is the same as Batchbased is the method for pretraning.
 
-| ImageNet | MetaChest  | Method       | Unseen     | Seen       | HM   |
+| ImageNet | MetaChest  | Method       | Unseen     | Seen       | HM         |
 | -------: | ---------: | -----------: | ---------: | ---------: | ---------: |
 |          | ✅         | BatchBased   |  |  |  |
 | 1k       | ✅         | BatchBased   |  |  |  |
@@ -102,10 +102,8 @@ Observations
 | 21k      | ✅         | ProtoNet     |  |  |  |
 
 Observations
-- ProtoNet: 1k improves Random by 1.85
-- ProtoNet: 1k+MetaChest improves 1k by 5.25
-- ProtoNet: prototypes imrpove with MetaChest pretraning
-- BatchBased: The improvement of 1k over Random is only 0.23
+- mtrn_episodes = number_of_examples / avg_size_episode = 4087
+-
 
 
 --------------------------------------------------
