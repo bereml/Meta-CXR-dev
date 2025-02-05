@@ -418,12 +418,12 @@ def paper_gfsl_proto(
         aggregate_exp_df(join(results_dir, exp))
 
 
-def paper_shift_ds_proto(
+def paper_shift_proto(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         checkpoint_name='base',
         debug=False):
-    exp = 'shift_ds_proto'
+    exp = 'shift_proto'
     net_weights = 'mobilenetv3-large-100_i1k-metachest_seed0'
     method = 'protonet'
     cfgs = list(product(
@@ -433,6 +433,12 @@ def paper_shift_ds_proto(
             'ds_chexpert',
             'ds_mimic',
             'ds_padchest',
+            'age_center',
+            'age_tails',
+            'sex_female',
+            'sex_male',
+            'view_ap',
+            'view_pa',
             'complete',
         ],
         seeds,
@@ -459,87 +465,6 @@ def paper_shift_ds_proto(
         )
         aggregate_exp_df(join(results_dir, exp))
 
-
-def paper_shift_pop_proto(
-        seeds=SEEDS,
-        results_dir=RESULTS_DIR,
-        checkpoint_name='base',
-        debug=False):
-    exp = 'shift_pop_proto'
-    net_weights = 'mobilenetv3-large-100_i1k-metachest_seed0'
-    method = 'protonet'
-    cfgs = list(product(
-        # data_distro
-        [
-            'age_center',
-            'age_tails',
-            'sex_female',
-            'sex_male',
-            'complete',
-        ],
-        seeds,
-    ))
-    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        (data_distro, seed) = cfg
-        run = '_'.join([
-            data_distro,
-        ])
-        hparams = {}
-        if debug:
-            hparams.update(DEBUG_HPARAMS)
-            results_dir = 'rdev'
-        eval_model(
-            results_dir=results_dir,
-            exp=exp,
-            run=run,
-            data_distro=data_distro,
-            net_weights=net_weights,
-            method=method,
-            seed=seed,
-            checkpoint_name=checkpoint_name,
-            **hparams
-        )
-        aggregate_exp_df(join(results_dir, exp))
-
-
-def paper_shift_view_proto(
-        seeds=SEEDS,
-        results_dir=RESULTS_DIR,
-        checkpoint_name='base',
-        debug=False):
-    exp = 'shift_view_proto'
-    net_weights = 'mobilenetv3-large-100_i1k-metachest_seed0'
-    method = 'protonet'
-    cfgs = list(product(
-        # data_distro
-        [
-            'view_ap',
-            'view_pa',
-            'complete',
-        ],
-        seeds,
-    ))
-    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        (data_distro, seed) = cfg
-        run = '_'.join([
-            data_distro,
-        ])
-        hparams = {}
-        if debug:
-            hparams.update(DEBUG_HPARAMS)
-            results_dir = 'rdev'
-        eval_model(
-            results_dir=results_dir,
-            exp=exp,
-            run=run,
-            data_distro=data_distro,
-            net_weights=net_weights,
-            method=method,
-            seed=seed,
-            checkpoint_name=checkpoint_name,
-            **hparams
-        )
-        aggregate_exp_df(join(results_dir, exp))
 
 
 # PROTO ------------------------------------------
