@@ -159,20 +159,33 @@ def paper_pretraining(
     cfgs = list(product(
         #   [net_weights,      method,       checkpoint_name]
         [
-            ['random',         'batchbased', 'metachest'],
-            ['i1k',            'batchbased', 'i1k-metachest'],
-            ['i21k',           'batchbased', 'i21k-metachest'],
-            ['random',         'protonet',   None],
-            ['i1k',            'protonet',   None],
-            ['i21k',           'protonet',   None],
-            ['metachest',      'protonet',   None],
-            ['i1k-metachest',  'protonet',   None],
-            ['i21k-metachest', 'protonet',   None],
+            # ['random',         'batchbased', 'metachest'],
+            # ['i1k',            'batchbased', 'i1k-metachest'],
+            # ['i21k',           'batchbased', 'i21k-metachest'],
+            # ['random',         'protonet',   None],
+            # ['i1k',            'protonet',   None],
+            # ['i21k',           'protonet',   None],
+            # ['metachest',      'protonet',   None],
+            # ['i1k-metachest',  'protonet',   None],
+            # ['i21k-metachest', 'protonet',   None],
+            ['random',              'batchbased'],
+            ['i1k',                 'batchbased'],
+            ['i21k',                'batchbased'],
+            ['random',              'protonet'],
+            ['i1k',                 'protonet'],
+            ['i21k',                'protonet'],
+            ['random+batchbased',   'protonet'],
+            ['i1k+batchbased',      'protonet'],
+            ['i21k+batchbased',     'protonet'],
+            ['random+protonet',     'batchbased'],
+            ['i1k+protonet',        'batchbased'],
+            ['i21k+protonet',       'batchbased'],
         ],
         seeds,
     ))
+    lst = []
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        (net_weights, method, checkpoint_name), seed = cfg
+        (net_weights, method), seed = cfg
         run = '_'.join([
             net_weights,
             method,
@@ -183,12 +196,10 @@ def paper_pretraining(
                            else DEBUG_HPARAMS)
             results_dir = 'rdev'
 
-        # include backbone name in net_weights & checkpoint_name
-        if 'metachest' in net_weights:
-            net_weights = '_'.join([net_backbone, net_weights, f'seed{seed}'])
-        if checkpoint_name:
-            checkpoint_name = '_'.join([net_backbone, checkpoint_name, f'seed{seed}'])
-            hparams['checkpoint_name'] = checkpoint_name
+
+        checkpoint_name = f'{net_backbone}_{net_weights}+{method}_seed{seed}'
+        if net_weights not in {'random', 'i1k', 'i21k'} :
+            net_weights = f'{net_backbone}_{net_weights}_seed{seed}'
 
         train_model(
             results_dir=results_dir,
@@ -197,9 +208,110 @@ def paper_pretraining(
             net_weights=net_weights,
             method=method,
             seed=seed,
+            checkpoint_name=checkpoint_name,
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
+
+
+def paper_pretraining_batchbased_protonet(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'pretraining'
+    net_backbone = 'mobilenetv3-large-100'
+    cfgs = list(product(
+        #   [net_weights,           method]
+        [
+            ['random',              'batchbased'],
+            ['i1k',                 'batchbased'],
+            ['i21k',                'batchbased'],
+            ['random+batchbased',   'protonet'],
+            ['i1k+batchbased',      'protonet'],
+            ['i21k+batchbased',     'protonet'],
+        ],
+        seeds,
+    ))
+    lst = []
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (net_weights, method), seed = cfg
+        run = '_'.join([
+            net_weights,
+            method,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+                           else DEBUG_HPARAMS)
+            results_dir = 'rdev'
+
+
+        checkpoint_name = f'{net_backbone}_{net_weights}+{method}_seed{seed}'
+        if net_weights not in {'random', 'i1k', 'i21k'} :
+            net_weights = f'{net_backbone}_{net_weights}_seed{seed}'
+
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            net_weights=net_weights,
+            method=method,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
+
+def paper_pretraining_protonet_batchbased(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'pretraining'
+    net_backbone = 'mobilenetv3-large-100'
+    cfgs = list(product(
+        #   [net_weights,           method]
+        [
+            ['random',              'protonet'],
+            ['i1k',                 'protonet'],
+            ['i21k',                'protonet'],
+            ['random+protonet',     'batchbased'],
+            ['i1k+protonet',        'batchbased'],
+            ['i21k+protonet',       'batchbased'],
+        ],
+        seeds,
+    ))
+    lst = []
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (net_weights, method), seed = cfg
+        run = '_'.join([
+            net_weights,
+            method,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+                           else DEBUG_HPARAMS)
+            results_dir = 'rdev'
+
+
+        checkpoint_name = f'{net_backbone}_{net_weights}+{method}_seed{seed}'
+        if net_weights not in {'random', 'i1k', 'i21k'} :
+            net_weights = f'{net_backbone}_{net_weights}_seed{seed}'
+
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            net_weights=net_weights,
+            method=method,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
 
 
 def paper_resolution(
