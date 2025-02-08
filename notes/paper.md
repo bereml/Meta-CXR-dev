@@ -89,7 +89,7 @@ Observations
 
 - Batchbased with/without MetaChest pretraning is the same as Batchbased is the method for pretraning.
 
-| Weights | 1st Method | 2nd Method | Seen       | Unseen     | HH         |
+| Weights | 1st Round  | 2nd Round  | Seen       | Unseen     | HH         |
 |:--------|:-----------|:-----------|:-----------|:-----------|:-----------|
 | Random  | Batchbased |            | 80.08±0.17 | 69.98±0.48 | 71.76±0.36 |
 | Random  | Protonet   |            | 76.76±0.15 | 71.42±0.41 | 71.95±0.30 |
