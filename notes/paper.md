@@ -89,21 +89,23 @@ Observations
 
 - Batchbased with/without MetaChest pretraning is the same as Batchbased is the method for pretraning.
 
-| ImageNet | MetaChest  | Method       | Seen       | Unseen     | HM         |
-| -------: | ---------: | -----------: | ---------: | ---------: | ---------: |
-|          | ✅         | BatchBased   | 80.08±0.17 | 69.98±0.48 | 71.76±0.36 |
-| 1k       | ✅         | BatchBased   | 84.54±0.15 | 74.50±0.47 | 76.51±0.36 |
-| 21k      | ✅         | BatchBased   | 83.82±0.15 | 72.33±0.48 | 74.83±0.36 |
-|          |            | ProtoNet     | 76.76±0.15 | 71.42±0.41 | 71.95±0.30 |
-| 1k       |            | ProtoNet     | 82.05±0.15 | 76.20±0.38 | 77.44±0.27 |
-| 21k      |            | ProtoNet     | 79.93±0.14 | 77.92±0.36 | 77.44±0.25 |
-|          | ✅         | ProtoNet     | 79.24±0.14 | 76.18±0.38 | 76.10±0.26 |
-| 1k       | ✅         | ProtoNet     | 81.70±0.14 | 79.71±0.36 | 79.29±0.25 |
-| 21k      | ✅         | ProtoNet     | 81.58±0.14 | 77.04±0.36 | 77.79±0.26 |
+| Weights | 1st Method | 2nd Method | Seen       | Unseen     | HH         |
+|:--------|:-----------|:-----------|:-----------|:-----------|:-----------|
+| Random  | Batchbased |            | 80.08±0.17 | 69.98±0.48 | 71.76±0.36 |
+| Random  | Protonet   |            | 76.76±0.15 | 71.42±0.41 | 71.95±0.30 |
+| I1k     | Batchbased |            | 84.54±0.15 | 74.50±0.47 | 76.51±0.36 |
+| I1k     | Protonet   |            | 82.05±0.15 | 76.20±0.38 | 77.44±0.27 |
+| I21k    | Batchbased |            | 83.82±0.15 | 72.33±0.48 | 74.83±0.36 |
+| I21k    | Protonet   |            | 79.93±0.14 | 77.92±0.36 | 77.44±0.25 |
+| Random  | Batchbased | Protonet   | 79.24±0.14 | 76.18±0.38 | 76.10±0.26 |
+| Random  | Protonet   | Batchbased | 79.87±0.17 | 68.99±0.48 | 71.05±0.36 |
+| I1k     | Batchbased | Protonet   | 81.70±0.14 | 79.71±0.36 | 79.29±0.25 |
+| I1k     | Protonet   | Batchbased | 83.25±0.16 | 71.56±0.48 | 74.10±0.36 |
+| I21k    | Batchbased | Protonet   | 81.58±0.14 | 77.04±0.36 | 77.79±0.26 |
+| I21k    | Protonet   | Batchbased | 83.24±0.15 | 71.25±0.47 | 74.04±0.35 |
 
 Observations
 - mtrn_episodes = number_of_examples / avg_size_episode = 4087
--
 
 
 --------------------------------------------------
