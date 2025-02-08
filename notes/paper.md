@@ -89,7 +89,7 @@ Observations
 
 - Batchbased with/without MetaChest pretraning is the same as Batchbased is the method for pretraning.
 
-| ImageNet | MetaChest  | Method       | Unseen     | Seen       | HM         |
+| ImageNet | MetaChest  | Method       | Seen       | Unseen     | HM         |
 | -------: | ---------: | -----------: | ---------: | ---------: | ---------: |
 |          | ✅         | BatchBased   | 80.08±0.17 | 69.98±0.48 | 71.76±0.36 |
 | 1k       | ✅         | BatchBased   | 84.54±0.15 | 74.50±0.47 | 76.51±0.36 |
@@ -112,7 +112,7 @@ Observations
 - TODO: Check ConvNext FLOPS
 - Batch size 32
 
-| Backbone              | Unseen     | Seen       | HM         | Params     | MACs (G)  | Encoding |
+| Backbone              | Seen       | Unseen     | HM         | Params     | MACs (G)  | Encoding |
 | --------------------- | ---------: | ---------: | ---------: | ---------: | --------: | -------: |
 | Efficient             |            |            |            |            |           |          |
 |   MobileNetV3Small075 | 83.39±0.16 | 72.74±0.47 | 74.90±0.36 |  1,016,584 |      0.11 |     1024 |
@@ -129,7 +129,7 @@ Observations
 Observations
 - La Beye es un 🐶
 
-| run                   | seen       | unseen     | hm         |
+| run                   | Seen       | Unseen     | HM         |
 |:----------------------|:-----------|:-----------|:-----------|
 | convnextv2-atto       | 83.90±0.15 | 77.04±0.44 | 77.94±0.34 |
 | convnextv2-nano       | 82.72±0.16 | 74.59±0.44 | 76.09±0.33 |
@@ -139,7 +139,7 @@ Observations
 --------------------------------------------------
 ### RX Resolution
 
-| Backbone            | Resolution | Unseen     | Seen       | HM         |
+| Backbone            | Resolution | Seen       | Unseen     | HM         |
 | ------------------: | ---------: | ---------: | ---------: | ---------: |
 | MobileNetV3Large100 |        224 | 80.82±0.17 | 71.20±0.44 | 73.36±0.31 |
 |                     |        384 | 84.42±0.15 | 75.25±0.46 | 76.95±0.35 |
@@ -174,7 +174,7 @@ Observations
 - Meta-val is the same when possible.
 - Meta-tst consider clasees/examples only of the subdataset.
 
-| Subdataset          | Unseen     | Seen       | HM         |
+| Subdataset          | Seen       | Unseen     | HM         |
 | ------------------- | ---------: | ---------: | ---------: |
 | Complete            | 84.54±0.15 | 74.50±0.47 | 76.51±0.36 |
 | ChestXray14         | 69.08±0.16 | 71.78±0.43 | 68.29±0.30 |
@@ -187,7 +187,7 @@ Observations
 
 #### Subpopulation Shift
 
-| Subpopulation       | Unseen     | Seen       | HM         |
+| Subpopulation       | Seen       | Unseen     | HM         |
 | ------------------- | ---------: | ---------: | ---------: |
 | Complete            | 84.54±0.15 | 74.50±0.47 | 76.51±0.36 |
 | Age [31-62]         | 84.18±0.15 | 75.83±0.44 | 77.52±0.33 |
@@ -201,7 +201,7 @@ Observations
 
 #### View Shift
 
-| View       | Unseen     | Seen       | HM         |
+| View                | Seen       | Unseen     | HM         |
 | ------------------- | ---------: | ---------: | ---------: |
 | Complete            | 84.54±0.15 | 74.50±0.47 | 76.51±0.36 |
 | AP                  | 84.46±0.15 | 67.39±0.41 | 72.59±0.32 |
@@ -215,7 +215,7 @@ Observations
 --------------------------------------------------
 ### From Generalized to Standard FSL
 
-|   n-way |   n-unseen |   k-shot |   Unseen |   Seen |    HM |
+|   n-way |   n-unseen |   k-shot | Seen     | Unseen | HM    |
 |--------:|-----------:|---------:|---------:|-------:|------:|
 |       3 |          1 |        1 |    70.13 |  78.6  | 71.36 |
 |       3 |          1 |        5 |    74.5  |  84.54 | 76.51 |
