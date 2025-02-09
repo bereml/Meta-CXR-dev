@@ -54,23 +54,25 @@ def eval(run=None):
         method.hparams.episodes_mtst_csv = hparams.episodes_mtst_csv
 
     else:
-        checkpoints_dir = 'checkpoints'
-        checkpoint_path = join(checkpoints_dir, f'{hparams.checkpoint_name}.pth')
-        if not isfile(checkpoint_path):
-            raise FileNotFoundError(f"Checkpoint not found {checkpoint_path}")
         run_dir = join(hparams.results_dir, hparams.exp, hparams.run)
         if isdir(run_dir):
             print(f'Evaluation dir already exists: {run_dir}')
             return
 
-        makedirs(run_dir)
+        checkpoint_path = join('checkpoints', f'{hparams.checkpoint_name}.pth')
+        if not isfile(checkpoint_path):
+            raise FileNotFoundError(f"Checkpoint not found {checkpoint_path}")
+
         Method = METHODS.get(hparams.method, None)
         if Method is None:
             raise ValueError(f"unknown method {hparams.method}")
 
         method = Method(hparams)
         method.net.backbone.load_state_dict(torch.load(checkpoint_path))
+        # TODO: analyze why this modfy the behaviour
+        hparams.norm = method.hparams.norm
 
+        makedirs(run_dir)
         with open(join(run_dir, 'hparams.yml'), 'w') as f:
             yaml.dump(vars(hparams), f, default_flow_style=False)
 
@@ -94,9 +96,10 @@ def eval(run=None):
         logger=False,
         inference_mode=False,
     )
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        trainer.test(method, mtst_dl, verbose=False)
+    # with warnings.catch_warnings():
+    #     warnings.simplefilter("ignore")
+    #     trainer.test(method, mtst_dl, verbose=False)
+    trainer.test(method, mtst_dl, verbose=False)
 
     save_evaluation(
         method.test_df, mtst_dl.dataset.seen, mtst_dl.dataset.unseen, hparams)
