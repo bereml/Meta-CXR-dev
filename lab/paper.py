@@ -371,7 +371,7 @@ def paper_gfsl_proto(
         results_dir=RESULTS_DIR,
         debug=False):
     exp = 'gfsl_proto'
-    net_weights = 'mobilenetv3-large-100_i1k+batchbased+protonet_seed0'
+    checkpoint_name = 'mobilenetv3-large-100_i1k+batchbased+protonet_seed0'
     method = 'protonet'
     cfgs = list(product(
         # mtst_n_way, mtst_n_unseen
@@ -408,8 +408,8 @@ def paper_gfsl_proto(
             results_dir=results_dir,
             exp=exp,
             run=run,
-            net_weights=net_weights,
             method=method,
+            checkpoint_name=checkpoint_name,
             mtst_n_way=mtst_n_way,
             mtst_n_unseen=mtst_n_unseen,
             mtst_trn_k_shot=mtst_trn_k_shot,
@@ -424,7 +424,7 @@ def paper_shift_proto(
         results_dir=RESULTS_DIR,
         debug=False):
     exp = 'shift_proto'
-    net_weights = 'mobilenetv3-large-100_i1k+batchbased+protonet_seed0'
+    checkpoint_name = 'mobilenetv3-large-100_i1k+batchbased+protonet_seed0'
     method = 'protonet'
     cfgs = list(product(
         # data_distro
@@ -457,8 +457,8 @@ def paper_shift_proto(
             exp=exp,
             run=run,
             data_distro=data_distro,
-            net_weights=net_weights,
             method=method,
+            checkpoint_name=checkpoint_name,
             seed=seed,
             **hparams
         )
