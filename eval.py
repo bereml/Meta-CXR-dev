@@ -58,6 +58,8 @@ def eval(run=None):
         if isdir(run_dir):
             print(f'Evaluation dir already exists: {run_dir}')
             return
+        # TODO: remove if works
+        hparams.norm = {'mean': [0.0, 0.0, 0.0], 'std': [1.0, 1.0, 1.0]}
 
         checkpoint_path = join('checkpoints', f'{hparams.checkpoint_name}.pth')
         if not isfile(checkpoint_path):

@@ -452,8 +452,6 @@ def paper_shift_proto(
         if debug:
             hparams.update(DEBUG_HPARAMS)
             results_dir = 'rdev'
-        # TODO: check if this works
-        hparams.update({'mean': [0.0, 0.0, 0.0], 'std': [1.0, 1.0, 1.0]})
         eval_model(
             results_dir=results_dir,
             exp=exp,
