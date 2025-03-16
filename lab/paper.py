@@ -293,15 +293,15 @@ def paper_shift_ds(
 def paper_shift_pop(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
-        checkpoint_name='base',
+        checkpoint_name='mobilenetv3-large-100_i1k+batchbased_seed0',
         debug=False):
     exp = 'shift_pop'
     cfgs = list(product(
         # data_distro
         [
-            'young',
-            'adult',
-            'old',
+            'age_young',
+            'age_adult',
+            'age_old',
             # 'age_center',
             # 'age_tails',
             # 'sex_female',
