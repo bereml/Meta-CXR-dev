@@ -299,9 +299,16 @@ def paper_shift_pop(
     cfgs = list(product(
         # data_distro
         [
-            'age_young',
-            'age_adult',
-            'age_old',
+            # 'age_young',
+            # 'age_adult',
+            # 'age_old',
+            'age_decade2',
+            'age_decade3',
+            'age_decade4',
+            'age_decade5',
+            'age_decade6',
+            'age_decade7',
+            'age_decade8',
             # 'age_center',
             # 'age_tails',
             # 'sex_female',
