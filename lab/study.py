@@ -298,3 +298,50 @@ def study_method_protonet(
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
+
+
+
+def study_pretraining(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'pretraining'
+    net_backbone = 'mobilenetv3-large-100'
+    cfgs = list(product(
+        #   [net_weights,           method]
+        [
+            ['i1k',                 'batchbased'],
+            ['i1k',                 'protonet'],
+            ['i1k+batchbased',      'protonet'],
+            ['i1k+protonet',        'batchbased'],
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (net_weights, method), seed = cfg
+        run = '_'.join([
+            net_weights,
+            method,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+                           else DEBUG_HPARAMS)
+            results_dir = 'rdev'
+
+        if net_weights not in {'random', 'i1k', 'i21k'} :
+            net_weights = f'{net_backbone}_{net_weights}_seed{seed}'
+
+        checkpoint_name = f'{net_backbone}_{net_weights}+{method}_seed{seed}'
+
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            net_weights=net_weights,
+            method=method,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
