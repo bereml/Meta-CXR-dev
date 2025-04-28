@@ -160,6 +160,7 @@ def paper_method(
         [
             'batchbased',
             'protonet',
+            'episodebased',
         ],
         seeds,
     ))
