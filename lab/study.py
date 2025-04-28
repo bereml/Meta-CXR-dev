@@ -300,46 +300,51 @@ def study_method_protonet(
         aggregate_exp_df(join(results_dir, exp))
 
 
-
-def study_pretraining(
+def study_eval_proto_gfsl(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
+        checkpoint_name='mobilenetv3-large-100_i1k+batchbased+protonet_seed0',
         debug=False):
-    exp = 'pretraining'
-    net_backbone = 'mobilenetv3-large-100'
+    exp = 'eval_proto_gfsl'
     cfgs = list(product(
-        #   [net_weights,           method]
+        # mtst_n_way, mtst_n_unseen
         [
-            ['i1k',                 'batchbased'],
-            ['i1k',                 'protonet'],
-            ['i1k+batchbased',      'protonet'],
-            ['i1k+protonet',        'batchbased'],
+            [3, 1],
+            [3, 2],
+            [3, 3],
+            # [4, 1],
+            # [4, 2],
+            # [4, 3],
+            # [4, 4],
+            # [5, 1],
+            # [5, 2],
+            # [5, 3],
+            # [5, 4],
+            # [5, 5],
         ],
+        # mtst_trn_k_shot
+        # [1, 5, 15],
+        [5],
         seeds,
     ))
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        (net_weights, method), seed = cfg
+        (mtst_n_way, mtst_n_unseen), mtst_trn_k_shot, seed = cfg
         run = '_'.join([
-            net_weights,
-            method,
+            f'nway-{mtst_n_way}',
+            f'unseen-{mtst_n_unseen}',
+            f'kshot-{mtst_trn_k_shot:02d}',
         ])
         hparams = {}
         if debug:
-            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
-                           else DEBUG_HPARAMS)
+            hparams.update(DEBUG_HPARAMS_BB)
             results_dir = 'rdev'
-
-        if net_weights not in {'random', 'i1k', 'i21k'} :
-            net_weights = f'{net_backbone}_{net_weights}_seed{seed}'
-
-        checkpoint_name = f'{net_backbone}_{net_weights}+{method}_seed{seed}'
-
-        train_model(
+        eval_model(
             results_dir=results_dir,
             exp=exp,
             run=run,
-            net_weights=net_weights,
-            method=method,
+            mtst_n_way=mtst_n_way,
+            mtst_n_unseen=mtst_n_unseen,
+            mtst_trn_k_shot=mtst_trn_k_shot,
             seed=seed,
             checkpoint_name=checkpoint_name,
             **hparams
