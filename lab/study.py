@@ -263,7 +263,7 @@ def study_method_episodebase_data(
 
 
 def study_method_protonet(
-        net_backbone='mobilenetv3-small-075',
+        # net_backbone='mobilenetv3-small-075',
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         debug=False):
@@ -290,7 +290,7 @@ def study_method_protonet(
             results_dir=results_dir,
             exp=exp,
             run=run,
-            net_backbone=net_backbone,
+            # net_backbone=net_backbone,
             method='protonet',
             protonet_encoder_type=protonet_encoder_type,
             protonet_encoder_size=protonet_encoder_size,
