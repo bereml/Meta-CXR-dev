@@ -117,7 +117,7 @@ class EpisodeBased(FewShotMethod):
         y_true_tst, y_prob_tst, _ = self.adapt_episode(
             episode, self.mtst_hparams, False)
         metrics = self.compute_full_metrics(
-            y_true_tst, y_prob_tst, episode['seen'], episode['unseen'], True)
+            y_true_tst, y_prob_tst, episode['seen'], episode['unseen'])
         self.add_episode_metrics(metrics)
 
     @staticmethod
