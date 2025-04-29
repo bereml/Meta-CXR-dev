@@ -109,10 +109,10 @@ def train():
         **trainer_args,
     )
 
-    # with warnings.catch_warnings():
-    #     warnings.simplefilter("ignore")
-    #     trainer.fit(method, mtrn_dl, mval_dl)
-    trainer.fit(method, mtrn_dl, mval_dl)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        trainer.fit(method, mtrn_dl, mval_dl)
+    # trainer.fit(method, mtrn_dl, mval_dl)
 
     best_model_path = checkpoint_cb.best_model_path
     print(f"Best: {best_model_path}")
