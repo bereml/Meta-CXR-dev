@@ -109,6 +109,7 @@ def train():
         **trainer_args,
     )
 
+    # Ignore warnings for Protonet
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         trainer.fit(method, mtrn_dl, mval_dl)
