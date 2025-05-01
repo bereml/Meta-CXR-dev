@@ -1,4 +1,4 @@
-from .base import METHODS
+from .base import METHODS, FewShotMethod
 from .batchbased import BatchBased
 from .episodebased import EpisodeBased
 from .feat import FEAT

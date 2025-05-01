@@ -4,7 +4,7 @@ import glob
 import yaml
 import warnings
 from os import makedirs
-from os.path import isdir, isfile, join
+from os.path import basename, dirname, isdir, isfile, join
 
 import pandas as pd
 import pytorch_lightning as pl
@@ -13,7 +13,7 @@ from pytorch_lightning import seed_everything
 
 from args import parse_args
 from data import build_mdl
-from method import METHODS
+from method import METHODS, FewShotMethod
 from utils import get_run_dir
 
 
@@ -33,52 +33,63 @@ def save_evaluation(df, seen, unseen, hparams):
     print(f'Episodes results: {path}')
 
 
-def eval(run=None):
+def eval(checkpoint_path=None):
     print('==================================\n'
           '=========== EVALUATION ===========')
 
     hparams = parse_args()
     # replace run when is called by train()
-    if run is not None:
-        hparams.run = run
+    # if run is not None:
+    #     hparams.run = run
 
     seed_everything(hparams.seed, workers=True)
 
-    if run:
+    Method: FewShotMethod = METHODS.get(hparams.method, None)
+    if Method is None:
+            raise ValueError(f"unknown method {hparams.method}")
+
+    # from train()
+    if checkpoint_path:
     # if not hparams.checkpoint_name:
-        ckpt_pattern = join(get_run_dir(hparams), 'checkpoints', '*.ckpt')
-        best_model_path = glob.glob(ckpt_pattern)[0]
+        # ckpt_pattern = join(get_run_dir(hparams), 'checkpoints', '*.ckpt')
+        # best_model_path = glob.glob(ckpt_pattern)[0]
+        method = Method.load_from_checkpoint(checkpoint_path, strict=False)
 
-        Method = METHODS[hparams.method]
-        method = Method.load_from_checkpoint(best_model_path, strict=False)
         method.hparams.episodes_mtst_csv = hparams.episodes_mtst_csv
+        # hparams.run = basename(dirname(dirname(dirname(checkpoint_path))))
+        # hparams.norm = method.hparams.norm
 
+    # eval from bash
     else:
         run_dir = join(hparams.results_dir, hparams.exp, hparams.run)
         if isdir(run_dir):
             print(f'Evaluation dir already exists: {run_dir}')
             return
 
-        checkpoint_path = join('checkpoints', f'{hparams.checkpoint_name}.pth')
+        checkpoint_path = join(
+            hparams.checkpoints_dir, hparams.checkpoint_name)
         if not isfile(checkpoint_path):
             raise FileNotFoundError(f"Checkpoint not found {checkpoint_path}")
 
-        Method = METHODS.get(hparams.method, None)
-        if Method is None:
-            raise ValueError(f"unknown method {hparams.method}")
-
         method = Method(hparams)
         method.net.backbone.load_state_dict(torch.load(checkpoint_path))
-        # TODO: analyze why this modfy the behaviour
-        hparams.norm = method.hparams.norm
-        # TODO: remove if works
-        hparams.norm = {'mean': [0.0, 0.0, 0.0], 'std': [1.0, 1.0, 1.0]}
+
+        cfg = method.net.backbone.pretrained_cfg
+        hparams.norm = {'mean': list(cfg['mean']), 'std': list(cfg['std'])}
+
+        # cfg = method.net.backbone.pretrained_cfg
+        # hparams.norm = {'mean': list(cfg['mean']), 'std': list(cfg['std'])}
+        # # TODO: analyze why this modfy the behaviour
+        # hparams.norm = method.hparams.norm
+        # # TODO: remove if works
+        # hparams.norm = {'mean': [0.0, 0.0, 0.0], 'std': [1.0, 1.0, 1.0]}
 
         makedirs(run_dir)
         with open(join(run_dir, 'hparams.yml'), 'w') as f:
             yaml.dump(vars(hparams), f, default_flow_style=False)
 
-    hparams.norm = method.hparams.norm
+    # hparams.norm = method.hparams.norm
+
 
     mtst_dl = build_mdl(
         'mtst',

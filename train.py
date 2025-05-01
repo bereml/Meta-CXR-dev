@@ -115,21 +115,21 @@ def train():
         trainer.fit(method, mtrn_dl, mval_dl)
     # trainer.fit(method, mtrn_dl, mval_dl)
 
-    best_model_path = checkpoint_cb.best_model_path
-    print(f"Best: {best_model_path}")
+    best_checkpoint_path = checkpoint_cb.best_model_path
+    # checkpoint_path.best_model_path
+    print(f"Best: {best_checkpoint_path}")
 
     if hparams.checkpoint_name:
-        checkpoints_dir = 'checkpoints'
-        os.makedirs(checkpoints_dir, exist_ok=True)
+        os.makedirs(hparams.checkpoints_dir, exist_ok=True)
         checkpoint_path = join(
-            checkpoints_dir, f'{hparams.checkpoint_name}.pth')
+            hparams.checkpoints_dir, hparams.checkpoint_name)
         method = Method.load_from_checkpoint(
-            checkpoint_cb.best_model_path, strict=False)
+            best_checkpoint_path, strict=False)
         torch.save(method.net.backbone.state_dict(), checkpoint_path)
         print(f"Best backbone checkpoint: {checkpoint_path}")
 
     if hparams.eval_after_train:
-        eval(hparams.run)
+        eval(best_checkpoint_path)
 
 
 def main():

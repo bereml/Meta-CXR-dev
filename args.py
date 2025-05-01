@@ -112,6 +112,9 @@ def parse_args():
     parser.add_argument('--checkpoint_name',
                         type=str, default=None,
                         help='checkpoint name')
+    parser.add_argument('--checkpoints_dir',
+                        type=str, default='checkpoints',
+                        help='checkpoints directory')
     parser.add_argument('--accelerator',
                         type=str, default='auto',
                         choices=['auto', 'cpu', 'gpu'],
