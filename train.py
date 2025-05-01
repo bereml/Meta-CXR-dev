@@ -120,10 +120,11 @@ def train():
 
     if hparams.checkpoint_name:
         checkpoints_dir = 'checkpoints'
-        best_model_path = checkpoint_cb.best_model_path
         os.makedirs(checkpoints_dir, exist_ok=True)
-        checkpoint_path = join(checkpoints_dir, f'{hparams.checkpoint_name}.pth')
-        method = Method.load_from_checkpoint(best_model_path, strict=False)
+        checkpoint_path = join(
+            checkpoints_dir, f'{hparams.checkpoint_name}.pth')
+        method = Method.load_from_checkpoint(
+            checkpoint_cb.best_model_path, strict=False)
         torch.save(method.net.backbone.state_dict(), checkpoint_path)
         print(f"Best backbone checkpoint: {checkpoint_path}")
 
