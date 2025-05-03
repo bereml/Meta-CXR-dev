@@ -229,3 +229,39 @@ def study_eval_proto_gfsl(
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
+
+
+def study_repro(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'study_repro'
+    checkpoint_name='mobilenetv3-large-100_i1k+batchbased+protonet_seed0.pth'
+    cfgs = list(product(
+        # method
+        [
+            'batchbased',
+            'protonet'
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        method, seed = cfg
+        run = '_'.join([
+            method
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+                           else DEBUG_HPARAMS)
+            results_dir = 'rdev'
+        eval_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            method=method,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
