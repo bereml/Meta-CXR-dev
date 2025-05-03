@@ -140,4 +140,4 @@ class Registry(dict):
         return decorator_register
 
 
-METHODS: dict[str, FewShotMethod] = Registry()
+METHODS: dict[str, type[FewShotMethod]] = Registry()
