@@ -269,7 +269,7 @@ Observations
 |       5 |          1 |        1 | 70.80±0.34 | 77.87±0.14 | 72.89±0.24 |
 |       5 |          1 |        5 | 82.08±0.23 | 84.11±0.09 | 82.63±0.15 |
 |       5 |          1 |       15 | 85.97±0.16 | 86.32±0.08 | 85.93±0.10 |
-|       5 |          2 |        1 | 63.63±0.19 | 79.09±0.14 | 70.03±0.14 |P
+|       5 |          2 |        1 | 63.63±0.19 | 79.09±0.14 | 70.03±0.14 |
 |       5 |          2 |        5 | 74.01±0.14 | 84.67±0.09 | 78.75±0.09 |
 |       5 |          2 |       15 | 78.74±0.12 | 86.56±0.07 | 82.31±0.08 |
 |       5 |          3 |        1 | 60.79±0.15 | 80.75±0.16 | 68.94±0.12 |
@@ -295,8 +295,17 @@ Observations
 
 
 ### General Plan
+
+- [ ] HP search EpisodeBased
+- [ ] Check FOMAML https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial16/Meta_Learning.html
+- [ ] Check Reptile or iMAML
+- [ ] Check FEAT
+- [ ] Check another method
+- [ ] Review ProtoNet
+- [ ] Review EpisodeBased
+- [ ] Implemet EpisodeBased experiment with equivalence between batch and episode data size
+
 - [ ] Update HPs
-- [ ] Develop plots resolution, gfsl
 - [ ] Check TIMM/MobileNet-V4, MamabaOut
         https://huggingface.co/collections/timm/mobilenetv4-pretrained-weights-6669c22cda4db4244def9637
 - [ ] metachest-dev TODO.md
@@ -309,26 +318,11 @@ Observations
 #### Feb 1st Week 09-15
 
 --------------------------------------------------
-#### Feb 1st Week 02-08
-- [ ] RX Resolution Exp: analyze
-- [ ] Pretraning Exp: prepare
-- [ ] Pretraning Exp: run
-- [ ] Pretraning Exp: analize
-
-
-
---------------------------------------------------
-### Explore
-
-Observations
-- Eva02 https://arxiv.org/pdf/2303.11331
-- M38M (Merged-38M): I21K, CC12M, CC3M, COCO, ADE20K, Object365, OpenImages
-
-- [ ] HP search EpisodeBased
-- [ ] Check FOMAML https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial16/Meta_Learning.html
-- [ ] Check Reptile or iMAML
-- [ ] Check FEAT
-- [ ] Check another method
-- [ ] Review ProtoNet
-- [ ] Review EpisodeBased
-- [ ] Implemet EpisodeBased experiment with equivalence between batch and episode data size
+#### May-03 May-09
+- [ ] Fix reproducibility of Protonet
+  - [x] Seed: Check seed is set before train of eval
+  - [ ] Norm: Check the same norm is used for train and eval
+  - [ ] Model: is only an issue for protonet?
+  - [ ] Weights: Check the Weights are loaded as saved
+  - [ ] Layers State: Check the layer start with same state
+  - [ ] Model: is the top layer related?
