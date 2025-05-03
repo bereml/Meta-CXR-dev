@@ -18,9 +18,6 @@ from method import METHODS
 from utils import RunTimer, get_run_dir
 
 
-DETERMINISTIC = {'warn': 'warn', 'true': True, 'false': False}
-
-
 def train():
     print("==================================\n"
           "=========== TRAINING =============")
@@ -88,7 +85,9 @@ def train():
         version=f"seed{hparams.seed}",
         default_hp_metric=False,
     )
-    deterministic = DETERMINISTIC[hparams.deterministic]
+    deterministic = {
+        'warn': 'warn', 'true': True, 'false': False
+    }[hparams.deterministic]
 
     trainer_args = {}
     if hparams.precision == 16 and method.automatic_optimization:
@@ -116,7 +115,6 @@ def train():
     # trainer.fit(method, mtrn_dl, mval_dl)
 
     best_checkpoint_path = checkpoint_cb.best_model_path
-    # checkpoint_path.best_model_path
     print(f"Best: {best_checkpoint_path}")
 
     if hparams.checkpoint_name:
@@ -128,8 +126,8 @@ def train():
         torch.save(method.net.backbone.state_dict(), checkpoint_path)
         print(f"Best backbone checkpoint: {checkpoint_path}")
 
-    if hparams.eval_after_train:
-        eval(best_checkpoint_path)
+    if hparams.train_and_eval:
+        eval(True, hparams, best_checkpoint_path)
 
 
 def main():

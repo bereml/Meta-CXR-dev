@@ -106,9 +106,9 @@ def parse_args():
     parser.add_argument('--stop_patience',
                         type=int, default=10,
                         help='early stopping patience')
-    parser.add_argument('--eval_after_train',
+    parser.add_argument('--train_and_eval',
                         type=str2bool, default=True, nargs='?', const=False,
-                        help='eval model after train')
+                        help='train and evaluate the model')
     parser.add_argument('--checkpoint_name',
                         type=str, default=None,
                         help='checkpoint name')

@@ -33,33 +33,23 @@ def save_evaluation(df, seen, unseen, hparams):
     print(f'Episodes results: {path}')
 
 
-def eval(checkpoint_path=None):
+def eval(train_and_eval=False, hparams=None, checkpoint_path=None):
     print('==================================\n'
           '=========== EVALUATION ===========')
 
-    hparams = parse_args()
-    # replace run when is called by train()
-    # if run is not None:
-    #     hparams.run = run
+    if not train_and_eval:
+        hparams = parse_args()
 
     seed_everything(hparams.seed, workers=True)
 
-    Method: FewShotMethod = METHODS.get(hparams.method, None)
+    Method = METHODS.get(hparams.method, None)
     if Method is None:
             raise ValueError(f"unknown method {hparams.method}")
 
-    # from train()
-    if checkpoint_path:
-    # if not hparams.checkpoint_name:
-        # ckpt_pattern = join(get_run_dir(hparams), 'checkpoints', '*.ckpt')
-        # best_model_path = glob.glob(ckpt_pattern)[0]
+    if train_and_eval:
         method = Method.load_from_checkpoint(checkpoint_path, strict=False)
-
         method.hparams.episodes_mtst_csv = hparams.episodes_mtst_csv
-        # hparams.run = basename(dirname(dirname(dirname(checkpoint_path))))
-        # hparams.norm = method.hparams.norm
 
-    # eval from bash
     else:
         run_dir = join(hparams.results_dir, hparams.exp, hparams.run)
         if isdir(run_dir):
@@ -77,19 +67,9 @@ def eval(checkpoint_path=None):
         cfg = method.net.backbone.pretrained_cfg
         hparams.norm = {'mean': list(cfg['mean']), 'std': list(cfg['std'])}
 
-        # cfg = method.net.backbone.pretrained_cfg
-        # hparams.norm = {'mean': list(cfg['mean']), 'std': list(cfg['std'])}
-        # # TODO: analyze why this modfy the behaviour
-        # hparams.norm = method.hparams.norm
-        # # TODO: remove if works
-        # hparams.norm = {'mean': [0.0, 0.0, 0.0], 'std': [1.0, 1.0, 1.0]}
-
         makedirs(run_dir)
         with open(join(run_dir, 'hparams.yml'), 'w') as f:
             yaml.dump(vars(hparams), f, default_flow_style=False)
-
-    # hparams.norm = method.hparams.norm
-
 
     mtst_dl = build_mdl(
         'mtst',

@@ -11,18 +11,6 @@ import torch.nn as nn
 from torchmetrics.functional.classification import binary_auroc, multilabel_auroc
 
 
-class Registry(dict):
-
-    def register(self, name):
-        def decorator_register(obj):
-            self[name] = obj
-            return obj
-        return decorator_register
-
-
-METHODS = Registry()
-
-
 def auroc(y_true, y_prob, average='micro'):
     n_classes = y_true.shape[1]
     with warnings.catch_warnings():
@@ -141,3 +129,15 @@ class FewShotMethod(pl.LightningModule):
 
     def advance_global_step(self):
         self.trainer.fit_loop.epoch_loop.manual_optimization.optim_step_progress.increment_completed()
+
+
+class Registry(dict):
+
+    def register(self, name):
+        def decorator_register(obj):
+            self[name] = obj
+            return obj
+        return decorator_register
+
+
+METHODS: dict[str, FewShotMethod] = Registry()
