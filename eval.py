@@ -13,8 +13,7 @@ from pytorch_lightning import seed_everything
 
 from args import parse_args
 from data import build_mdl
-from method import METHODS, FewShotMethod
-from utils import get_run_dir
+from method import METHODS
 
 
 def save_evaluation(df, seen, unseen, hparams):
@@ -61,11 +60,12 @@ def eval(train_and_eval=False, hparams=None, checkpoint_path=None):
         if not isfile(checkpoint_path):
             raise FileNotFoundError(f"Checkpoint not found {checkpoint_path}")
 
-        method = Method(hparams)
-        method.net.backbone.load_state_dict(torch.load(checkpoint_path))
 
-        cfg = method.net.backbone.pretrained_cfg
-        hparams.norm = {'mean': list(cfg['mean']), 'std': list(cfg['std'])}
+        print(checkpoint_path)
+
+        checkpoint_method = Method.load_from_checkpoint(checkpoint_path, strict=False)
+        method = Method(hparams)
+        method.net.backbone = checkpoint_method.net.backbone
 
         makedirs(run_dir)
         with open(join(run_dir, 'hparams.yml'), 'w') as f:

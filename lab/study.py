@@ -182,7 +182,7 @@ def study_method_protonet(
 def study_eval_proto_gfsl(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
-        checkpoint_name='mobilenetv3-large-100_i1k+batchbased+protonet_seed0.pth',
+        checkpoint_name='mobilenetv3-large-100_i1k+batchbased+protonet_seed0_full.pth',
         debug=False):
     exp = 'eval_proto_gfsl'
     cfgs = list(product(

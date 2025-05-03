@@ -1,6 +1,7 @@
 """ train.py """
 
 import os
+import shutil
 import warnings
 from os.path import isdir, join
 
@@ -121,10 +122,11 @@ def train():
         os.makedirs(hparams.checkpoints_dir, exist_ok=True)
         checkpoint_path = join(
             hparams.checkpoints_dir, hparams.checkpoint_name)
-        method = Method.load_from_checkpoint(
-            best_checkpoint_path, strict=False)
-        torch.save(method.net.backbone.state_dict(), checkpoint_path)
-        print(f"Best backbone checkpoint: {checkpoint_path}")
+        shutil.copyfile(
+            best_checkpoint_path,
+            checkpoint_path
+        )
+        print(f'Checkpoint saved to {checkpoint_path}')
 
     if hparams.train_and_eval:
         eval(True, hparams, best_checkpoint_path)
