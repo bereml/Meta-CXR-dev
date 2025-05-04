@@ -210,7 +210,6 @@ def paper_pretraining(
         ],
         seeds,
     ))
-    lst = []
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
         (net_weights, method), seed = cfg
         run = '_'.join([
