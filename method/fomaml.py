@@ -19,6 +19,7 @@ class FOMAML(FewShotMethod):
         self.net = create_net(
             backbone=hparams.net_backbone,
             weights=hparams.net_weights,
+            checkpoints_dir=hparams.checkpoints_dir
         )
         self.save_hparams(hparams, self.net)
         self.setup_precision(self.hparams.precision)

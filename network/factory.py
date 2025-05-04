@@ -29,14 +29,14 @@ def unfreeze_and_train(module):
 class Net(nn.Module):
 
     def __init__(self, backbone, weights, features_only=False,
-                 head_type='id', head_classes=0):
+                 head_type='id', head_classes=0, checkpoints_dir='checkpoints'):
         super().__init__()
         if features_only:
             head_type, head_classes = 'id', 0
-        self._create_backbone(backbone, weights, features_only)
+        self._create_backbone(backbone, weights, features_only, checkpoints_dir)
         self.new_head(head_type, head_classes)
 
-    def _create_backbone(self, backbone, weights, features_only):
+    def _create_backbone(self, backbone, weights, features_only, checkpoints_dir):
         self.backbone_name = backbone
         self.backbone_weights = weights
         self.backbone_features_only = features_only
@@ -44,7 +44,7 @@ class Net(nn.Module):
         if create_fn is None:
             raise NotImplementedError('Model not implemented: '
                                     f'backbone={backbone} weights={weights}')
-        self.backbone = create_fn(weights, features_only)
+        self.backbone = create_fn(weights, features_only, checkpoints_dir)
         if self.backbone is None:
             raise NotImplementedError('Model not implemented: '
                                     f'backbone={backbone} weights={weights}')
@@ -91,6 +91,6 @@ class Net(nn.Module):
         )
 
 def create_net(backbone, weights='random', features_only=False,
-               head_type='id', head_classes=0):
+               head_type='id', head_classes=0, checkpoints_dir='checkpoints'):
     return Net(backbone, weights, features_only,
-               head_type, head_classes)
+               head_type, head_classes, checkpoints_dir)

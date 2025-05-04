@@ -101,6 +101,7 @@ class FEAT(FewShotMethod):
             weights=hparams.net_weights,
             head_type=hparams.feat_encoder_type,
             head_classes=hparams.feat_encoder_size,
+            checkpoints_dir=hparams.checkpoints_dir
         )
         self.tsfm = nn.MultiheadAttention(
             embed_dim=hparams.feat_encoder_size,

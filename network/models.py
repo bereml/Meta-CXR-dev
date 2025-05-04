@@ -16,8 +16,8 @@ def _create_with_timm(timm_name, weights, features_only):
     )
 
 
-def _create_with_checkpoint(timm_name, weights, features_only):
-    path = join('checkpoints', f'{weights}.pth')
+def _create_from_checkpoint(timm_name, weights, features_only, checkpoints_dir):
+    path = join(checkpoints_dir, f'{weights}.pth')
     if not isfile(path):
         raise FileNotFoundError(f'Checkpoint not found {path}')
     model = timm.create_model(
@@ -30,17 +30,16 @@ def _create_with_checkpoint(timm_name, weights, features_only):
     return model
 
 
-def _create(model_name, timm_name, weights, features_only):
+def _create(model_name, timm_name, weights, features_only, checkpoints_dir):
     if not timm_name:
         raise NotImplementedError('Pretrained model not implemented '
                                   f'model={model_name} weights={weights}')
     if weights in {'random', 'i1k', 'i21k',
                    'mim_in22k_ft_in22k_in1k', 'mim_m38m_ft_in22k_in1k'}:
-        create_fn = _create_with_timm
+        return _create_with_timm(timm_name, weights, features_only)
     else:
-        create_fn = _create_with_checkpoint
-    model = create_fn(timm_name, weights, features_only)
-    return model
+        return _create_from_checkpoint(
+            timm_name, weights, features_only, checkpoints_dir)
 
 
 @BACKBONES.register('convnext-atto')

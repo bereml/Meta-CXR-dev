@@ -20,6 +20,7 @@ class EpisodeBased(FewShotMethod):
         self.net = create_net(
             backbone=hparams.net_backbone,
             weights=hparams.net_weights,
+            checkpoints_dir=hparams.checkpoints_dir
         )
         self.save_hparams(hparams, self.net)
         self.automatic_optimization = False

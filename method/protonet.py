@@ -95,6 +95,7 @@ class ProtoNet(FewShotMethod):
             weights=hparams.net_weights,
             head_type=hparams.protonet_encoder_type,
             head_classes=hparams.protonet_encoder_size,
+            checkpoints_dir=hparams.checkpoints_dir
         )
         self.save_hparams(hparams, self.net)
 
