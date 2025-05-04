@@ -107,7 +107,7 @@ class ProtoNet(FewShotMethod):
 
     def adapt_episode(
         self,
-        episode: dict[str: torch.Tensor]
+        episode: dict[str, torch.Tensor]
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         n_trn = episode['n_trn']
         # [b, c, h, w]
@@ -143,7 +143,7 @@ class ProtoNet(FewShotMethod):
 
     def training_step(
         self,
-        episode: dict[str: torch.Tensor],
+        episode: dict[str, torch.Tensor],
         _
     ) -> torch.Tensor:
         y_true_tst, y_prob_tst, loss = self.adapt_episode(episode)
@@ -152,7 +152,7 @@ class ProtoNet(FewShotMethod):
         return loss
 
     def validation_step(self,
-        episode: dict[str: torch.Tensor],
+        episode: dict[str, torch.Tensor],
         _
     ):
         y_true_tst, y_prob_tst, loss = self.adapt_episode(episode)
@@ -161,7 +161,7 @@ class ProtoNet(FewShotMethod):
             episode['seen'], episode['unseen'], loss)
 
     def test_step(self,
-        episode: dict[str: torch.Tensor],
+        episode: dict[str, torch.Tensor],
         _
     ):
         y_true_tst, y_prob_tst, _ = self.adapt_episode(episode)
