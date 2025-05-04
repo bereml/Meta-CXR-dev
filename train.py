@@ -68,11 +68,6 @@ def train():
         hparams
     )
 
-    Method = METHODS.get(hparams.method, None)
-    if Method is None:
-        raise ValueError(f"unknown method {hparams.method}")
-    method = Method(hparams)
-
     monitor_mode = "min" if hparams.stop_metric == "loss" else "max"
     stop_metric = f"{hparams.stop_metric}/mval"
 

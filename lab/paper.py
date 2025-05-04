@@ -188,6 +188,7 @@ def paper_method(
 
 def paper_pretraining(
         seeds=SEEDS,
+        checkpoints_dir='checkpoints',
         results_dir=RESULTS_DIR,
         debug=False):
     exp = 'pretraining'
@@ -222,10 +223,9 @@ def paper_pretraining(
                            else DEBUG_HPARAMS)
             results_dir = 'rdev'
 
-
-        checkpoint_name = f'{net_backbone}_{net_weights}+{method}_seed{seed}'
+        checkpoint_name = f'{net_backbone}_{net_weights}+{method}.pth'
         if net_weights not in {'random', 'i1k', 'i21k'} :
-            net_weights = f'{net_backbone}_{net_weights}_seed{seed}'
+            net_weights = f'{net_backbone}_{net_weights}.pth'
 
         train_model(
             results_dir=results_dir,
@@ -233,6 +233,7 @@ def paper_pretraining(
             run=run,
             net_weights=net_weights,
             method=method,
+            checkpoints_dir=checkpoints_dir,
             seed=seed,
             checkpoint_name=checkpoint_name,
             **hparams
