@@ -151,13 +151,19 @@ class ProtoNet(FewShotMethod):
                                      episode['seen'], episode['unseen'], loss)
         return loss
 
-    def validation_step(self, episode: dict[str: torch.Tensor], _):
+    def validation_step(self,
+        episode: dict[str: torch.Tensor],
+        _
+    ):
         y_true_tst, y_prob_tst, loss = self.adapt_episode(episode)
         self.compute_metrics_and_log(
             'mval', y_true_tst, y_prob_tst,
             episode['seen'], episode['unseen'], loss)
 
-    def test_step(self, episode: dict[str: torch.Tensor], _):
+    def test_step(self,
+        episode: dict[str: torch.Tensor],
+        _
+    ):
         y_true_tst, y_prob_tst, _ = self.adapt_episode(episode)
         metrics = self.compute_full_metrics(
             y_true_tst, y_prob_tst, episode['seen'], episode['unseen'])
