@@ -82,7 +82,7 @@ def summary(backbone, input_size=(1, 3, 384, 384), params_units='M', macs_units=
 | fc   |  144 | 81.12±0.14 | 77.46±0.37 | 77.76±0.26 |
 
 Observations
-* FC are reproducble
+* AVG is reproducible according to the experiment
 * FC 96 or AVG 128
 
 --------------------------------------------------
