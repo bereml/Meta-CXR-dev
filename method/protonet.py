@@ -1,27 +1,31 @@
 """ protonet.py """
 
+from argparse import ArgumentParser, Namespace
+
 import torch
 import torch.optim as optim
 from einops import repeat
 
 from network import create_net
-from utils import str2list
 from .base import FewShotMethod, METHODS
 
 
-def compute_protos(z, y):
+def compute_protos(
+    z: torch.Tensor,
+    y: torch.Tensor
+) -> torch.Tensor:
     """Compute prototypes.
 
     Parameters
     ----------
-    z : torch.tensor
+    z : torch.Tensor
         [b, d] tensor of `b` examples with `d` features.
-    y : torch.tensor
+    y : torch.Tensor
         [b, n] tensor of `b` examples with `n` classes.
 
     Returns
     -------
-    torch.tensor
+    torch.Tensor
         [n, d] tensor of `n` prototypes with `d` features.
     """
     d, n = z.shape[1], y.shape[1]
@@ -42,19 +46,22 @@ def compute_protos(z, y):
     return p
 
 
-def compute_similarity(p, z):
+def compute_similarity(
+    p: torch.Tensor,
+    z: torch.Tensor
+) -> torch.Tensor:
     """Computes distance of examples to protos.
 
     Parameters
     ----------
-    p : torch.tensor
+    p : torch.Tensor
         [n, d] tensor of `n` prototypes, `d` features.
-    z : torch.tensor
+    z : torch.Tensor
         [b, d] tensor of `b` examples, `d` features.
 
     Returns
     -------
-    torch.tensor
+    torch.Tensor
         (n, c) tensor of `n` examples, `c` classes.
     """
     n, b = p.shape[0], z.shape[0]
@@ -80,7 +87,7 @@ def compute_similarity(p, z):
 @METHODS.register('protonet')
 class ProtoNet(FewShotMethod):
 
-    def __init__(self, hparams):
+    def __init__(self, hparams: Namespace):
         super().__init__(hparams)
         hparams = self.convert_hparams(hparams)
         self.net = create_net(
@@ -98,7 +105,10 @@ class ProtoNet(FewShotMethod):
         )
         return opt
 
-    def adapt_episode(self, episode):
+    def adapt_episode(
+        self,
+        episode: dict[str: torch.Tensor]
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         n_trn = episode['n_trn']
         # [b, c, h, w]
         x = episode['x']
@@ -131,26 +141,30 @@ class ProtoNet(FewShotMethod):
 
         return y_true_tst, y_prob_tst, loss
 
-    def training_step(self, episode, episode_idx):
+    def training_step(
+        self,
+        episode: dict[str: torch.Tensor],
+        _
+    ) -> torch.Tensor:
         y_true_tst, y_prob_tst, loss = self.adapt_episode(episode)
         self.compute_metrics_and_log('mtrn', y_true_tst, y_prob_tst,
                                      episode['seen'], episode['unseen'], loss)
         return loss
 
-    def validation_step(self, episode, episode_idx):
+    def validation_step(self, episode: dict[str: torch.Tensor], _):
         y_true_tst, y_prob_tst, loss = self.adapt_episode(episode)
         self.compute_metrics_and_log(
             'mval', y_true_tst, y_prob_tst,
             episode['seen'], episode['unseen'], loss)
 
-    def test_step(self, episode, episode_idx):
+    def test_step(self, episode: dict[str: torch.Tensor], _):
         y_true_tst, y_prob_tst, _ = self.adapt_episode(episode)
         metrics = self.compute_full_metrics(
             y_true_tst, y_prob_tst, episode['seen'], episode['unseen'])
         self.add_episode_metrics(metrics)
 
     @staticmethod
-    def add_args(parser):
+    def add_args(parser: ArgumentParser):
         parser.add_argument('--protonet_encoder_type',
                             type=str, default='avg',
                             choices=['avg', 'fc'],
