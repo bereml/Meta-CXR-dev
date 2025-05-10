@@ -117,10 +117,14 @@ def train():
         os.makedirs(hparams.checkpoints_dir, exist_ok=True)
         checkpoint_path = join(
             hparams.checkpoints_dir, hparams.checkpoint_name)
-        shutil.copyfile(
-            best_checkpoint_path,
-            checkpoint_path
-        )
+        method = Method.load_from_checkpoint(
+            best_checkpoint_path, strict=False)
+        torch.save(method.net.backbone.state_dict(), checkpoint_path)
+        # TODO: remove if we are going to preserve state dict way
+        # shutil.copyfile(
+        #     best_checkpoint_path,
+        #     checkpoint_path
+        # )
         print(f'Checkpoint saved to {checkpoint_path}')
 
     if hparams.train_and_eval:

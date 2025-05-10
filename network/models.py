@@ -26,7 +26,9 @@ def _create_from_checkpoint(timm_name, weights, features_only, checkpoints_dir):
         num_classes=0,
         features_only=features_only,
     )
-    load_checkpoint(model, path, strict=False)
+    print(f"Loading checkpoint: {path}")
+    incompatible_keys = load_checkpoint(model, path, strict=False)
+    print(incompatible_keys)
     return model
 
 

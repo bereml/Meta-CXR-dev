@@ -62,7 +62,12 @@ def eval(train_and_eval=False, hparams=None, checkpoint_path=None):
             raise FileNotFoundError(f"Checkpoint not found {checkpoint_path}")
 
         method = Method(hparams)
-        method.net.backbone.load_state_dict(torch.load(checkpoint_path))
+        from timm.models.helpers import load_checkpoint
+        print(f"Loading checkpoint: {checkpoint_path}")
+        incompatible_keys = load_checkpoint(
+            method.net.backbone, checkpoint_path, strict=False)
+        print(incompatible_keys)
+        # method.net.backbone.load_state_dict(torch.load(checkpoint_path))
 
         cfg = method.net.backbone.pretrained_cfg
         hparams.norm = {'mean': list(cfg['mean']), 'std': list(cfg['std'])}
