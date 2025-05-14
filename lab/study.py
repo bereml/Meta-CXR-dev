@@ -348,7 +348,7 @@ def study_pretraining(
         run = '_'.join([
             net_weights,
             method,
-            protonet_encoder_size
+            f'fc-{protonet_encoder_size}'
         ])
         hparams = {}
         if debug:
@@ -366,6 +366,7 @@ def study_pretraining(
             run=run,
             net_weights=net_weights,
             method=method,
+            protonet_encoder_type='fc',
             protonet_encoder_size=protonet_encoder_size,
             checkpoints_dir=checkpoints_dir,
             seed=seed,
