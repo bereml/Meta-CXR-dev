@@ -321,8 +321,8 @@ Observations
 #### May-03 May-09
 - [ ] Fix reproducibility of Protonet
   - [x] Seed: Check seed is set before train of eval
-  - [ ] Norm: Check the same norm is used for train and eval
   - [ ] Model: is only an issue for protonet?
+  - [ ] Norm: Check the same norm is used for train and eval
   - [ ] Weights: Check the Weights are loaded as saved
   - [ ] Layers State: Check the layer start with same state
   - [ ] Model: is the top layer related?

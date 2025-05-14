@@ -86,8 +86,24 @@ Observations
 * FC 96 or AVG 128
 
 --------------------------------------------------
-## Reproducibility
+## Pretraining
 
+ProtoNet with AVG 128
+
+| run                        | seen       | unseen     | hm         |
+|:---------------------------|:-----------|:-----------|:-----------|
+| i1k+batchbased_protonet    | 81.74±0.14 | 76.66±0.37 | 77.58±0.27 |
+| i1k+protonet_batchbased    | 83.08±0.16 | 73.25±0.44 | 75.48±0.32 |
+| i1k_batchbased             | 82.32±0.16 | 71.77±0.46 | 74.02±0.34 |
+| i1k_protonet               | 81.92±0.14 | 79.14±0.36 | 79.13±0.26 |
+| i21k+batchbased_protonet   | 82.16±0.13 | 78.53±0.36 | 78.91±0.25 |
+| i21k+protonet_batchbased   | 83.77±0.15 | 73.50±0.47 | 75.60±0.35 |
+| i21k_batchbased            | 84.00±0.15 | 72.86±0.48 | 75.11±0.37 |
+| i21k_protonet              | 79.52±0.14 | 77.95±0.37 | 77.22±0.26 |
+| random+batchbased_protonet | 78.89±0.15 | 76.57±0.39 | 76.03±0.28 |
+| random+protonet_batchbased | 78.43±0.18 | 67.69±0.47 | 69.71±0.36 |
+| random_batchbased          | 79.78±0.18 | 69.68±0.48 | 71.41±0.37 |
+| random_protonet            | 75.59±0.16 | 73.65±0.40 | 72.74±0.28 |
 *
 
 
