@@ -231,23 +231,81 @@ def study_eval_proto_gfsl(
         aggregate_exp_df(join(results_dir, exp))
 
 
-def study_repro(
+
+def study_repro_pretraining(
         seeds=SEEDS,
+        checkpoints_dir='checkpoints',
         results_dir=RESULTS_DIR,
         debug=False):
-    exp = 'study_repro'
-    checkpoint_name='mobilenetv3-large-100_i1k+batchbased+protonet_seed0.pth'
+    exp = 'repro_pretraining'
+    net_backbone = 'mobilenetv3-large-100'
     cfgs = list(product(
-        # method
+        #   [net_weights,           method]
         [
-            'batchbased',
-            'protonet'
+            # ['i1k',                 'batchbased'],
+            # ['i1k+batchbased',      'batchbased'],
+            ['i1k+batchbased',      'protonet'],
         ],
         seeds,
     ))
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        method, seed = cfg
+        (net_weights, method), seed = cfg
         run = '_'.join([
+            net_weights,
+            method,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+                           else DEBUG_HPARAMS)
+            results_dir = 'rdev'
+
+        checkpoint_name = f'{net_backbone}_{net_weights}+{method}.pth'
+        if net_weights not in {'random', 'i1k', 'i21k'} :
+            net_weights = f'{net_backbone}_{net_weights}.pth'
+
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            net_weights=net_weights,
+            method=method,
+            checkpoints_dir=checkpoints_dir,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
+def study_repro_eval(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'repro_eval'
+    # checkpoint_name='mobilenetv3-large-100_i1k+batchbased+protonet_seed0.pth'
+    cfgs = list(product(
+        # method
+        [
+            [
+                'mobilenetv3-large-100_i1k+batchbased.pth',
+                'batchbased'
+            ],
+            [
+                'mobilenetv3-large-100_i1k+batchbased+batchbased.pth',
+                'batchbased'
+            ],
+            [
+                'mobilenetv3-large-100_i1k+batchbased+protonet.pth',
+                'protonet'
+            ]
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (checkpoint_name, method), seed = cfg
+        run = '_'.join([
+            checkpoint_name,
             method
         ])
         hparams = {}
@@ -260,6 +318,56 @@ def study_repro(
             exp=exp,
             run=run,
             method=method,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
+
+def study_pretraining(
+        seeds=SEEDS,
+        checkpoints_dir='checkpoints',
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'pretraining'
+    net_backbone = 'mobilenetv3-large-100'
+    cfgs = list(product(
+        #   [net_weights,           method]
+        [
+            # ['i1k',                 'batchbased'],
+            # ['i1k+batchbased',      'batchbased'],
+            ['i1k+batchbased',      'protonet'],
+        ],
+        [80, 96, 128, 144],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (net_weights, method), protonet_encoder_size, seed = cfg
+        run = '_'.join([
+            net_weights,
+            method,
+            protonet_encoder_size
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+                           else DEBUG_HPARAMS)
+            results_dir = 'rdev'
+
+        checkpoint_name = f'{net_backbone}_{net_weights}+{method}.pth'
+        if net_weights not in {'random', 'i1k', 'i21k'} :
+            net_weights = f'{net_backbone}_{net_weights}.pth'
+
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            net_weights=net_weights,
+            method=method,
+            protonet_encoder_size=protonet_encoder_size,
+            checkpoints_dir=checkpoints_dir,
             seed=seed,
             checkpoint_name=checkpoint_name,
             **hparams
