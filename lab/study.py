@@ -461,6 +461,56 @@ def study_repro_train_train_eval(
 
 
 
+# only batchbased + protonet
+# def study_pretraining(
+#         seeds=SEEDS,
+#         checkpoints_dir='checkpoints',
+#         results_dir=RESULTS_DIR,
+#         debug=False):
+#     exp = 'pretraining'
+#     net_backbone = 'mobilenetv3-large-100'
+#     cfgs = list(product(
+#         #   [net_weights,           method]
+#         [
+#             # ['i1k',                 'batchbased', {}],
+#             # ['i1k+batchbased',      'batchbased', {}],
+#             ['i1k+batchbased',      'protonet'],
+#         ],
+#         ['avg', 'fc'],
+#         [80, 96, 128, 144],
+#         seeds,
+#     ))
+#     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+#         (net_weights, method), protonet_encoder_type, protonet_encoder_size, seed = cfg
+#         run = '_'.join([
+#             net_weights,
+#             method,
+#             f'{protonet_encoder_type}-{protonet_encoder_size}'
+#         ])
+#         hparams = {}
+#         if debug:
+#             hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+#                            else DEBUG_HPARAMS)
+#             results_dir = 'rdev'
+
+#         checkpoint_name = f'{net_backbone}_{net_weights}+{method}.pth'
+#         if net_weights not in {'random', 'i1k', 'i21k'} :
+#             net_weights = f'{net_backbone}_{net_weights}.pth'
+
+#         train_model(
+#             results_dir=results_dir,
+#             exp=exp,
+#             run=run,
+#             net_weights=net_weights,
+#             method=method,
+#             protonet_encoder_type=protonet_encoder_type,
+#             protonet_encoder_size=protonet_encoder_size,
+#             checkpoints_dir=checkpoints_dir,
+#             seed=seed,
+#             checkpoint_name=checkpoint_name,
+#             **hparams
+#         )
+#         aggregate_exp_df(join(results_dir, exp))
 
 def study_pretraining(
         seeds=SEEDS,
@@ -472,9 +522,7 @@ def study_pretraining(
     cfgs = list(product(
         #   [net_weights,           method]
         [
-            # ['i1k',                 'batchbased', {}],
-            # ['i1k+batchbased',      'batchbased', {}],
-            ['i1k+batchbased',      'protonet'],
+            ['i1k',                 'protonet'],
         ],
         ['avg', 'fc'],
         [80, 96, 128, 144],
