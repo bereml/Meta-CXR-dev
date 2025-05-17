@@ -559,3 +559,58 @@ def study_pretraining(
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
+
+
+# ------------------------------------------------
+def study_task_complexity_proto(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        checkpoint_name='mobilenetv3-large-100_i1k+protonet.pth',
+        debug=False):
+    exp = 'task_complexity_proto'
+    method = 'protonet'
+    cfgs = list(product(
+        # mtst_n_way, mtst_n_unseen
+        [
+            [3, 1],
+            [3, 2],
+            [3, 3],
+            [4, 1],
+            [4, 2],
+            [4, 3],
+            [4, 4],
+            [5, 1],
+            [5, 2],
+            [5, 3],
+            [5, 4],
+            [5, 5],
+        ],
+        # mtst_trn_k_shot
+        [1, 5, 15],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (mtst_n_way, mtst_n_unseen), mtst_trn_k_shot, seed = cfg
+        run = '_'.join([
+            f'nway-{mtst_n_way}',
+            f'unseen-{mtst_n_unseen}',
+            f'kshot-{mtst_trn_k_shot:02d}',
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+                           else DEBUG_HPARAMS)
+            results_dir = 'rdev'
+        eval_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            mtst_n_way=mtst_n_way,
+            mtst_n_unseen=mtst_n_unseen,
+            mtst_trn_k_shot=mtst_trn_k_shot,
+            method=method,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
