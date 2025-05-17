@@ -115,6 +115,7 @@ Observations
 | I21k    | Batchbased | Protonet   | 81.58±0.14 | 77.04±0.36 | 77.79±0.26 |
 | I21k    | Protonet   | Batchbased | 83.24±0.15 | 71.25±0.47 | 74.04±0.35 |
 
+
 Observations
 - mtrn_episodes = number_of_examples / avg_size_episode = 4087
 
@@ -326,3 +327,7 @@ Observations
   - [ ] Weights: Check the Weights are loaded as saved
   - [ ] Layers State: Check the layer start with same state
   - [ ] Model: is the top layer related?
+- [ ] Actulizar gráfica
+  - [ ] Titulo Task Complexity
+  - [ ] n-unseen italica
+- [ ] Reviar que tan complicado es correr 0-unseen
