@@ -12,18 +12,31 @@ from utils import aggregate_exp_df, eval_model, train_model
 
 SEEDS = [0]
 RESULTS_DIR = 'rstudy'
+# DEBUG_HPARAMS = {
+#     'mtrn_episodes': 1,
+#     'mval_episodes': 1,
+#     'mtst_episodes': 1,
+#     'max_epochs': 1,
+# }
+# DEBUG_HPARAMS_BB = {
+#     'batchbased_train_batches': 1,
+#     'mtrn_episodes': 1,
+#     'mval_episodes': 1,
+#     'mtst_episodes': 1,
+#     'max_epochs': 1,
+# }
 DEBUG_HPARAMS = {
-    'mtrn_episodes': 1,
-    'mval_episodes': 1,
-    'mtst_episodes': 1,
-    'max_epochs': 1,
+    'mtrn_episodes': 2,
+    'mval_episodes': 2,
+    'mtst_episodes': 2,
+    'max_epochs': 2,
 }
 DEBUG_HPARAMS_BB = {
-    'batchbased_train_batches': 1,
-    'mtrn_episodes': 1,
-    'mval_episodes': 1,
-    'mtst_episodes': 1,
-    'max_epochs': 1,
+    'batchbased_train_batches': 2,
+    'mtrn_episodes': 2,
+    'mval_episodes': 2,
+    'mtst_episodes': 2,
+    'max_epochs': 2,
 }
 
 
@@ -460,58 +473,6 @@ def study_repro_train_train_eval(
         aggregate_exp_df(join(results_dir, exp))
 
 
-
-# only batchbased + protonet
-# def study_pretraining(
-#         seeds=SEEDS,
-#         checkpoints_dir='checkpoints',
-#         results_dir=RESULTS_DIR,
-#         debug=False):
-#     exp = 'pretraining'
-#     net_backbone = 'mobilenetv3-large-100'
-#     cfgs = list(product(
-#         #   [net_weights,           method]
-#         [
-#             # ['i1k',                 'batchbased', {}],
-#             # ['i1k+batchbased',      'batchbased', {}],
-#             ['i1k+batchbased',      'protonet'],
-#         ],
-#         ['avg', 'fc'],
-#         [80, 96, 128, 144],
-#         seeds,
-#     ))
-#     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-#         (net_weights, method), protonet_encoder_type, protonet_encoder_size, seed = cfg
-#         run = '_'.join([
-#             net_weights,
-#             method,
-#             f'{protonet_encoder_type}-{protonet_encoder_size}'
-#         ])
-#         hparams = {}
-#         if debug:
-#             hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
-#                            else DEBUG_HPARAMS)
-#             results_dir = 'rdev'
-
-#         checkpoint_name = f'{net_backbone}_{net_weights}+{method}.pth'
-#         if net_weights not in {'random', 'i1k', 'i21k'} :
-#             net_weights = f'{net_backbone}_{net_weights}.pth'
-
-#         train_model(
-#             results_dir=results_dir,
-#             exp=exp,
-#             run=run,
-#             net_weights=net_weights,
-#             method=method,
-#             protonet_encoder_type=protonet_encoder_type,
-#             protonet_encoder_size=protonet_encoder_size,
-#             checkpoints_dir=checkpoints_dir,
-#             seed=seed,
-#             checkpoint_name=checkpoint_name,
-#             **hparams
-#         )
-#         aggregate_exp_df(join(results_dir, exp))
-
 def study_pretraining(
         seeds=SEEDS,
         checkpoints_dir='checkpoints',
@@ -614,3 +575,154 @@ def study_task_complexity_proto(
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
+
+
+
+# ------------------------------------------------
+# Check if we have the same results with:
+#   study_method_protonet_train_eval
+#   study_method_protonet_eval
+def study_method_protonet_train_eval(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+
+    exp = 'study_method_protonet_train_eval'
+    cfgs = list(product(
+        # protonet_encoder_type
+        ['avg', 'fc'],
+        # protonet_encoder_size
+        [96, 128, 144],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        protonet_encoder_type, protonet_encoder_size, seed = cfg
+        run = '_'.join([
+            f'{protonet_encoder_type}',
+            f'{protonet_encoder_size}',
+        ])
+        checkpoint_name = f'i1k-protonet-{protonet_encoder_type}-{protonet_encoder_size}.pth'
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS)
+            results_dir = 'rdev'
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            method='protonet',
+            protonet_encoder_type=protonet_encoder_type,
+            protonet_encoder_size=protonet_encoder_size,
+            checkpoint_name=checkpoint_name,
+            seed=seed,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+def study_method_protonet_eval(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'study_method_protonet_eval'
+    method = 'protonet'
+    cfgs = list(product(
+        # protonet_encoder_type
+        ['avg', 'fc'],
+        # protonet_encoder_size
+        [96, 128, 144],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        protonet_encoder_type, protonet_encoder_size, seed = cfg
+        run = '_'.join([
+            'eval',
+            f'{protonet_encoder_type}',
+            f'{protonet_encoder_size}',
+        ])
+        checkpoint_name = f'i1k-protonet-{protonet_encoder_type}-{protonet_encoder_size}.pth'
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+                           else DEBUG_HPARAMS)
+            results_dir = 'rdev'
+        eval_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            method=method,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
+def study_train_eval_repro(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    iters = 5
+    DEBUG_HPARAMS = {
+        'mtrn_episodes': iters,
+        'mval_episodes': iters,
+        'mtst_episodes': iters,
+        'max_epochs': iters,
+    }
+    DEBUG_HPARAMS_BB = {
+        'batchbased_train_batches': iters,
+        'mtrn_episodes': iters,
+        'mval_episodes': iters,
+        'mtst_episodes': iters,
+        'max_epochs': iters,
+    }
+    exp = 'study_train_eval_repro'
+    cfgs = list(product(
+        [
+            ['protonet',
+             {'protonet_encoder_type': 'avg',
+              'protonet_encoder_size': 128}],
+            ['protonet',
+             {'protonet_encoder_type': 'fc',
+              'protonet_encoder_size': 128}],
+            ['protonet',
+             {'protonet_encoder_type': 'avg',
+              'protonet_encoder_size': 96}],
+            ['protonet',
+             {'protonet_encoder_type': 'avg',
+              'protonet_encoder_size': 144}],
+            ['batchbased',
+             {}]
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (method, hparams), seed = cfg
+        hparams_str = '-'.join([f'{k}={v}' for k, v in hparams.items()])
+        run = f"te_{method}_{hparams_str}"
+        checkpoint_name = f'{run}.pth'
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+                           else DEBUG_HPARAMS)
+            results_dir = 'rdev'
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            method=method,
+            checkpoint_name=checkpoint_name,
+            seed=seed,
+            **hparams
+        )
+        run = f"eo_{method}_{hparams_str}"
+        eval_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            method=method,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
