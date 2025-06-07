@@ -1,54 +1,71 @@
 # Paper 🩻 🐺 🐶 🤟🏽 😿
 
+## TODO
+
+- [ ] Pretraining Table
+  - [ ] Get stable results for Batchbased
+    - [ ] Design and run study experiment
+  - [ ] Get stable results for ProtoNet
+    - [ ] Design and run study experiment
+  - [ ] Get stable results for EpisodeBased
+    - [ ] Design and run study experiment
+  - [ ] Decide: Batchbased or ProtoNet?
+  - [ ] Update HPs table
+
+- [ ] metachest-dev TODO.md
+- [ ] Check FOMAML
+  https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial16/Meta_Learning.html
+- [ ] Check Reptile or iMAML
+- [ ] Check FEAT
+- [ ] Implemet EpisodeBased experiment with equivalence between batch and episode data size
+- [ ] Check TIMM/MobileNet-V4, MamabaOut
+  https://huggingface.co/collections/timm/mobilenetv4-pretrained-weights-6669c22cda4db4244def9637
+- [ ] https://pixi.sh/
+
+
+## Progress
+
+- [ ] Experiments
+    - [ ] Method
+    - [ ] Pretraining
+    - [x] Architecture
+    - [x] Rx Resolution
+    - [x] Distribution Shift
+      - [x] Subdataset Shift
+      - [x] Subpopulation Shift
+      - [x] View ShiftEpamer25!Sure, roppoc
+    - [x] From GFSL to SFSL
+
+- [ ] Manuscript
+  - [ ]   0% Abstract
+  - [ ]   0% Intro
+  - [x] 100% Related Work
+  - [ ]  90% MetaChest Dataset
+    - [ ] Agregar no-finding
+  - [ ]  90%: Transfer Learning Paradigms
+    - [ ] Revisar consistencia de notación con la siguiente sección
+  - [ ]  60% Few Shot Multi-label Classification
+    - [ ] Diagrama
+    - [ ] Notación
+    - [ ] Algoritmo
+    - [ ] Redacción
+  - [ ]  10% Methods
+    - [ ] BatchBased
+    - [ ] EpisodeBased
+    - [ ] ProtoNet
+  - [ ]  10% Experimental Setup
+  - [ ]  10% Results and Discussion
+    - [ ]   0% Methods
+    - [ ]   0% Pretraining
+    - [ ] 100% Architectures
+    - [ ] 100% RX Resolution
+    - [ ] 100% Subdataset Shift
+    - [ ] 100% Subpopulation Shift
+    - [ ]  80% Task Complexity
+  - [ ]   5% Conclusions
+
+
 ## Experiments
-
-Default HPs:
-
-| HP                | Value     |
-| :---------------- | --------: |
-| Data              |           |
-|   data_distro     | complete  |
-|   mtrn_batch_size | 64        |
-|   mtrn_n_way      | 3         |
-|   mtrn_trn_k_shot | 5         |
-|   mtrn_tst_k_shot | 15        |
-|   mval_n_way      | 3         |
-|   mval_n_unseen   | 1         |
-|   mval_trn_k_shot | 5         |
-|   mval_tst_k_shot | 15        |
-|   mtst_n_way      | 3         |
-|   mtst_n_unseen   | 1         |
-|   mtst_trn_k_shot | 5         |
-|   mtst_tst_k_shot | 15        |
-|   image_size      | 384       |
-|   data_aug        | false     |
-| Network           |           |
-|   net_backbone    | mobilenetv3-large-100 |
-|   net_weights     | i1k       |
-| Method            |           |
-|   method          | batchbased |
-|   batchbased_trn_lr | 0.0001  |
-|   batchbased_sch_milestones | 1 |
-|   batchbased_mval_lr | 0.005  |
-|   batchbased_inner_steps | 100 |
-|   batchbased_mval_net_steps | 0 |
-|   batchbased_mval_net_lr | 0.005 |
-|   batchbased_mval_net_batch_pct | 1.0 |
-|   batchbased_mval_head_steps | 100 |
-|   batchbased_mval_head_lr | 0.005 |
-|   batchbased_mval_head_batch_pct | 0.5 |
-|   batchbased_train_batches | 0 |
-|   batchbased_reset_head | 0 |
-| Training          |           |
-|   mtrn_episodes   | 1000      |
-|   mval_episodes   | 100       |
-|   mtst_episodes   | 100000    |
-|   max_epochs      | 150       |
-|   stop_metric     | HM↑ |
-|   stop_patience   | 10        |
-|   deterministic   | warn      |
-|   precision       | 16        |
-
 
 --------------------------------------------------
 ### Method
@@ -206,7 +223,7 @@ Observations
 | Complete             | 84.54±0.15 | 74.50±0.47 | 76.51±0.36 |
 | Age [31-62]          | 84.18±0.15 | 75.83±0.44 | 77.52±0.33 |
 | Age [10,30]∪[63,80]  | 84.56±0.14 | 73.83±0.45 | 76.28±0.35 |
-| Age Young [10-20]    | 80.01±0.18 | 80.70±0.35 | 78.88±0.26 |
+| Age Young [10-20]    | 80.01±0.18 | 80.70±0.35 | 78.88±0.26 |timeData
 | Age Adult [21-60]    | 84.21±0.15 | 75.38±0.45 | 77.05±0.35 |
 | Age Old   [61-80]    | 84.69±0.15 | 72.22±0.44 | 75.49±0.33 |
 | Female               | 83.70±0.15 | 75.52±0.45 | 76.97±0.34 |
@@ -289,45 +306,49 @@ Observations
 
 
 --------------------------------------------------
---------------------------------------------------
---------------------------------------------------
+### Default HPs
 
-## TODO & Progress
-
-
-### General Plan
-
-- [ ] HP search EpisodeBased
-- [ ] Check FOMAML https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial16/Meta_Learning.html
-- [ ] Check Reptile or iMAML
-- [ ] Check FEAT
-- [ ] Check another method
-- [ ] Review ProtoNet
-- [ ] Review EpisodeBased
-- [ ] Implemet EpisodeBased experiment with equivalence between batch and episode data size
-
-- [ ] Update HPs
-- [ ] Check TIMM/MobileNet-V4, MamabaOut
-        https://huggingface.co/collections/timm/mobilenetv4-pretrained-weights-6669c22cda4db4244def9637
-- [ ] metachest-dev TODO.md
-- [ ] https://pixi.sh/
-
-
-### Progress
-
---------------------------------------------------
-#### Feb 1st Week 09-15
-
---------------------------------------------------
-#### May-03 May-09
-- [ ] Fix reproducibility of Protonet
-  - [x] Seed: Check seed is set before train of eval
-  - [ ] Model: is only an issue for protonet?
-  - [ ] Norm: Check the same norm is used for train and eval
-  - [ ] Weights: Check the Weights are loaded as saved
-  - [ ] Layers State: Check the layer start with same state
-  - [ ] Model: is the top layer related?
-- [ ] Actulizar gráfica
-  - [ ] Titulo Task Complexity
-  - [ ] n-unseen italica
-- [ ] Reviar que tan complicado es correr 0-unseen
+| HP                | Value     |
+| :---------------- | --------: |
+| Data              |           |
+|   data_distro     | complete  |
+|   mtrn_batch_size | 64        |
+|   mtrn_n_way      | 3         |
+|   mtrn_trn_k_shot | 5         |
+|   mtrn_tst_k_shot | 15        |
+|   mval_n_way      | 3         |
+|   mval_n_unseen   | 1         |
+|   mval_trn_k_shot | 5         |
+|   mval_tst_k_shot | 15        |
+|   mtst_n_way      | 3         |
+|   mtst_n_unseen   | 1         |
+|   mtst_trn_k_shot | 5         |
+|   mtst_tst_k_shot | 15        |
+|   image_size      | 384       |
+|   data_aug        | false     |
+| Network           |           |
+|   net_backbone    | mobilenetv3-large-100 |
+|   net_weights     | i1k       |
+| Method            |           |
+|   method          | batchbased |
+|   batchbased_trn_lr | 0.0001  |
+|   batchbased_sch_milestones | 1 |
+|   batchbased_mval_lr | 0.005  |
+|   batchbased_inner_steps | 100 |
+|   batchbased_mval_net_steps | 0 |
+|   batchbased_mval_net_lr | 0.005 |
+|   batchbased_mval_net_batch_pct | 1.0 |
+|   batchbased_mval_head_steps | 100 |
+|   batchbased_mval_head_lr | 0.005 |
+|   batchbased_mval_head_batch_pct | 0.5 |
+|   batchbased_train_batches | 0 |
+|   batchbased_reset_head | 0 |
+| Training          |           |
+|   mtrn_episodes   | 1000      |
+|   mval_episodes   | 100       |
+|   mtst_episodes   | 100000    |
+|   max_epochs      | 150       |
+|   stop_metric     | HM↑ |
+|   stop_patience   | 10        |
+|   deterministic   | warn      |
+|   precision       | 16        |
