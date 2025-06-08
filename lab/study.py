@@ -526,7 +526,8 @@ def study_pretraining(
 def study_task_complexity_proto(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
-        checkpoint_name='mobilenetv3-large-100_i1k+protonet.pth',
+        # checkpoint_name='mobilenetv3-large-100_i1k+protonet.pth',
+        checkpoint_name='te_protonet_protonet_encoder_type=avg-protonet_encoder_size=128.pth',
         debug=False):
     exp = 'task_complexity_proto'
     method = 'protonet'
