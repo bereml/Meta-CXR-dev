@@ -548,7 +548,7 @@ def study_task_complexity_proto(
             [5, 5],
         ],
         # mtst_trn_k_shot
-        [1, 5, 15],
+        [1, 5, 15, 30],
         seeds,
     ))
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
