@@ -122,7 +122,7 @@ def paper_gfsl(
             [5, 5],
         ],
         # mtst_trn_k_shot
-        [1, 5, 15],
+        [1, 5, 15, 30],
         seeds,
     ))
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
