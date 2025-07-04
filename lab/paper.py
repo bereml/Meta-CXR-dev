@@ -99,6 +99,54 @@ def paper_arch(
         aggregate_exp_df(join(results_dir, exp))
 
 
+def paper_arch_pn(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = f'arch_pn'
+    method = 'protonet'
+    cfgs = list(product(
+        # arch
+        [
+            # efficient
+            'mobilenetv3-small-075',
+            'mobilevitv2-050',
+            'mobilenetv3-large-100',
+            'convnext-atto',
+            'convnextv2-atto',
+            'mobilevitv2-100',
+            # large
+            'densenet121',
+            'mobilevitv2-200',
+            'convnextv2-nano',
+            'densenet161',
+            'convnext-tiny',
+            'convnextv2-tiny',
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        backbone, seed = cfg
+        run = '_'.join([
+            backbone,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+                           else DEBUG_HPARAMS)
+            results_dir = 'rdev'
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            net_backbone=backbone,
+            method=method,
+            seed=seed,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
 def paper_gfsl(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
