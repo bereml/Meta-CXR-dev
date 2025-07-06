@@ -423,6 +423,48 @@ def paper_shift_ds(
         aggregate_exp_df(join(results_dir, exp))
 
 
+def paper_shift_pn(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        checkpoint_name='mobilenetv3-large-100_i1k+protonet.pth',
+        debug=False):
+    exp = 'shift_ds_pn'
+    method= 'protonet'
+    cfgs = list(product(
+        # data_distro
+        [
+            'ds_chestxray14',
+            'ds_chexpert',
+            'ds_mimic',
+            'ds_padchest',
+            'complete',
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        data_distro, seed = cfg
+        run = '_'.join([
+            data_distro,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+                           else DEBUG_HPARAMS)
+            results_dir = 'rdev'
+        eval_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            data_distro=data_distro,
+            method=method,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
+
 def paper_shift_pop(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
