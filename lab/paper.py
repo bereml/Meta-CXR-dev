@@ -423,7 +423,7 @@ def paper_shift_ds(
         aggregate_exp_df(join(results_dir, exp))
 
 
-def paper_shift_pn(
+def paper_shift_ds_pn(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         checkpoint_name='mobilenetv3-large-100_i1k+protonet.pth',
@@ -508,6 +508,52 @@ def paper_shift_pop(
         aggregate_exp_df(join(results_dir, exp))
 
 
+def paper_shift_pop_pn(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        checkpoint_name='mobilenetv3-large-100_i1k+protonet.pth',
+        debug=False):
+    exp = 'shift_pop_pn'
+    method= 'protonet'
+    cfgs = list(product(
+        # data_distro
+        [
+            'age_decade2',
+            'age_decade3',
+            'age_decade4',
+            'age_decade5',
+            'age_decade6',
+            'age_decade7',
+            'age_decade8',
+            'sex_female',
+            'sex_male',
+            'complete',
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (data_distro, seed) = cfg
+        run = '_'.join([
+            data_distro,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+                           else DEBUG_HPARAMS)
+            results_dir = 'rdev'
+        eval_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            data_distro=data_distro,
+            method=method,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
 def paper_shift_view(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
@@ -537,6 +583,44 @@ def paper_shift_view(
             exp=exp,
             run=run,
             data_distro=data_distro,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+def paper_shift_view_pn(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        checkpoint_name='mobilenetv3-large-100_i1k+protonet.pth',
+        debug=False):
+    exp = 'shift_view_pn'
+    method= 'protonet'
+    cfgs = list(product(
+        # data_distro
+        [
+            'view_ap',
+            'view_pa',
+            'complete',
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (data_distro, seed) = cfg
+        run = '_'.join([
+            data_distro,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+                           else DEBUG_HPARAMS)
+            results_dir = 'rdev'
+        eval_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            data_distro=data_distro,
+            method=method,
             seed=seed,
             checkpoint_name=checkpoint_name,
             **hparams
