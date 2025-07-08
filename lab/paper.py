@@ -626,3 +626,120 @@ def paper_shift_view_pn(
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
+
+
+###############################################################################
+
+def paper_pretraining_small_bb(
+        seeds=SEEDS,
+        checkpoints_dir='checkpoints',
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'pretraining'
+    net_backbone = 'mobilenetv3-small-075'
+    mtrn_trn_k_shot=30
+    mtrn_tst_k_shot=30
+    mval_trn_k_shot=30
+    mval_tst_k_shot=30
+    mtst_trn_k_shot=30
+    mtst_tst_k_shot=30
+    cfgs = list(product(
+        #   [net_weights,           method]
+        [
+            ['random',              'batchbased'],
+            ['i1k',                 'batchbased'],
+            ['i21k',                'batchbased'],
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (net_weights, method), seed = cfg
+        run = '_'.join([
+            net_weights,
+            method,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+                           else DEBUG_HPARAMS)
+            results_dir = 'rdev'
+
+        checkpoint_name = f'{net_backbone}_{net_weights}+{method}.pth'
+        if net_weights not in {'random', 'i1k', 'i21k'} :
+            net_weights = f'{net_backbone}_{net_weights}.pth'
+
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            mtrn_trn_k_shot=mtrn_trn_k_shot,
+            mtrn_tst_k_shot=mtrn_tst_k_shot,
+            mval_trn_k_shot=mval_trn_k_shot,
+            mval_tst_k_shot=mval_tst_k_shot,
+            mtst_trn_k_shot=mtst_trn_k_shot,
+            mtst_tst_k_shot=mtst_tst_k_shot,
+            net_weights=net_weights,
+            method=method,
+            checkpoints_dir=checkpoints_dir,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+def paper_pretraining_small_pn(
+        seeds=SEEDS,
+        checkpoints_dir='checkpoints',
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'pretraining'
+    net_backbone = 'mobilenetv3-small-075'
+    mtrn_trn_k_shot=30
+    mtrn_tst_k_shot=30
+    mval_trn_k_shot=30
+    mval_tst_k_shot=30
+    mtst_trn_k_shot=30
+    mtst_tst_k_shot=30
+    cfgs = list(product(
+        #   [net_weights,           method]
+        [
+            ['random',              'protonet'],
+            ['i1k',                 'protonet'],
+            ['i21k',                'protonet'],
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (net_weights, method), seed = cfg
+        run = '_'.join([
+            net_weights,
+            method,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB if method == 'batchbased'
+                           else DEBUG_HPARAMS)
+            results_dir = 'rdev'
+
+        checkpoint_name = f'{net_backbone}_{net_weights}+{method}.pth'
+        if net_weights not in {'random', 'i1k', 'i21k'} :
+            net_weights = f'{net_backbone}_{net_weights}.pth'
+
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            mtrn_trn_k_shot=mtrn_trn_k_shot,
+            mtrn_tst_k_shot=mtrn_tst_k_shot,
+            mval_trn_k_shot=mval_trn_k_shot,
+            mval_tst_k_shot=mval_tst_k_shot,
+            mtst_trn_k_shot=mtst_trn_k_shot,
+            mtst_tst_k_shot=mtst_tst_k_shot,
+            net_weights=net_weights,
+            method=method,
+            checkpoints_dir=checkpoints_dir,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
