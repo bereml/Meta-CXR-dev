@@ -850,3 +850,46 @@ def paper_task_compĺexity_pn(
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
+
+def paper_shift_pop_bb(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        checkpoint_name='mobilenetv3-small-075_i1k+batchbased.pth',
+        debug=False):
+    exp = 'shift_pop_bb'
+    cfgs = list(product(
+        # data_distro
+        [
+            'age_decade2',
+            'age_decade3',
+            'age_decade4',
+            'age_decade5',
+            'age_decade6',
+            'age_decade7',
+            'age_decade8',
+            'sex_female',
+            'sex_male',
+            'complete',
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (data_distro, seed) = cfg
+        run = '_'.join([
+            data_distro,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB)
+            results_dir = 'rdev'
+        eval_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            data_distro=data_distro,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
