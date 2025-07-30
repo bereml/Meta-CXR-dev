@@ -940,3 +940,54 @@ def paper_shift_ds_bb(
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
+
+
+def paper_resolution_bb(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        mtrn_batch_size=32,
+        debug=False):
+    exp = 'resolution'
+    mtst_trn_k_shot=30
+    mtst_tst_k_shot=30
+    cfgs = list(product(
+        # image_size, net_backbone
+        [
+            [ 224, 'mobilenetv3-small-075'],
+            [ 384, 'mobilenetv3-small-075'],
+            [ 512, 'mobilenetv3-small-075'],
+            [ 768, 'mobilenetv3-small-075'],
+            [1024, 'mobilenetv3-small-075'],
+            # [ 224, 'convnext-tiny'],
+            # [ 384, 'convnext-tiny'],
+            # [ 512, 'convnext-tiny'],
+            # [ 768, 'convnext-tiny'],
+            # [ 224, 'densenet121'],
+            # [ 384, 'densenet121'],
+            # [ 512, 'densenet121'],
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (image_size, net_backbone), seed = cfg
+        run = '_'.join([
+            net_backbone,
+            f'{image_size:04d}',
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(DEBUG_HPARAMS_BB)
+            results_dir = 'rdev'
+        train_model(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            image_size=image_size,
+            net_backbone=net_backbone,
+            mtrn_batch_size=mtrn_batch_size,
+            mtst_trn_k_shot=mtst_trn_k_shot,
+            mtst_tst_k_shot=mtst_tst_k_shot,
+            seed=seed,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
