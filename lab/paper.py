@@ -948,8 +948,8 @@ def paper_resolution_bb(
         mtrn_batch_size=32,
         debug=False):
     exp = 'resolution'
-    mtst_trn_k_shot=30
-    mtst_tst_k_shot=30
+    mtst_trn_k_shot=5
+    mtst_tst_k_shot=5
     cfgs = list(product(
         # image_size, net_backbone
         [
@@ -958,13 +958,13 @@ def paper_resolution_bb(
             [ 512, 'mobilenetv3-small-075'],
             [ 768, 'mobilenetv3-small-075'],
             [1024, 'mobilenetv3-small-075'],
-            # [ 224, 'convnext-tiny'],
-            # [ 384, 'convnext-tiny'],
-            # [ 512, 'convnext-tiny'],
-            # [ 768, 'convnext-tiny'],
-            # [ 224, 'densenet121'],
-            # [ 384, 'densenet121'],
-            # [ 512, 'densenet121'],
+            [ 224, 'convnext-tiny'],
+            [ 384, 'convnext-tiny'],
+            [ 512, 'convnext-tiny'],
+            [ 768, 'convnext-tiny'],
+            [ 224, 'densenet121'],
+            [ 384, 'densenet121'],
+            [ 512, 'densenet121'],
         ],
         seeds,
     ))
