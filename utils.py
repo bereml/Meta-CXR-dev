@@ -171,14 +171,14 @@ def timestamp(fmt='%y%m%dT%H%M%S'):
     return datetime.datetime.fromtimestamp(time.time()).strftime(fmt)
 
 
-def train_model(**kwargs):
-    elems = ['python train.py'] + [f'--{k} {v}' for k, v in kwargs.items()]
+def pretrain_adapt(**kwargs):
+    elems = ['python pretrain.py'] + [f'--{k} {v}' for k, v in kwargs.items()]
     cmd = ' '.join(elems)
     run_cmd(cmd)
 
 
-def eval_model(**kwargs):
-    elems = ['python eval.py'] + [f'--{k} {v}' for k, v in kwargs.items()]
+def adapt(**kwargs):
+    elems = ['python adapt.py'] + [f'--{k} {v}' for k, v in kwargs.items()]
     cmd = ' '.join(elems)
     run_cmd(cmd)
 

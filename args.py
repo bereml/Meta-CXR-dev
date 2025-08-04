@@ -37,10 +37,10 @@ def parse_args():
                         type=int, default=3,
                         help='meta-training n-way')
     parser.add_argument('--mtrn_trn_k_shot',
-                        type=int, default=5,
+                        type=int, default=30,
                         help='meta-training training k-shot')
     parser.add_argument('--mtrn_tst_k_shot',
-                        type=int, default=15,
+                        type=int, default=30,
                         help='meta-training test k-shot')
     parser.add_argument('--mval_n_way',
                         type=int, default=3,
@@ -49,10 +49,10 @@ def parse_args():
                         type=int, default=1,
                         help='meta-validation n-way unseen')
     parser.add_argument('--mval_trn_k_shot',
-                        type=int, default=5,
+                        type=int, default=30,
                         help='meta-validation training k-shot')
     parser.add_argument('--mval_tst_k_shot',
-                        type=int, default=15,
+                        type=int, default=30,
                         help='Meta-validation test k-shot')
     parser.add_argument('--mtst_n_way',
                         type=int, default=3,
@@ -61,10 +61,10 @@ def parse_args():
                         type=int, default=1,
                         help='meta-test n-way unseen')
     parser.add_argument('--mtst_trn_k_shot',
-                        type=int, default=5,
+                        type=int, default=30,
                         help='meta-test training k-shot')
     parser.add_argument('--mtst_tst_k_shot',
-                        type=int, default=15,
+                        type=int, default=30,
                         help='meta-tst test k-shot')
     parser.add_argument('--image_size',
                         type=int, default=384,
@@ -77,7 +77,7 @@ def parse_args():
                         help='dataloaders number of workers')
     # NETWORK
     parser.add_argument('--net_backbone',
-                        type=str, default='mobilenetv3-large-100',
+                        type=str, default='mobilenetv3-small-075',
                         help='backbone architecture')
     parser.add_argument('--net_weights',
                         type=str, default='i1k',
@@ -88,13 +88,13 @@ def parse_args():
                         help='learning method')
     # TRAINING
     parser.add_argument('--mtrn_episodes',
-                        type=int, default=1000,
+                        type=int, default=1_000,
                         help='number of meta-training episodes')
     parser.add_argument('--mval_episodes',
                         type=int, default=100,
                         help='number of meta-validation episodes')
     parser.add_argument('--mtst_episodes',
-                        type=int, default=10000,
+                        type=int, default=10_000,
                         help='number of meta-test episodes')
     parser.add_argument('--max_epochs',
                         type=int, default=100,
@@ -106,9 +106,9 @@ def parse_args():
     parser.add_argument('--stop_patience',
                         type=int, default=10,
                         help='early stopping patience')
-    parser.add_argument('--train_and_eval',
+    parser.add_argument('--pretrain_adapt',
                         type=str2bool, default=True, nargs='?', const=False,
-                        help='train and evaluate the model')
+                        help='pretrain and adapt the model')
     parser.add_argument('--checkpoint_name',
                         type=str, default=None,
                         help='checkpoint name')

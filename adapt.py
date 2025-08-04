@@ -33,11 +33,11 @@ def save_evaluation(df, seen, unseen, hparams):
     print(f'Episodes results: {path}')
 
 
-def eval(train_and_eval=False, hparams=None, checkpoint_path=None):
+def adapt(train_adapt=False, hparams=None, checkpoint_path=None):
     print('==================================\n'
           '=========== EVALUATION ===========')
 
-    if not train_and_eval:
+    if not train_adapt:
         hparams = parse_args()
 
     seed_everything(hparams.seed, workers=True)
@@ -46,7 +46,7 @@ def eval(train_and_eval=False, hparams=None, checkpoint_path=None):
     if Method is None:
             raise ValueError(f"unknown method {hparams.method}")
 
-    if train_and_eval:
+    if train_adapt:
         method = Method.load_from_checkpoint(checkpoint_path, strict=False)
         method.hparams.episodes_mtst_csv = hparams.episodes_mtst_csv
 

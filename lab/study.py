@@ -7,7 +7,7 @@ from os.path import join, isfile
 
 from tqdm import tqdm
 
-from utils import aggregate_exp_df, eval_model, train_model
+from utils import adapt, aggregate_exp_df, pretrain_adapt
 
 
 SEEDS = [0]

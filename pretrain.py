@@ -14,12 +14,12 @@ from pytorch_lightning import seed_everything
 
 from args import parse_args
 from data import build_dl, build_mdl
-from eval import eval
+from adapt import adapt
 from method import METHODS
 from utils import RunTimer, get_run_dir
 
 
-def train():
+def pretrain_adapt():
     print("==================================\n"
           "=========== TRAINING =============")
 
@@ -127,13 +127,13 @@ def train():
         # )
         print(f'Checkpoint saved to {checkpoint_path}')
 
-    if hparams.train_and_eval:
-        eval(True, hparams, best_checkpoint_path)
+    if hparams.pretrain_adapt:
+        adapt(True, hparams, best_checkpoint_path)
 
 
 def main():
     with RunTimer():
-        train()
+        pretrain_adapt()
 
 
 if __name__ == "__main__":
