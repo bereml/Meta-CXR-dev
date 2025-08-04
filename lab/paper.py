@@ -33,26 +33,20 @@ def debug_hparams(method: str = 'batchbased') -> dict[str, int]:
 
 ###############################################################################
 
-def paper_pretraining(
+def paper_base(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         debug=False):
-    exp = 'pretraining'
-    net_backbone = 'mobilenetv3-large-100'
+    exp = 'base'
+    net_backbone = 'mobilenetv3-small-075'
+    net_weights = 'i1k'
     cfgs = list(product(
-        #   [net_weights, method]
-        [
-            ['i1k',       'batchbased'],
-            ['i1k',       'protonet'],
-            ['i21k',      'batchbased'],
-            ['i21k',      'protonet'],
-            ['random',    'batchbased'],
-            ['random',    'protonet'],
-        ],
+        # method
+        ['batchbased', 'protonet'],
         seeds,
     ))
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        (net_weights, method), seed = cfg
+        method, seed = cfg
         run = '_'.join([
             net_weights,
             method,
@@ -77,20 +71,27 @@ def paper_pretraining(
         )
         aggregate_exp_df(join(results_dir, exp))
 
-def paper_base(
+
+def paper_pretraining(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         debug=False):
-    exp = 'base'
-    net_backbone = 'mobilenetv3-small-075'
-    net_weights = 'i1k'
+    exp = 'pretraining'
+    net_backbone = 'mobilenetv3-large-100'
     cfgs = list(product(
-        # method
-        ['batchbased', 'protonet'],
+        #   [net_weights, method]
+        [
+            ['i1k',       'batchbased'],
+            ['i1k',       'protonet'],
+            ['i21k',      'batchbased'],
+            ['i21k',      'protonet'],
+            ['random',    'batchbased'],
+            ['random',    'protonet'],
+        ],
         seeds,
     ))
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        method, seed = cfg
+        (net_weights, method), seed = cfg
         run = '_'.join([
             net_weights,
             method,
