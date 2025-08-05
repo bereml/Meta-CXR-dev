@@ -105,4 +105,4 @@ def adapt(train_adapt=False, hparams=None, checkpoint_path=None):
 
 if __name__ == '__main__':
     import sys
-    sys.exit(eval())
+    sys.exit(adapt())
