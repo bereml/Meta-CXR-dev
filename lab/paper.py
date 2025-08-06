@@ -219,11 +219,11 @@ def paper_shift_ds(
     cfgs = list(product(
         # data_distro
         [
+            'complete',
             'ds_chestxray14',
             'ds_chexpert',
             'ds_mimic',
             'ds_padchest',
-            'complete',
         ],
         seeds,
     ))
@@ -256,6 +256,7 @@ def paper_shift_pop(
     cfgs = list(product(
         # data_distro
         [
+            'complete',
             'age_decade2',
             'age_decade3',
             'age_decade4',
@@ -267,7 +268,6 @@ def paper_shift_pop(
             'sex_male',
             'view_ap',
             'view_pa',
-            'complete',
         ],
         seeds,
     ))
