@@ -46,7 +46,7 @@ def compute_protos(
     return p
 
 
-def compute_similarity(
+def compute_distance(
     p: torch.Tensor,
     z: torch.Tensor
 ) -> torch.Tensor:
@@ -77,11 +77,39 @@ def compute_similarity(
     # compute distance
     # [b, n] <- [b, n, d], [b, n, d]
     dist = torch.sqrt(torch.pow(p - z, 2).sum(dim=2))
-    # convert to similarity
-    # [b, n]
-    sim = -(dist - dist.mean())
+    return dist
 
-    return sim
+
+def compute_logits(
+    p: torch.Tensor,
+    z_trn: torch.Tensor,
+    z_tst: torch.Tensor,
+    mean_set: str,
+) -> torch.Tensor:
+    """Computes distance of examples to protos.
+
+    Parameters
+    ----------
+    p : torch.Tensor
+        [n, d] tensor of `n` prototypes, `d` features.
+    z : torch.Tensor
+        [b, d] tensor of `b` examples, `d` features.
+
+    Returns
+    -------
+    torch.Tensor
+        (n, c) tensor of `n` examples, `c` classes.
+    """
+
+    dist_tst = compute_distance(p, z_tst)
+
+    if mean_set == 'trn':
+        mean = compute_distance(p, z_trn).mean()
+    else:
+        mean = dist_tst.mean()
+
+    logits = mean - dist_tst
+    return logits
 
 
 @METHODS.register('protonet')
@@ -132,7 +160,7 @@ class ProtoNet(FewShotMethod):
 
         # compute logits
         # [b_tst, n] <- [n, d], [b_tst, d]
-        y_lgts_tst = compute_similarity(p, z_tst)
+        y_lgts_tst = compute_logits(p, z_trn, z_tst, self.hparams.protonet_mean_set)
 
         # compute probs
         with torch.no_grad():
@@ -182,3 +210,7 @@ class ProtoNet(FewShotMethod):
         parser.add_argument('--protonet_lr',
                             type=float, default=0.0001,
                             help='meta-trn lr')
+        parser.add_argument('--protonet_mean_set',
+                            type=str, default='tst',
+                            choices=['trn', 'tst'],
+                            help='mean set to compute logits')
