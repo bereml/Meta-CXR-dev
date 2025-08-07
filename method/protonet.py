@@ -211,6 +211,6 @@ class ProtoNet(FewShotMethod):
                             type=float, default=0.0001,
                             help='meta-trn lr')
         parser.add_argument('--protonet_mean_set',
-                            type=str, default='tst',
+                            type=str, default='trn',
                             choices=['trn', 'tst'],
                             help='mean set to compute logits')
