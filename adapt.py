@@ -35,7 +35,7 @@ def save_evaluation(df, seen, unseen, hparams):
 
 def adapt(train_adapt=False, hparams=None, checkpoint_path=None):
     print('==================================\n'
-          '=========== EVALUATION ===========')
+          '============== ADAPT =============')
 
     if not train_adapt:
         hparams = parse_args()

@@ -21,7 +21,7 @@ from utils import RunTimer, get_run_dir
 
 def pretrain_adapt():
     print("==================================\n"
-          "=========== TRAINING =============")
+          "=========== PRETRAIN =============")
 
     torch.set_float32_matmul_precision('medium')
 
