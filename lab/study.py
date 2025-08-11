@@ -75,6 +75,50 @@ def study_pn_mean(
         aggregate_exp_df(join(results_dir, exp))
 
 
+def study_shift_ds_5shot(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'shift_ds_5shot'
+    mtst_n_way = 3
+    mtst_n_unseen = 1
+    mtst_trn_k_shot = 5
+    cfgs = list(product(
+        # data_distro
+        [
+            'complete',
+            'ds_chestxray14',
+            'ds_chexpert',
+            'ds_mimic',
+            'ds_padchest',
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (data_distro, seed) = cfg
+        run = '_'.join([
+            data_distro,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(debug_hparams())
+            results_dir = 'rdev'
+        adapt(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            mtst_n_way=mtst_n_way,
+            mtst_n_unseen=mtst_n_unseen,
+            mtst_trn_k_shot=mtst_trn_k_shot,
+            data_distro=data_distro,
+            seed=seed,
+            checkpoint_name=CHECKPOINT_NAME,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
+
 # # DEBUG_HPARAMS = {
 # #     'mtrn_episodes': 1,
 # #     'mval_episodes': 1,
