@@ -79,10 +79,11 @@ def study_shift_ds_5shot(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         debug=False):
-    exp = 'shift_ds_5shot'
+    exp = 'shift_ds_trn5shot_tst15shot'
     mtst_n_way = 3
     mtst_n_unseen = 1
     mtst_trn_k_shot = 5
+    mtst_trn_k_shot = 15
     cfgs = list(product(
         # data_distro
         [
