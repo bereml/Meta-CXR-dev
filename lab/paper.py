@@ -482,3 +482,89 @@ def paper_base_pn(
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
+
+
+
+
+def paper_base_gpu0(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'base'
+    # net_backbone = 'mobilenetv3-small-075'
+    net_weights = 'i1k'
+    cfgs = list(product(
+        # net_backbone
+        ['mobilenetv3-small-075'],
+        # method
+        ['batchbased', 'protonet'],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        net_backbone, method, seed = cfg
+        run = '_'.join([
+            net_backbone,
+            net_weights,
+            method,
+        ])
+        checkpoint_name = f'{net_backbone}_{net_weights}+{method}.pth'
+
+        hparams = {}
+        if debug:
+            hparams.update(debug_hparams(method))
+            results_dir = 'rdev'
+
+        pretrain_adapt(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            net_backbone=net_backbone,
+            net_weights=net_weights,
+            method=method,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
+def paper_base_gpu1(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'base'
+    # net_backbone = 'mobilenetv3-small-075'
+    net_weights = 'i1k'
+    cfgs = list(product(
+        # net_backbone
+        ['mobilenetv3-large-100'],
+        # method
+        ['batchbased', 'protonet'],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        net_backbone, method, seed = cfg
+        run = '_'.join([
+            net_backbone,
+            net_weights,
+            method,
+        ])
+        checkpoint_name = f'{net_backbone}_{net_weights}+{method}.pth'
+
+        hparams = {}
+        if debug:
+            hparams.update(debug_hparams(method))
+            results_dir = 'rdev'
+
+        pretrain_adapt(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            net_backbone=net_backbone,
+            net_weights=net_weights,
+            method=method,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
