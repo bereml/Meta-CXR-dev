@@ -79,7 +79,8 @@ def study_shift_ds_5shot(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         debug=False):
-    exp = 'shift_ds_trn5shot_tst15shot'
+    exp = 'shift_ds_trn5shot_tst15shot_large'
+    net_backbone = 'mobilenetv3-large-100'
     mtst_n_way = 3
     mtst_n_unseen = 1
     mtst_trn_k_shot = 5
@@ -113,6 +114,7 @@ def study_shift_ds_5shot(
             mtst_trn_k_shot=mtst_trn_k_shot,
             mtst_tst_k_shot=mtst_tst_k_shot,
             data_distro=data_distro,
+            net_backbone=net_backbone,
             seed=seed,
             checkpoint_name=CHECKPOINT_NAME,
             **hparams
