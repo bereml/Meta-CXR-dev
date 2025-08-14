@@ -534,3 +534,60 @@ def paper_task_compĺexity_bb_gpu1(
             **hparams
         )
         aggregate_exp_df(join(results_dir, exp))
+
+
+
+def paper_base_bb_large(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'base'
+    # net_backbone = 'mobilenetv3-small-075'
+    net_backbone = 'mobilenetv3-large-100'
+    net_weights = 'i1k'
+    mval_n_way = 3
+    mval_n_unseen = 1
+    mval_trn_k_shot = 5
+    mval_tst_k_shot = 15
+    mtst_n_way = 3
+    mtst_n_unseen = 1
+    mtst_trn_k_shot = 5
+    mtst_tst_k_shot = 15
+    cfgs = list(product(
+        # method
+        ['batchbased'],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        method, seed = cfg
+        run = '_'.join([
+            net_weights,
+            method,
+        ])
+        checkpoint_name = f'{net_backbone}_{net_weights}+{method}.pth'
+
+        hparams = {}
+        if debug:
+            hparams.update(debug_hparams(method))
+            results_dir = 'rdev'
+
+        pretrain_adapt(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            mval_n_way=mval_n_way,
+            mval_n_unseen=mval_n_unseen,
+            mval_trn_k_shot=mval_trn_k_shot,
+            mval_tst_k_shot=mval_tst_k_shot,
+            mtst_n_way=mtst_n_way,
+            mtst_n_unseen=mtst_n_unseen,
+            mtst_trn_k_shot=mtst_trn_k_shot,
+            mtst_tst_k_shot=mtst_tst_k_shot,
+            net_backbone=net_backbone,
+            net_weights=net_weights,
+            method=method,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))

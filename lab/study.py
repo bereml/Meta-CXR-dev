@@ -83,7 +83,7 @@ def study_shift_ds_5shot(
     mtst_n_way = 3
     mtst_n_unseen = 1
     mtst_trn_k_shot = 5
-    mtst_trn_k_shot = 15
+    mtst_tst_k_shot = 15
     cfgs = list(product(
         # data_distro
         [
@@ -111,6 +111,7 @@ def study_shift_ds_5shot(
             mtst_n_way=mtst_n_way,
             mtst_n_unseen=mtst_n_unseen,
             mtst_trn_k_shot=mtst_trn_k_shot,
+            mtst_tst_k_shot=mtst_tst_k_shot,
             data_distro=data_distro,
             seed=seed,
             checkpoint_name=CHECKPOINT_NAME,
