@@ -87,16 +87,19 @@ def paper_base(
         results_dir=RESULTS_DIR,
         debug=False):
     exp = 'base'
-    net_backbone = 'mobilenetv3-small-075'
+    # net_backbone = 'mobilenetv3-small-075'
     net_weights = 'i1k'
     cfgs = list(product(
+        # net_backbone
+        ['mobilenetv3-small-075', 'mobilenetv3-large-100'],
         # method
         ['batchbased', 'protonet'],
         seeds,
     ))
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        method, seed = cfg
+        net_backbone, method, seed = cfg
         run = '_'.join([
+            net_backbone,
             net_weights,
             method,
         ])
@@ -309,11 +312,11 @@ def paper_task_compĺexity_bb(
             [4, 2],
             [4, 3],
             [4, 4],
-            # [5, 1],
-            # [5, 2],
-            # [5, 3],
-            # [5, 4],
-            # [5, 5],
+            [5, 1],
+            [5, 2],
+            [5, 3],
+            [5, 4],
+            [5, 5],
         ],
         # mtst_trn_k_shot
         [1, 5, 15, 30],
@@ -482,85 +485,25 @@ def paper_base_pn(
 
 
 
-def paper_task_compĺexity_bb_gpu1(
-        seeds=SEEDS,
-        results_dir=RESULTS_DIR,
-        checkpoint_name='mobilenetv3-small-075_i1k+batchbased.pth',
-        debug=False):
-    exp = 'task_compĺexity'
-    method = 'batchbased'
-    cfgs = list(product(
-        # mtst_n_way, mtst_n_unseen
-        [
-            # [3, 1],
-            # [3, 2],
-            # [3, 3],
-            # [4, 1],
-            # [4, 2],
-            # [4, 3],
-            # [4, 4],
-            [5, 1],
-            [5, 2],
-            [5, 3],
-            [5, 4],
-            [5, 5],
-        ],
-        # mtst_trn_k_shot
-        [1, 5, 15, 30],
-        seeds,
-    ))
-    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        (mtst_n_way, mtst_n_unseen), mtst_trn_k_shot, seed = cfg
-        run = '_'.join([
-            method,
-            f'nway-{mtst_n_way}',
-            f'unseen-{mtst_n_unseen}',
-            f'kshot-{mtst_trn_k_shot:02d}',
-        ])
-        hparams = {}
-        if debug:
-            hparams.update(debug_hparams(method))
-            results_dir = 'rdev'
-        adapt(
-            results_dir=results_dir,
-            exp=exp,
-            run=run,
-            mtst_n_way=mtst_n_way,
-            mtst_n_unseen=mtst_n_unseen,
-            mtst_trn_k_shot=mtst_trn_k_shot,
-            method=method,
-            seed=seed,
-            checkpoint_name=checkpoint_name,
-            **hparams
-        )
-        aggregate_exp_df(join(results_dir, exp))
 
-
-
-def paper_base_bb_large(
+def paper_base_gpu0(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         debug=False):
     exp = 'base'
     # net_backbone = 'mobilenetv3-small-075'
-    net_backbone = 'mobilenetv3-large-100'
     net_weights = 'i1k'
-    mval_n_way = 3
-    mval_n_unseen = 1
-    mval_trn_k_shot = 5
-    mval_tst_k_shot = 15
-    mtst_n_way = 3
-    mtst_n_unseen = 1
-    mtst_trn_k_shot = 5
-    mtst_tst_k_shot = 15
     cfgs = list(product(
+        # net_backbone
+        ['mobilenetv3-small-075'],
         # method
-        ['batchbased'],
+        ['batchbased', 'protonet'],
         seeds,
     ))
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        method, seed = cfg
+        net_backbone, method, seed = cfg
         run = '_'.join([
+            net_backbone,
             net_weights,
             method,
         ])
@@ -575,14 +518,48 @@ def paper_base_bb_large(
             results_dir=results_dir,
             exp=exp,
             run=run,
-            mval_n_way=mval_n_way,
-            mval_n_unseen=mval_n_unseen,
-            mval_trn_k_shot=mval_trn_k_shot,
-            mval_tst_k_shot=mval_tst_k_shot,
-            mtst_n_way=mtst_n_way,
-            mtst_n_unseen=mtst_n_unseen,
-            mtst_trn_k_shot=mtst_trn_k_shot,
-            mtst_tst_k_shot=mtst_tst_k_shot,
+            net_backbone=net_backbone,
+            net_weights=net_weights,
+            method=method,
+            seed=seed,
+            checkpoint_name=checkpoint_name,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
+
+def paper_base_gpu1(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'base'
+    # net_backbone = 'mobilenetv3-small-075'
+    net_weights = 'i1k'
+    cfgs = list(product(
+        # net_backbone
+        ['mobilenetv3-large-100'],
+        # method
+        ['batchbased', 'protonet'],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        net_backbone, method, seed = cfg
+        run = '_'.join([
+            net_backbone,
+            net_weights,
+            method,
+        ])
+        checkpoint_name = f'{net_backbone}_{net_weights}+{method}.pth'
+
+        hparams = {}
+        if debug:
+            hparams.update(debug_hparams(method))
+            results_dir = 'rdev'
+
+        pretrain_adapt(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
             net_backbone=net_backbone,
             net_weights=net_weights,
             method=method,
