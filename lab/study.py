@@ -156,6 +156,39 @@ def study_distro_mask(
         aggregate_exp_df(join(results_dir, exp))
 
 
+def study_sub_random(
+        seeds=SEEDS,
+        results_dir=RESULTS_DIR,
+        debug=False):
+    exp = 'sub_random'
+    cfgs = list(product(
+        # data_distro
+        [
+            'complete',
+            'sub_random_90',
+        ],
+        seeds,
+    ))
+    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
+        (data_distro, seed) = cfg
+        run = '_'.join([
+            data_distro,
+        ])
+        hparams = {}
+        if debug:
+            hparams.update(debug_hparams())
+            results_dir = 'rdev'
+        adapt(
+            results_dir=results_dir,
+            exp=exp,
+            run=run,
+            data_distro=data_distro,
+            seed=seed,
+            checkpoint_name=CHECKPOINT_NAME,
+            **hparams
+        )
+        aggregate_exp_df(join(results_dir, exp))
+
 
 
 # # DEBUG_HPARAMS = {
