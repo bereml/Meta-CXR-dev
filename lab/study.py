@@ -165,7 +165,7 @@ def study_sub_random(
         # data_distro
         [
             'complete',
-            'sub_random_90',
+            'sub_random_50',
         ],
         seeds,
     ))
