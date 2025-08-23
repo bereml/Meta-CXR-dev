@@ -693,7 +693,7 @@ def test_build_mdl(
         mset='mtrn',
         image_size=384, data_aug=False,
         n_episodes=1, n_way=3, n_unseen=1,
-        trn_k_shot=5, tst_k_shot=15,
+        trn_k_shot=30, tst_k_shot=30,
         norm={'mean': [0.0, 0.0, 0.0], 'std': [1.0, 1.0, 1.0]},
         num_workers=0,
         data_distro='complete',
@@ -740,8 +740,9 @@ def test_build_mdl(
         data = np.column_stack([subset, datasets, names, y.type(torch.int)])
         cols = ['subset', 'dataset', 'name'] + seen + unseen
         df = pd.DataFrame(data, columns=cols)
-        pd.set_option('display.max_colwidth', 500)
+        #with pd.option_context('display.max_rows', None, 'display.max_columns', None):
         print(df)
+        df.to_csv('test_build_mdl.csv')
 
         if debug:
             show_grid(x)
