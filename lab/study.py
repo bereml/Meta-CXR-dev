@@ -166,6 +166,8 @@ def study_sub_random(
         [
             'complete',
             'sub_random_50',
+            'sub_random_75',
+            'sub_random_90',
         ],
         seeds,
     ))
