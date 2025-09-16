@@ -215,7 +215,7 @@ def paper_task_complexity_bb(
         results_dir=RESULTS_DIR,
         checkpoint_name='mobilenetv3-small-075_i1k+batchbased.pth',
         debug=False):
-    exp = 'task_compĺexity'
+    exp = 'task_complexity'
     method = 'batchbased'
     cfgs = list(product(
         # mtst_n_way, mtst_n_unseen
@@ -269,7 +269,7 @@ def paper_task_complexity_pn(
         results_dir=RESULTS_DIR,
         checkpoint_name='mobilenetv3-small-075_i1k+protonet.pth',
         debug=False):
-    exp = 'task_compĺexity'
+    exp = 'task_complexity'
     method = 'protonet'
     cfgs = list(product(
         # mtst_n_way, mtst_n_unseen
