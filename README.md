@@ -3,7 +3,7 @@
 By [Berenice Montalvo-Lezama](https://turing.iimas.unam.mx/~bereml/) and
 [Gibran Fuentes-Pineda](http://turing.iimas.unam.mx/~gibranfp/).
 
-This repo reproduces the main results of [MetaChest: Generalized few-shot learning of patologies from chest X-rays](https://arxiv.org/abs/2210.07983).
+This repo reproduces the main results of [MetaChest: Generalized few-shot learning of patologies from chest X-rays]().
 
 A description of the MetaChest dataset can be found in the [site](https://bereml.github.io/metachest/).
 
