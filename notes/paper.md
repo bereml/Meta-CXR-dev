@@ -2,6 +2,99 @@
 
 ## TODO
 
+- [ ] Title
+- [ ] Abstract
+  - [ ] Draft main ideas
+  - [ ] Write main phrases
+  - [ ] Assamble
+  - [ ] Review
+
+- [ ] Intro
+  - [ ] Context and Background
+  - [ ] Research Problem
+  - [ ] Objectives
+  - [ ] Contributions & Results
+  - [ ] Paper organization
+
+- [x] Pathology Classification Complexity
+  - [x] Update and Rework Plot
+
+- [ ] Resolution
+  - [ ] Translate
+  - [ ] Update and Rework
+  - [ ] Review
+
+- [ ] Architectures
+  - [ ] Translate
+  - [ ] Update and Rework
+  - [ ] Review
+
+- [x] Conclusions
+  - [x] Research Statement
+    - [x] Draft main ideas
+    - [x] Write main phrases
+    - [x] Assamble
+    - [x] Review
+  - [x] Key points
+    - [x] Draft main ideas
+    - [x] Write main phrases
+    - [x] Assamble
+    - [x] Review
+  - [x] Findings & Contributions (Conclusions)
+    - [x] Draft main ideas
+    - [x] Write main phrases
+    - [x] Assamble
+    - [x] Review
+  - [x] Future work
+    - [x] Draft main ideas
+    - [x] Write main phrases
+    - [x] Assamble
+    - [x] Review
+
+- [ ] Finish code review
+- [ ] Finish websites
+- [ ] Updates URLs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 - [ ] Pretraining Table
   - [ ] Get stable results for Batchbased
     - [ ] Design and run study experiment
