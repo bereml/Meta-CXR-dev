@@ -12,7 +12,7 @@ from utils import adapt, aggregate_exp_df, pretrain_adapt
 
 SEEDS = [0]
 CHECKPOINT_NAME = 'mobilenetv3-small-075_i1k+batchbased.pth'
-RESULTS_DIR = 'rpaper'
+RESULTS_DIR = 'results'
 
 DEBUG_HPARAMS_BB = {
     'batchbased_train_batches': 1,
@@ -46,18 +46,14 @@ def paper_arch(
         [
             # efficient
             'mobilenetv3-small-075',
-            'mobilevitv2-050',
             'mobilenetv3-large-100',
-            'convnext-atto',
-            'convnextv2-atto',
             'mobilevitv2-100',
+            'convnext-atto',
             # large
             'densenet121',
-            'mobilevitv2-200',
-            'convnextv2-nano',
             'densenet161',
             'convnext-tiny',
-            'convnextv2-tiny',
+            'mobilevitv2-200',
         ],
         seeds,
     ))
@@ -214,88 +210,7 @@ def paper_resolution(
         aggregate_exp_df(join(results_dir, exp))
 
 
-def paper_shift_ds(
-        seeds=SEEDS,
-        results_dir=RESULTS_DIR,
-        debug=False):
-    exp = 'shift_ds'
-    cfgs = list(product(
-        # data_distro
-        [
-            'complete',
-            'ds_chestxray14',
-            'ds_chexpert',
-            'ds_mimic',
-            'ds_padchest',
-        ],
-        seeds,
-    ))
-    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        (data_distro, seed) = cfg
-        run = '_'.join([
-            data_distro,
-        ])
-        hparams = {}
-        if debug:
-            hparams.update(debug_hparams())
-            results_dir = 'rdev'
-        adapt(
-            results_dir=results_dir,
-            exp=exp,
-            run=run,
-            data_distro=data_distro,
-            seed=seed,
-            checkpoint_name=CHECKPOINT_NAME,
-            **hparams
-        )
-        aggregate_exp_df(join(results_dir, exp))
-
-
-def paper_shift_pop(
-        seeds=SEEDS,
-        results_dir=RESULTS_DIR,
-        debug=False):
-    exp = 'shift_pop'
-    cfgs = list(product(
-        # data_distro
-        [
-            'complete',
-            'age_decade2',
-            'age_decade3',
-            'age_decade4',
-            'age_decade5',
-            'age_decade6',
-            'age_decade7',
-            'age_decade8',
-            'sex_female',
-            'sex_male',
-            'view_ap',
-            'view_pa',
-        ],
-        seeds,
-    ))
-    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        (data_distro, seed) = cfg
-        run = '_'.join([
-            data_distro,
-        ])
-        hparams = {}
-        if debug:
-            hparams.update(debug_hparams())
-            results_dir = 'rdev'
-        adapt(
-            results_dir=results_dir,
-            exp=exp,
-            run=run,
-            data_distro=data_distro,
-            seed=seed,
-            checkpoint_name=CHECKPOINT_NAME,
-            **hparams
-        )
-        aggregate_exp_df(join(results_dir, exp))
-
-
-def paper_task_compĺexity_bb(
+def paper_task_complexity_bb(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         checkpoint_name='mobilenetv3-small-075_i1k+batchbased.pth',
@@ -349,7 +264,7 @@ def paper_task_compĺexity_bb(
         aggregate_exp_df(join(results_dir, exp))
 
 
-def paper_task_compĺexity_pn(
+def paper_task_complexity_pn(
         seeds=SEEDS,
         results_dir=RESULTS_DIR,
         checkpoint_name='mobilenetv3-small-075_i1k+protonet.pth',
@@ -460,92 +375,6 @@ def paper_base_pn(
     for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
         method, seed = cfg
         run = '_'.join([
-            net_weights,
-            method,
-        ])
-        checkpoint_name = f'{net_backbone}_{net_weights}+{method}.pth'
-
-        hparams = {}
-        if debug:
-            hparams.update(debug_hparams(method))
-            results_dir = 'rdev'
-
-        pretrain_adapt(
-            results_dir=results_dir,
-            exp=exp,
-            run=run,
-            net_backbone=net_backbone,
-            net_weights=net_weights,
-            method=method,
-            seed=seed,
-            checkpoint_name=checkpoint_name,
-            **hparams
-        )
-        aggregate_exp_df(join(results_dir, exp))
-
-
-
-
-def paper_base_gpu0(
-        seeds=SEEDS,
-        results_dir=RESULTS_DIR,
-        debug=False):
-    exp = 'base'
-    # net_backbone = 'mobilenetv3-small-075'
-    net_weights = 'i1k'
-    cfgs = list(product(
-        # net_backbone
-        ['mobilenetv3-small-075'],
-        # method
-        ['batchbased', 'protonet'],
-        seeds,
-    ))
-    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        net_backbone, method, seed = cfg
-        run = '_'.join([
-            net_backbone,
-            net_weights,
-            method,
-        ])
-        checkpoint_name = f'{net_backbone}_{net_weights}+{method}.pth'
-
-        hparams = {}
-        if debug:
-            hparams.update(debug_hparams(method))
-            results_dir = 'rdev'
-
-        pretrain_adapt(
-            results_dir=results_dir,
-            exp=exp,
-            run=run,
-            net_backbone=net_backbone,
-            net_weights=net_weights,
-            method=method,
-            seed=seed,
-            checkpoint_name=checkpoint_name,
-            **hparams
-        )
-        aggregate_exp_df(join(results_dir, exp))
-
-
-def paper_base_gpu1(
-        seeds=SEEDS,
-        results_dir=RESULTS_DIR,
-        debug=False):
-    exp = 'base'
-    # net_backbone = 'mobilenetv3-small-075'
-    net_weights = 'i1k'
-    cfgs = list(product(
-        # net_backbone
-        ['mobilenetv3-large-100'],
-        # method
-        ['batchbased', 'protonet'],
-        seeds,
-    ))
-    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        net_backbone, method, seed = cfg
-        run = '_'.join([
-            net_backbone,
             net_weights,
             method,
         ])
