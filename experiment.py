@@ -2,12 +2,13 @@
 Experiments for Publication
 """
 
+import os
 from itertools import product
 from os.path import join
 
 from tqdm import tqdm
 
-from utils import adapt, aggregate_exp_df, pretrain_adapt
+from utils import adapt, aggregate_exp_df, load_config, pretrain_adapt
 
 
 SEEDS = [0]
@@ -83,7 +84,6 @@ def paper_base(
         results_dir=RESULTS_DIR,
         debug=False):
     exp = 'base'
-    # net_backbone = 'mobilenetv3-small-075'
     net_weights = 'i1k'
     cfgs = list(product(
         # net_backbone
@@ -321,79 +321,20 @@ def paper_task_complexity_pn(
 
 ##################################################
 
-def paper_base_bb(
-        seeds=SEEDS,
-        results_dir=RESULTS_DIR,
-        debug=False):
-    exp = 'base'
-    net_backbone = 'mobilenetv3-small-075'
-    net_weights = 'i1k'
-    cfgs = list(product(
-        # method
-        ['batchbased'],
-        seeds,
-    ))
-    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        method, seed = cfg
-        run = '_'.join([
-            net_weights,
-            method,
-        ])
-        checkpoint_name = f'{net_backbone}_{net_weights}+{method}.pth'
 
-        hparams = {}
-        if debug:
-            hparams.update(debug_hparams(method))
-            results_dir = 'rdev'
-
-        pretrain_adapt(
-            results_dir=results_dir,
-            exp=exp,
-            run=run,
-            net_backbone=net_backbone,
-            net_weights=net_weights,
-            method=method,
-            seed=seed,
-            checkpoint_name=checkpoint_name,
-            **hparams
-        )
-        aggregate_exp_df(join(results_dir, exp))
+def main(debug=False):
+    if not load_config()['metachest_dir']:
+        print("Set metachest_dir in config.toml, see README.md.")
+        exit(1)
+    os.makedirs(RESULTS_DIR, exist_ok=True)
+    paper_base(debug=debug)
+    paper_pretraining(debug=debug)
+    paper_task_complexity_bb(debug=debug)
+    paper_task_complexity_pn(debug=debug)
+    paper_arch(debug=debug)
+    paper_resolution(debug=debug)
 
 
-def paper_base_pn(
-        seeds=SEEDS,
-        results_dir=RESULTS_DIR,
-        debug=False):
-    exp = 'base'
-    net_backbone = 'mobilenetv3-small-075'
-    net_weights = 'i1k'
-    cfgs = list(product(
-        # method
-        ['protonet'],
-        seeds,
-    ))
-    for cfg in tqdm(cfgs, desc=f'EXP {exp}', ncols=75):
-        method, seed = cfg
-        run = '_'.join([
-            net_weights,
-            method,
-        ])
-        checkpoint_name = f'{net_backbone}_{net_weights}+{method}.pth'
-
-        hparams = {}
-        if debug:
-            hparams.update(debug_hparams(method))
-            results_dir = 'rdev'
-
-        pretrain_adapt(
-            results_dir=results_dir,
-            exp=exp,
-            run=run,
-            net_backbone=net_backbone,
-            net_weights=net_weights,
-            method=method,
-            seed=seed,
-            checkpoint_name=checkpoint_name,
-            **hparams
-        )
-        aggregate_exp_df(join(results_dir, exp))
+if __name__ == '__main__':
+    import fire
+    fire.Fire(main)
