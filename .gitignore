@@ -172,7 +172,7 @@ cython_debug/
 .vscode/
 
 # project
-/config.toml
+/config-bk.toml
 /checkpoints
 /rdev
 /rpaper
